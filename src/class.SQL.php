@@ -1,5 +1,6 @@
 <?php
-ob_start();
+namespace KerkEnIT;
+
 /**
  * SQL
  * @author     Marco van 't Klooster, Kerk en IT <info@kerkenit.nl>
@@ -420,7 +421,7 @@ class SQL {
 			endif;
 		endif;
 		$messages[] = $rtn;
-		$this->_memcache_obj->set('SQL_Messages', json_encode($messages), MEMCACHE_COMPRESSED, 5);
+		$this->_memcache_obj->set('SQL_Messages', json_encode($messages), \MEMCACHE_COMPRESSED, 5);
 
 		return $rtn;
 	}

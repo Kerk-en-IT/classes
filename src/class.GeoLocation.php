@@ -1,4 +1,5 @@
 <?php
+namespace KerkEnIT;
 
 /**
  * GeoLocation
@@ -152,6 +153,68 @@ class GeoLocation {
 
 		$angle = atan2(sqrt($a), $b);
 		return $angle * $earthRadius;
+	}
+
+
+	/**
+	 * Calculates the great-circle distance between two points, with
+	 * the Haversine formula.
+	 * @param float $latitudeFrom Latitude of start point in [deg decimal]
+	 * @param float $longitudeFrom Longitude of start point in [deg decimal]
+	 * @param float $latitudeTo Latitude of target point in [deg decimal]
+	 * @param float $longitudeTo Longitude of target point in [deg decimal]
+	 * @param float $earthRadius Mean earth radius in [m]
+	 * @return float Distance between points in [m] (same as earthRadius)
+	 */
+	public static function haversineGreatCircleDistance(
+		$latitudeFrom,
+		$longitudeFrom,
+		$latitudeTo,
+		$longitudeTo
+	) {
+		$theta = $longitudeFrom - $longitudeTo;
+		$distance = (sin(deg2rad($latitudeFrom)) * sin(deg2rad($latitudeTo))) + (cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * cos(deg2rad($theta)));
+		$distance = acos($distance);
+		$distance = rad2deg($distance);
+		$distance = $distance * 60 * 1.1515;
+
+		$distance = $distance * 1.609344;
+		$distance = $distance * 1000;
+		return $distance;
+	}
+
+	public static function getCenterLatLng($coordinates)
+	{
+		$latitudes = array_map(function ($coordinate) {
+			return $coordinate->latitude;
+		}, $coordinates);
+		if (count($latitudes) > 0) :
+			$min_latitude = min($latitudes);
+			$max_latitude = max($latitudes);
+
+			$longitudes = array_map(function ($coordinate) {
+				return $coordinate->longitude;
+			}, $coordinates);
+
+			$min_longitude = min($longitudes);
+			$max_longitude = max($longitudes);
+
+			$x = $y = $z = 0;
+			$n = count($coordinates);
+			foreach ($coordinates as $point) {
+				$lt = $point->latitude * pi() / 180;
+				$lg = $point->longitude * pi() / 180;
+				$x += cos($lt) * cos($lg);
+				$y += cos($lt) * sin($lg);
+				$z += sin($lt);
+			}
+			$x /= $n;
+			$y /= $n;
+
+			return [atan2(($z / $n), sqrt($x * $x + $y * $y)) * 180 / pi(), atan2($y, $x) * 180 / pi(), self::haversineGreatCircleDistance($min_latitude, $min_longitude, $max_latitude, $max_longitude)];
+		else :
+			return null;
+		endif;
 	}
 }
 

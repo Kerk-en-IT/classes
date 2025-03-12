@@ -1,10 +1,7 @@
 <?php
-if(!defined('DEBUG')) :
-	define('DEBUG', false);
-endif;
-if (!defined('DOWNLOAD')) :
-	define('DOWNLOAD', false);
-endif;
+namespace KerkEnIT;
+use Exception;
+use ErrorException;
 if (defined('DEBUG') && DEBUG) :
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -13,8 +10,7 @@ else :
 	ini_set('display_errors', 0);
 endif;
 
-
-class console {
+class Log {
 
 	private static function buffer_output(string $param, string $color = null)
 	{
@@ -26,10 +22,10 @@ class console {
 
 	public static function error_handler(string $color = null, ...$params)
 	{
-		if (DEBUG && php_sapi_name() == "cli") :
+		if (defined('DEBUG') && DEBUG && php_sapi_name() == "cli") :
 			var_dump($params);
 		elseif (defined('DEBUG') && DEBUG) :
-			if (ini_get('display_errors') == 0 && defined('DOWNLOAD') && DOWNLOAD) :
+			if (ini_get('display_errors') == 0 && defined('DOWNLOAD') && \DOWNLOAD) :
 				return null;
 			endif;
 			if (is_array($params)) :
@@ -96,7 +92,7 @@ class console {
 		array_pop($stack);
 		if(is_array($stack) && count($stack) > 0) :
 			foreach($stack as $index => $trace) :
-				if(array_key_exists('file', $trace) && !str_contains($trace['file'], '/log.php')) :
+				if(array_key_exists('file', $trace) && !str_contains($trace['file'], '/class.Log.php')) :
 					$message .= PHP_EOL . ($index +1) . '. File: ' . $trace['file'];
 				endif;
 				foreach ($trace as $key => $value) :
@@ -130,14 +126,14 @@ if (!function_exists('varDump')) :
 	 * @return void
 	 */
 	function varDump(...$params) {
-		console::log($params);
+		Log::log($params);
 	}
 endif;
 
 if (!function_exists('varDie')) :
 	function varDie(...$params)
 	{
-		console::error($params);
+		Log::error($params);
 		if (defined('DEBUG') && DEBUG) :
 			die();
 		endif;
@@ -166,12 +162,6 @@ if (!function_exists('error')) :
 	}
 endif;
 
-if (!function_exists('log_error')) :
-	function log_error(...$params)
-	{
-		varDie($params);
-	}
-endif;
 
 
 /**
@@ -184,7 +174,7 @@ endif;
  */
 function mail_error(string $subject, string|null $message, string $email): bool
 {
-	console::error_message($message);
+	Log::error_message($message);
 	if (defined('DEBUG') && DEBUG) :
 		header('Content-Type: text/markdown');
 		print $message;
@@ -296,7 +286,7 @@ function log_error($errno, $errstr, $errfile, $errline)
 		endif;
 	endif;
 
-	console::error_message($message);
+	Log::error_message($message);
 	$email = getenv('ADMIN_MAIL');
 	mail_error(
 		$subject,
@@ -409,7 +399,7 @@ function log_exception(Exception $e): bool
 		endif;
 	endif;
 
-	console::error_message($message);
+	Log::error_message($message);
 	$email = getenv('ADMIN_MAIL');
 	if (!DEBUG && ($errno !== (E_DEPRECATED | E_USER_DEPRECATED | E_NOTICE | E_USER_NOTICE))) :
 		mail_error(
@@ -420,14 +410,14 @@ function log_exception(Exception $e): bool
 
 
 		if (DEBUG) :
-			console::error_handler(
+			Log::error_handler(
 				$color,
 				$subject,
 				$message
 			);
 		endif;
 	elseif (!DEBUG) :
-		console::error_handler(
+		Log::error_handler(
 			$color,
 			$subject,
 			$message
@@ -477,5 +467,5 @@ function my_shutdown_function(): void
 	//endif;
 }
 //register_shutdown_function('my_shutdown_function');
-set_error_handler('log_error');
+//set_error_handler('log_error');
 ?>
