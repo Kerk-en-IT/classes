@@ -1,0 +1,26 @@
+{
+	"name": "classes",
+	"description": " All common classes developed by Kerk en IT",
+	"displayName": "Kerk en IT Classes",
+	"publisher": "Kerk en IT",
+	"version": "1.0.0",
+	"author": "Kerk en IT <info@kerkenit.nl> (https://www.kerkenit.nl)",
+	"license": "GPL-3.0-only",
+	"private": true,
+	"icon": "images/logo.svg",
+	"homepage": "https://www.kerkenit.nl",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/kerkenit/classes.git"
+	},
+	"bugs": {
+		"url": "https://github.com/kerkenit/classes/issues"
+	},
+	"readme": "README.md",
+	"markdown": "github",
+	"keywords": [
+		"kerkenit",
+		"classes",
+		"php"
+	]
+}
