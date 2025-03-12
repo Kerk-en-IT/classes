@@ -94,7 +94,7 @@ You need to be familiar to the commandline in in UNIX environment
 - [ ] Import all other projects and merge the into one big class
 - [ ] Complete all classes, functions and properties with correct documentation
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/kerkenit/classes/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
