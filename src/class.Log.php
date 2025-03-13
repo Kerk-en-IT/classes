@@ -3,7 +3,7 @@ namespace KerkEnIT;
 use Exception;
 use ErrorException;
 if (defined('DEBUG') && DEBUG) :
-	error_reporting(E_ALL);
+	error_reporting(E_ALL & ~E_DEPRECATED);
 	ini_set('display_errors', 1);
 else :
 	error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_WARNING);
