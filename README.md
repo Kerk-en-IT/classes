@@ -77,10 +77,20 @@ You need to be familiar to the commandline in in UNIX environment
 2. Navigate to your project
    ```sh
    cd ~/Sites/DEV/my.amazing.project
+   destination=$(pwd)
    ```
 3. Link the classes you want
    ```sh
-   ln /Users/kerkenit/Sites/DEV/classes/src/${classname}.php includes/classes/${classname}.php
+	src=$(pwd)
+	read -r -a classes <<< $(ls $src/src/*.php | xargs -n 1 basename | sed 's/\.php//g')
+	for((i=0;i<${#classes[@]};i++))
+	do
+		class="${classes[$i]}"
+		input="$src/src/$class.php"
+		file="$destination/includes/classes/KerkEnI/$class.php"
+		echo "Linking $input to $file"
+		ln "$input" "$file"
+	done
    ```
 4. Repeat for step 3 for every class you need.
 
