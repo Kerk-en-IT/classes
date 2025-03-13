@@ -87,7 +87,6 @@ class Cryptography
 
 				if (!$filePath) :
 					$filePath = realpath($dist_path . ltrim(ltrim($file, '.'), '/'));
-
 				endif;
 				try {
 					if ($filePath !== false && !array_key_exists($filePath, self::$hashesFiles)) :
@@ -115,6 +114,9 @@ class Cryptography
 			endif;
 			$ctime -= $first_blog_time;
 			$mtime -= $first_blog_time;
+
+			$ctime = log10(abs($ctime));
+			$mtime = log10(abs($mtime));
 			if ($filePath !== false && str_ends_with($filePath, '.css') && preg_match('~[0-9]+~', md5_file($filePath))) :
 				self::$hashesFiles[$filePath] = preg_replace("/[^0-9]/", '', md5_file($filePath)) % 9998;;
 				return self::$hashesFiles[$filePath];
@@ -123,8 +125,8 @@ class Cryptography
 				self::$hashesFiles[$filePath] = $mtime - $ctime;
 				return self::$hashesFiles[$filePath];
 			endif;
-			if ($filePath !== false && intval(((floatval($mtim) % 3.77) + (floatval($ctime) % 6.99) / 0.189)) > 10) :
-				self::$hashesFiles[$filePath] = intval(((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189));
+			if ($filePath !== false && ((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189) > 10.0) :
+				self::$hashesFiles[$filePath] = intval(log10(abs(intval(log10(abs($mtime)) % 3.77) + intval(log10(abs($ctime)) % 6.99)) / 0.189));
 				return self::$hashesFiles[$filePath];
 			endif;
 			//return ;
