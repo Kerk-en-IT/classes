@@ -1794,7 +1794,8 @@ class Format
 					$replace = $replace->diff(new \DateTime('now', $tz))->y;
 				endif;
 			else :
-			//varDump($match);
+				//varDump($match);
+				continue;
 			endif;
 			$buffer = str_replace($match, $replace, $buffer);
 		endforeach;
