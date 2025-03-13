@@ -1,5 +1,6 @@
 <?php
 namespace KerkEnIT;
+use Exception;
 
 /**
  * Cryptography Class File for Kerk en IT Framework
@@ -122,8 +123,8 @@ class Cryptography
 				self::$hashesFiles[$filePath] = $mtime - $ctime;
 				return self::$hashesFiles[$filePath];
 			endif;
-			if ($filePath !== false && (int)(((float)$mtime % 3.77) + ((float)$ctime % 6.99) / 0.189) > 10) :
-				self::$hashesFiles[$filePath] = (int)(((float)$mtime % 3.77) + ((float)$ctime % 6.99) / 0.189);
+			if ($filePath !== false && intval(((floatval($mtim) % 3.77) + (floatval($ctime) % 6.99) / 0.189)) > 10) :
+				self::$hashesFiles[$filePath] = intval(((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189));
 				return self::$hashesFiles[$filePath];
 			endif;
 			//return ;
@@ -161,8 +162,8 @@ class Cryptography
 		if ($mtime - $ctime > 5) :
 			return $mtime - $ctime;
 		endif;
-		if ((int)(((float)$mtime % 3.77) + ((float)$ctime % 6.99) / 0.189) > 10) :
-			return (int)(((float)$mtime % 3.77) + ((float)$ctime % 6.99) / 0.189);
+		if (intval(((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189) > 10)) :
+			return intval(((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189));
 		endif;
 		//return ;
 		if ($filePath !== false && preg_match('~[0-9]+~', md5_file($filePath))) :
