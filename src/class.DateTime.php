@@ -274,6 +274,27 @@ class DateTime
 
 	/**
 	 *
+	 * Get the date in ISO 8601 standard.
+	 * Also known as ATOM date
+	 *
+	 * @param mixed $datetime input date
+	 * @param string|bool $timezone destination TimeZone
+	 * @return string formatted date in ISO 8601 standard
+	 * E.g. 2022-12-01T13:47:24+01:00
+	 */
+	public static function ATOM($datetime = 'now', $timezone = 'Europe/Amsterdam'): string
+	{
+		$date = self::GetDate($datetime);
+		if ($timezone !== false) :
+			$date->setTimezone(new \DateTimeZone($timezone));
+		endif;
+
+		return $date->format(\DateTime::ATOM); // Updated ISO8601
+
+	}
+
+	/**
+	 *
 	 * Get the date in RFC 5545 standard.
 	 * Best for iCal (.ics) files
 	 *
