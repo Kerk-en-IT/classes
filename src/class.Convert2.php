@@ -58,9 +58,9 @@ class Convert2
 
 	public static function watermarks(&$img, $input_file)
 	{
-		if(realpath(__DIR__ . "/watermark.png") !== false) :
+		if(realpath(\get_include_path() . "/watermark.png") !== false) :
 			$watermark = new \Imagick();
-			$watermark->readImage(realpath(__DIR__ . "/watermark.png"));
+			$watermark->readImage(realpath(\get_include_path() . "/watermark.png"));
 
 			$width = $img->getImageWidth();
 			$height = $img->getImageHeight();
@@ -94,26 +94,26 @@ class Convert2
 
 			$watermark = new \Imagick();
 			if($rgb->avg < 96 && $rgb->g > 64 && $rgb->b < 64 && $rgb->r < 64) :
-				$png = __DIR__ . "/watermark_dark.png";
+				$png = \get_include_path() . "/watermark_dark.png";
 			elseif ($rgb->avg > 96 && $rgb->g > 64 && $rgb->b < 64 && $rgb->r < 64) :
-				$png = __DIR__ . "/watermark_light.png";
+				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
 			elseif ($rgb->avg < 128 && $rgb->g > 64 && $rgb->b < 128 && $rgb->b > 64 && $rgb->r >128 && $rgb->r < 144) :
-				$png = __DIR__ . "/watermark_light.png";
+				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
 			elseif ($rgb->avg < 128 && $rgb->g > 128 && $rgb->b < 128 && $rgb->r > 96) :
-				$png = __DIR__ . "/watermark_light.png";
+				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
 			elseif ($rgb->avg > 128 && $rgb->avg < 196 && $rgb->g >128 && $rgb->g < 196 && $rgb->b < 128 && $rgb->b > 96 && $rgb->r >128 && $rgb->r < 144) :
-				$png = __DIR__ . "/watermark_light.png";
+				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
 			elseif ($rgb->avg < 20 && $rgb->g < 25 && $rgb->b < 25 && $rgb->r < 25) :
-				$png = __DIR__ . "/watermark_dark.png";
+				$png = \get_include_path() . "/watermark_dark.png";
 			elseif ($rgb->avg > 235 && $rgb->g > 230 && $rgb->b > 230 && $rgb->r > 230) :
-				$png = __DIR__ . "/watermark_light.png";
+				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
 			else :
-				$png = __DIR__ . "/watermark.png";
+				$png = \get_include_path() . "/watermark.png";
 				$composite = \Imagick::COMPOSITE_OVER;
 			endif;
 			$watermark->readImage($png);
@@ -851,47 +851,66 @@ class Convert2
 	 * Get the dimension on an image
 	 *
 	 * @param  string $filename
-	 * @return object $size The dimension object
+	 * @return object $size The dimension object.
 	 */
-	public static function get_dimension(string $filename)
+	public static function get_dimension(string $filename) :object
 	{
-		$size = null;
+		$width = (\defined('MAX_WIDTH') ? \MAX_WIDTH : 1);
+		$height = (\defined('MAX_HEIGHT') ? \MAX_HEIGHT : 1);
+		if($width == 0) :
+			$width = $height;
+		endif;
+		if($height == 0) :
+			$height = $width;
+		endif;
+		$size = array(
+			'width' => $width,
+			'height' => $height,
+			'dimension' => $width / $height
+		);
 		$json = null;
 		try {
 			$filename = realpath($filename);
 			$extension = pathinfo($filename, PATHINFO_EXTENSION);
 			$json = str_replace('.' . $extension, '.dimension', $filename);
 			if (file_exists($json)) :
-				$size = (object)json_decode(file_get_contents($json));
-				$size->dimension = str_replace(',', '.', (string)$size->dimension);
-				return $size;
+				$size = (array)json_decode(file_get_contents($json));
+				if(array_key_exists('dimension', $size)) :
+					$size['dimension'] = str_replace(',', '.', (string)$size['dimension']);
+				endif;
+				return (object)$size;
 			endif;
 		} catch (Exception $e) {
 			$json = null;
 		}
 		try {
-			// Read image file with Image Magick
-			$img = new \Imagick($filename);
+			if(file_exists($filename)) :
+				// Read image file with Image Magick
+				$img = new \Imagick($filename);
 
-			// Scale down to 1x1 pixel to make \Imagick do the average
-			$size = array(
-				'width' => $img->getImageWidth(),
-				'height' => $img->getImageHeight()
-			);
-			$size['dimension'] = str_replace(',', '.', (string)floatval($size['height']) / floatval($size['width']));
+				// Scale down to 1x1 pixel to make \Imagick do the average
+				$size = array(
+					'width' => $img->getImageWidth(),
+					'height' => $img->getImageHeight()
+				);
+				$size['dimension'] = str_replace(',', '.', (string)floatval($size['height']) / floatval($size['width']));
+			endif;
 		} catch (\ImagickException $e) {
 			// Image Magick Error!
-			return null;
+			return (object)$size;
 		} catch (Exception $e) {
 			// Unknown Error!
-			return null;
+			return (object)$size;
 		}
-
-		if ($json != null) :
-			// Save the dimension
-			file_put_contents($json, json_encode($size));
+		if($size != null) :
+			if ($json != null) :
+				// Save the dimension
+				file_put_contents($json, json_encode($size));
+			endif;
+			// Return the dimension object
+			return (object)$size;
 		endif;
-		// Return the dimension object
+		// Return null if the function has not returned a value
 		return (object)$size;
 	}
 
