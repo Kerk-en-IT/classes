@@ -1,6 +1,6 @@
 <?php
 namespace KerkEnIT;
-
+use Exception;
 	/**
 	 * Console
 	 */
