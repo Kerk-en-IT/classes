@@ -24,7 +24,7 @@ endif;
  **/
 class Log {
 
-	private static function buffer_output(string $param, string $color = null)
+	private static function buffer_output(?string $color = null, string $param)
 	{
 		$rtn = '<div class="alert alert-' . ($color ?? 'info') . '">';
 		$rtn .= $param;
@@ -32,37 +32,77 @@ class Log {
 		echo $rtn;
 	}
 
-	public static function error_handler(string $color = null, ...$params)
+
+	private static function write_output(mixed ...$params): mixed
 	{
-		if (defined('DEBUG') && DEBUG && php_sapi_name() == "cli") :
-			var_dump($params);
+		\ob_flush();
+		if(\is_array($params)) :
+			if(count($params) == 0) :
+				return null;
+			elseif(count($params) == 1) :
+				$params = $params[0];
+				if(is_array($params) && array_key_exists(0, $params)) :
+					return self::write_output($params[0]);
+				endif;
+			else:
+				return \implode(PHP_EOL, $params);
+			endif;
+		endif;
+		if(\is_string($params)) :
+			return $params;
+		elseif(\is_numeric($params)) :
+			return $params;
+		elseif (\is_bool($params)) :
+			return $params;
+		elseif(\is_object($params)) :
+			return \json_encode($params);
+		else :
+			throw new Exception('Invalid parameter type: ' . gettype($params), 500);
+		endif;
+	}
+
+
+	public static function error_handler(?string $color = null, ...$params): void
+	{
+		if (php_sapi_name() == "cli") :
+			\ob_start();
+		endif;
+		$message = self::write_output($params);
+
+		if(php_sapi_name() == "cli") :
+			if($color === null) :
+				$color = "\033[31m";
+			else :
+				switch($color) :
+					case 'info':
+						$color = "\033[32m";
+						break;
+					case 'warning':
+						$color = "\033[33m";
+						break;
+					case 'danger':
+						$color = "\033[31m";
+						break;
+					case 'notice':
+						$color = "\033[34m";
+						break;
+					default:
+						$color = "\033[32m";
+						break;
+				endswitch;
+			endif;
+			echo $color . $message . "\033[0m\n";
 		elseif (defined('DEBUG') && DEBUG) :
 			if (ini_get('display_errors') == 0 && defined('DOWNLOAD') && \DOWNLOAD) :
-				return null;
-			endif;
-			if (is_array($params)) :
-				foreach ($params as $param) :
-					if (!is_string($param)) :
-						$param = json_encode($param);
-					endif;
-					error_log($param);
-				endforeach;
+				echo '';
 			else :
-				if (!is_string($params)) :
-					$params = json_encode($params);
-				endif;
-				error_log($params);
+				echo '<pre>';
+				self::buffer_output($color, \str_replace(\PHP_EOL, '<br>', $message));
+				echo '</pre>';
 			endif;
-			if (is_array($params)) :
-				foreach ($params as $param) :
-					self::buffer_output($param);
-				endforeach;
-			else :
-				if (!is_string($params)) :
-					$params = json_encode($params);
-				endif;
-				self::buffer_output($param);
-			endif;
+		endif;
+		if(PHP_OS != 'Darwin' && getenv('ZSH') !== true):
+			error_log($message);
 		endif;
 	}
 	public static function log(...$params)
