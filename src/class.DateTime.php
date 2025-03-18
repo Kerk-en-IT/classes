@@ -1,8 +1,22 @@
 <?php
+
 namespace KerkEnIT;
 
+/**
+ * DateTime Class File for Kerk en IT Framework
+ *
+ * PHP versions 8.3, 8.4
+ *
+ * @package    KerkEnIT
+ * @subpackage DateTime
+ * @author     Marco van 't Klooster <info@kerkenit.nl>
+ * @copyright  2010-2025 © Kerk en IT
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
+ * @link       https://www.kerkenit.nl
+ * @since      Class available since Release 1.1.0
+ **/
 class DateTime
-	{
+{
 	/**
 	 * Get Date from various types
 	 *
@@ -12,11 +26,11 @@ class DateTime
 	 */
 	public static function GetDate(mixed $datetime, string|bool|\DateTimeZone $timezone = false): \DateTime
 	{
-		if(!($timezone instanceof \DateTimeZone)) :
+		if (!($timezone instanceof \DateTimeZone)) :
 			if ($timezone !== false && empty($timezone)) :
 				$timezone = date_default_timezone_get();
 			endif;
-			if(is_string($timezone)) :
+			if (is_string($timezone)) :
 				$timezone = new \DateTimeZone($timezone);
 			endif;
 		endif;
@@ -37,7 +51,7 @@ class DateTime
 					if (is_string($datetime)) :
 						if (strlen($datetime) >= 10 && $datetime[5] !== '-' && $datetime[2] !== ':') :
 							$items = explode('-', $datetime);
-							if(\count($items) >= 3) :
+							if (\count($items) >= 3) :
 								if (strlen($items[0]) == 4) :
 									$datetime = $items[0] . '-' . $items[1] . '-' . $items[2];
 								else :
@@ -60,15 +74,15 @@ class DateTime
 							$datetime = str_replace(array(' okt ', ' okt. '), ' oct ', $datetime);
 							$datetime = str_replace(array(' nov ', ' nov. '), ' nov ', $datetime);
 							$datetime = str_replace(array(' dec ', ' dec. '), ' dec ', $datetime);
-							if(\str_contains($datetime, ' en ')) :
+							if (\str_contains($datetime, ' en ')) :
 								$datetime = explode(' en ', $datetime)[0];
 							endif;
 							$datetime = \ltrim($datetime, '-');
-							try{
+							try {
 								$date = new \DateTime($datetime ?? 'now');
 							} catch (Exception $e) {
 								try {
-									$date = new \DateTime(substr($datetime, 0, strlen('2000-01-01 00:00:00') -1) ?? 'now');
+									$date = new \DateTime(substr($datetime, 0, strlen('2000-01-01 00:00:00') - 1) ?? 'now');
 								} catch (Exception $e) {
 									$date = new \DateTime(substr($datetime, 0, strlen('2000-01-01') - 1) ?? 'now');
 								}
@@ -78,7 +92,7 @@ class DateTime
 						try {
 							if (is_string($datetime)) :
 								$items = explode('-', $datetime);
-								if(count($items) >= 3) :
+								if (count($items) >= 3) :
 									if (strlen($items[0]) == 4) :
 										$datetime = $items[0] . '-' . $items[1] . '-' . $items[2];
 									else :
@@ -475,7 +489,7 @@ class DateTime
 	public static function LongDate($datetime, $locale = NULL): string
 	{
 		$datetime = self::GetDate($datetime);
-		if($datetime instanceof \DateTime) :
+		if ($datetime instanceof \DateTime) :
 			if ($locale !== NULL) :
 				$dateFormatter = \IntlDateFormatter::create(
 					$locale,
@@ -1262,7 +1276,4 @@ class DateTime
 	{
 		return self::GetDate($datetime)->format('H:i:s');
 	}
-
-
 }
-?>

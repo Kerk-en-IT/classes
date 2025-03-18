@@ -9,7 +9,19 @@ else :
 	error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_WARNING);
 	ini_set('display_errors', 0);
 endif;
-
+/**
+ * Log Class File for Kerk en IT Framework
+ *
+ * PHP versions 8.3, 8.4
+ *
+ * @package    KerkEnIT
+ * @subpackage Log
+ * @author     Marco van 't Klooster <info@kerkenit.nl>
+ * @copyright  2024-2025 © Kerk en IT
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
+ * @link       https://www.kerkenit.nl
+ * @since      Class available since Release 1.0.0
+ **/
 class Log {
 
 	private static function buffer_output(string $param, string $color = null)

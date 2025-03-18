@@ -40,19 +40,22 @@ if (class_exists('\Imagick')) :
 	\Imagick::setResourceLimit(\Imagick::RESOURCETYPE_DISK, -1);
 	\Imagick::setResourceLimit(\Imagick::RESOURCETYPE_THREAD, -1);
 endif;
+
 /**
- * Convert2
+ * Convert2 Class File for Kerk en IT Framework
  *
  * Formatting various objects into the expected output.
  *
- * @package    Marcos
+ * PHP versions 8.3, 8.4
+ *
+ * @package    KerkEnIT
  * @subpackage Convert2
- * @author     Marco van 't Klooster <info@marcovantklooster.nl>
- * @copyright  2022 Marco van 't Klooster
- * @license    http://www.apache.org/licenses/   Apache License Version 2.0
- * @link       https://www.marcovantklooster.nl
- * @since      Class available since Release 1.0.59
- */
+ * @author     Marco van 't Klooster <info@kerkenit.nl>
+ * @copyright  2022-2025 © Kerk en IT
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
+ * @link       https://www.kerkenit.nl
+ * @since      Class available since Release 1.0.0
+ **/
 class Convert2
 {
 

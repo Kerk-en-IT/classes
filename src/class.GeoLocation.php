@@ -2,10 +2,18 @@
 namespace KerkEnIT;
 
 /**
- * GeoLocation
+ * GeoLocation Class File for Kerk en IT Framework
  *
- * @author     Marco van 't Klooster, Kerk en IT <info@kerkenit.nl>
- */
+ * PHP versions 8.3, 8.4
+ *
+ * @package    KerkEnIT
+ * @subpackage GeoLocation
+ * @author     Marco van 't Klooster <info@kerkenit.nl>
+ * @copyright  2022-2025 © Kerk en IT
+ * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
+ * @link       https://www.kerkenit.nl
+ * @since      Class available since Release 1.0.0
+ **/
 class GeoLocation {
 
 	/**
