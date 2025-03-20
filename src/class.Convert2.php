@@ -25,12 +25,13 @@ if (!defined('DEBUG')) :
 		define('DEBUG', false);
 	endif;
 endif;
-if(DEBUG) :
-	define('REGENERATE', false);
-else :
-	define('REGENERATE', false);
+if (!defined('REGENERATE')) :
+	if(DEBUG) :
+		define('REGENERATE', false);
+	else :
+		define('REGENERATE', false);
+	endif;
 endif;
-
 // maximum amount of memory map to allocate for the pixel cache
 if (class_exists('\Imagick')) :
 	\Imagick::setResourceLimit(\Imagick::RESOURCETYPE_MEMORY, MY_MAGICK_MEMORY_LIMIT);
