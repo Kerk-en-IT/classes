@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.0
+
+### Added or Changed
+- New class to change videos to a right web format using FFMPEG
+- Improved the autoloader by excluding PHP 8.4 classes for older PHP versions and only loading the necessary classes when requested.
+
 ## v1.1.0
 
 ### Added or Changed
