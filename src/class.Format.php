@@ -103,8 +103,8 @@ class Format
 		$name_text =  self::NameMarried(firstname: $firstname, infix: $infix, lastname: $lastname, lastname_partner: $lastname_partner, gender: $gender, gender_partner: $gender_partner, maritalstatus: $maritalstatus);
 		$age_text = '';
 		if (($age === null || $age == 0) && $dateofbirth !== null) :
-			$dateofbirth = \KerkEnIT\DateTime::GetDate($dateofbirth);
-			$dateofdeath = \KerkEnIT\DateTime::GetDate($dateofdeath);
+			$dateofbirth = DateTime::GetDate($dateofbirth);
+			$dateofdeath = DateTime::GetDate($dateofdeath);
 			$age = $dateofbirth->diff($dateofdeath)->y;
 		endif;
 		if (is_numeric($age) && $age > 0) :
@@ -134,8 +134,8 @@ class Format
 
 		$name_text =  self::NameMarriedAge(firstname: $firstname, infix: $infix, lastname: $lastname, lastname_partner: $lastname_partner, gender: $gender, gender_partner: $gender_partner, maritalstatus: $maritalstatus, age: $age, dateofbirth: $dateofbirth, dateofdeath: $dateofdeath);
 		if (($age === null || $age == 0) && $dateofbirth !== null) :
-			$dateofbirth = \KerkEnIT\DateTime::GetDate($dateofbirth);
-			$dateofdeath = \KerkEnIT\DateTime::GetDate($dateofdeath);
+			$dateofbirth = DateTime::GetDate($dateofbirth);
+			$dateofdeath = DateTime::GetDate($dateofdeath);
 			$age = $dateofbirth->diff($dateofdeath)->y;
 		endif;
 		$gender_text = self::GetGender($gender, $age);
@@ -1235,7 +1235,7 @@ class Format
 	 */
 	public static function MassAndChurch($start, $church)
 	{
-		return \KerkEnIT\DateTime::FullDateAt($start) . ' in de ' . $church;
+		return DateTime::FullDateAt($start) . ' in de ' . $church;
 	}
 
 	/**
