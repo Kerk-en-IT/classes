@@ -413,7 +413,7 @@ class SQL {
 	private function ignoreDuplicateMessages($rtn)
 	{
 		if ($this->_memcache_obj == null) :
-			$this->_memcache_obj = new Memcache;
+			$this->_memcache_obj = new \Memcache;
 			$this->_memcache_obj->connect('localhost', 11211);
 
 		endif;
