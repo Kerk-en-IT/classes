@@ -1122,7 +1122,7 @@ class DateTime
 	 */
 	public static function isWithinNextWeek($datetime)
 	{
-		return \KerkEnIT\DateTime::isWithinXDays($datetime, 6);
+		return self::isWithinXDays($datetime, 6);
 	}
 
 	/**
