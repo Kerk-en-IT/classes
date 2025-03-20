@@ -1,7 +1,7 @@
 <?php
 
 namespace KerkEnIT;
-
+use KerkEnIT\Format;
 /**
  * DateTime Class File for Kerk en IT Framework
  *
@@ -777,10 +777,10 @@ class DateTime
 		$firstdig1 = array(21, 24, 25, 27, 28, 29, 30, 31, 32, 34, 35, 38);
 		$firstdig2 = array(33, 36, 37, 39, 40);
 
-		$firstdig = \KerkEnIt\Math::idiv($y, 100);
+		$firstdig = \KerkEnIT\Math::idiv($y, 100);
 		$remain19 = $y % 19;
 
-		$temp = \KerkEnIt\Math::idiv($firstdig - 15, 2) + 202 - 11 * $remain19;
+		$temp = \KerkEnIT\Math::idiv($firstdig - 15, 2) + 202 - 11 * $remain19;
 
 		if (in_array($firstdig, $firstdig1)) {
 			$temp = $temp - 1;
@@ -810,7 +810,7 @@ class DateTime
 		}
 
 		$temp = $y % 100;
-		$td = ($temp + \KerkEnIt\Math::idiv($temp, 4)) % 7;
+		$td = ($temp + \KerkEnIT\Math::idiv($temp, 4)) % 7;
 
 		$te = ((20 - $tb - $tc - $td) % 7) + 1;
 		$d = $ta + $te;
@@ -872,19 +872,19 @@ class DateTime
 		endif;
 
 		if ($v = $interval->d >= 1) :
-			$text .= KerkEnIT\Format::pluralize($interval->d, ' dag ', ' dagen ');
+			$text .= Format::pluralize($interval->d, ' dag ', ' dagen ');
 		endif;
 
 		if ($v = $interval->h >= 1) :
-			$text .= KerkEnIT\Format::pluralize($interval->h, ' uur ', ' uren ');
+			$text .= Format::pluralize($interval->h, ' uur ', ' uren ');
 		endif;
 
 		if ($v = $interval->i >= 1) :
-			$text .= KerkEnIT\Format::pluralize($interval->i, ' minuut ', ' minuten ');
+			$text .= Format::pluralize($interval->i, ' minuut ', ' minuten ');
 		endif;
 
 		if ($v = $interval->s >= 1) :
-			$text .= KerkEnIT\Format::pluralize($interval->i, ' seconde ', ' seconden ');
+			$text .= Format::pluralize($interval->i, ' seconde ', ' seconden ');
 		endif;
 
 		if (empty($text)) :
