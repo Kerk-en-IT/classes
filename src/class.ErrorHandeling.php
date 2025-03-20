@@ -18,19 +18,7 @@ use ErrorException;
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.2.0
  */
- if (php_sapi_name() != 'cli' && count($_ENV) == 0) :
-	$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
-	if($file !== false) :
-		$env = explode(PHP_EOL, file_get_contents($file));
-		foreach ($env as $line) :
-			$line = explode('=', $line);
-			if (count($line) == 2) :
-				putenv(trim($line[0], '"') . "=" . trim($line[1], '"'));
-				$_ENV[trim($line[0], '"')] = trim($line[1], '"');
-			endif;
-		endforeach;
-	endif;
-endif;
+
 class ErrorHandeling
 {
 	private static function Project(): string
@@ -76,7 +64,7 @@ class ErrorHandeling
 
 	private static function ServerAdmin(): string
 	{
-		if($_ENV['SERVER_ADMIN'] === false || empty($_ENV['SERVER_ADMIN']) || !filter_var($_ENV['SERVER_ADMIN'], FILTER_VALIDATE_EMAIL)) :
+		if(!isset($_ENV['SERVER_ADMIN']) || $_ENV['SERVER_ADMIN'] === false || empty($_ENV['SERVER_ADMIN']) || !filter_var($_ENV['SERVER_ADMIN'], FILTER_VALIDATE_EMAIL)) :
 			if (isset($_SERVER) && array_key_exists('SERVER_NAME', $_SERVER)) :
 				$domain = explode('.', $_SERVER['SERVER_NAME']);
 				if (count($domain) === 3) :
