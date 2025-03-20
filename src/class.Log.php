@@ -1,7 +1,10 @@
 <?php
+
 namespace KerkEnIT;
+
 use Exception;
 use ErrorException;
+
 if (defined('DEBUG') && DEBUG) :
 	error_reporting(E_ALL & ~E_DEPRECATED);
 	ini_set('display_errors', 1);
@@ -22,45 +25,50 @@ endif;
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.0.0
  **/
-class Log {
+class Log
+{
 
-	private static function buffer_output(?string $color = null, string $param)
+	private static function buffer_output(?string $color = null, ?string $param = null): string
 	{
-		$rtn = '<div class="alert alert-' . ($color ?? 'info') . '">';
-		$rtn .= $param;
-		$rtn .= '</div>';
-		echo $rtn;
+		if ($param === null) :
+			return '';
+		else :
+			$rtn = '<div class="alert alert-' . ($color ?? 'info') . '">';
+			$rtn .= $param;
+			$rtn .= '</div>';
+			echo $rtn;
+		endif;
 	}
-
 
 	private static function write_output(mixed ...$params): mixed
 	{
 		\ob_flush();
-		if(\is_array($params)) :
-			if(count($params) == 0) :
+		if (\is_array($params)) :
+			if (count($params) == 0) :
 				return null;
-			elseif(count($params) == 1) :
+			elseif (count($params) == 1) :
 				$params = $params[0];
-				if(is_array($params) && array_key_exists(0, $params)) :
+				if (is_array($params) && array_key_exists(0, $params)) :
 					return self::write_output($params[0]);
 				endif;
 			else:
 				return \implode(PHP_EOL, $params);
 			endif;
 		endif;
-		if(\is_string($params)) :
+		if (\is_string($params)) :
 			return $params;
-		elseif(\is_numeric($params)) :
+		elseif (\is_numeric($params)) :
 			return $params;
 		elseif (\is_bool($params)) :
 			return $params;
-		elseif(\is_object($params)) :
+		elseif (\is_object($params)) :
 			return \json_encode($params);
+		elseif (\is_array($params)) :
+			return \implode(PHP_EOL, $params);
 		else :
 			throw new Exception('Invalid parameter type: ' . gettype($params), 500);
 		endif;
 	}
-
 
 	public static function error_handler(?string $color = null, ...$params): void
 	{
@@ -69,11 +77,11 @@ class Log {
 		endif;
 		$message = self::write_output($params);
 
-		if(php_sapi_name() == "cli") :
-			if($color === null) :
+		if (php_sapi_name() == "cli") :
+			if ($color === null) :
 				$color = "\033[31m";
 			else :
-				switch($color) :
+				switch ($color):
 					case 'info':
 						$color = "\033[32m";
 						break;
@@ -101,10 +109,11 @@ class Log {
 				echo '</pre>';
 			endif;
 		endif;
-		if(PHP_OS != 'Darwin' && getenv('ZSH') !== true):
+		if (PHP_OS != 'Darwin' && getenv('ZSH') !== true):
 			error_log($message);
 		endif;
 	}
+
 	public static function log(...$params)
 	{
 		self::error_handler('notice', $params);
@@ -128,7 +137,8 @@ class Log {
 		endif;
 	}
 
-	public static function error_message(string|null &$message) {
+	public static function error_message(string|null &$message)
+	{
 		global $mysqli;
 		global $sql;
 
@@ -142,17 +152,24 @@ class Log {
 
 		$stack = array_reverse(debug_backtrace());
 		array_pop($stack);
-		if(is_array($stack) && count($stack) > 0) :
-			foreach($stack as $index => $trace) :
-				if(array_key_exists('file', $trace) && !str_contains($trace['file'], '/class.Log.php')) :
-					$message .= PHP_EOL . ($index +1) . '. File: ' . $trace['file'];
+		if (is_array($stack) && count($stack) > 0) :
+			foreach ($stack as $index => $trace) :
+				if (array_key_exists('file', $trace) && !str_contains($trace['file'], '/class.ErrorHandeling.php')) :
+					$message .= PHP_EOL . ($index + 1) . '. File: ' . $trace['file'];
 				endif;
 				foreach ($trace as $key => $value) :
-					if ($key !== 'file') :
-						if(is_array($value)) :
-							$message .= PHP_EOL . implode(PHP_EOL . '     - ', $value);
-						else :
-							$message .= PHP_EOL . '   - ' . ucfirst($key) . ': ' . json_encode($value);
+					if ($key === 'file' && str_contains($value, '/class.ErrorHandeling.php')) :
+						continue 2;
+					else :
+						if ($key !== 'file') :
+							if($key == 'function' && $value == 'shutdown_function') :
+								continue 2;
+							endif;
+							if (is_array($value)) :
+								$message .= PHP_EOL . implode(PHP_EOL . '     - ', $value);
+							else :
+								$message .= PHP_EOL . '   - ' . ucfirst($key) . ': ' . json_encode($value);
+							endif;
 						endif;
 					endif;
 				endforeach;
@@ -164,7 +181,7 @@ class Log {
 		}
 
 		if (isset($sql) && !empty($sql)) :
-			$message .= '```' . $sql . '```';
+			$message .= \PHP_EOL .  \PHP_EOL .  '```sql' . \PHP_EOL .  preg_replace('/\s+/', ' ', $sql) . \PHP_EOL . '```';
 		endif;
 	}
 }
@@ -177,7 +194,8 @@ if (!function_exists('varDump')) :
 	 * @param  mixed $params
 	 * @return void
 	 */
-	function varDump(...$params) {
+	function varDump(...$params)
+	{
 		Log::log($params);
 	}
 endif;
@@ -191,8 +209,6 @@ if (!function_exists('varDie')) :
 		endif;
 	}
 endif;
-
-
 
 if (!function_exists('log')) :
 	/**
@@ -213,311 +229,4 @@ if (!function_exists('error')) :
 		varDie($params);
 	}
 endif;
-
-
-
-/**
- * mail error to the developer
- *
- * @param  string $subject
- * @param  string|null $message
- * @param  string $email
- * @return bool true on success or false on failure.
- */
-function mail_error(string $subject, string|null $message, string $email): bool
-{
-	Log::error_message($message);
-	if (defined('DEBUG') && DEBUG) :
-		header('Content-Type: text/markdown');
-		print $message;
-		die();
-	endif;
-
-	$email = getenv('ADMIN_MAIL');
-	$headers = array();
-
-	// To send HTML mail, the Content-type header must be set
-	//$headers[] = 'MIME-Version: 1.0';
-	//$headers[] = 'Content-type: text/html; charset=iso-8859-1';
-	$headers[] = 'X-Mailer: PHP/' . phpversion();
-	$headers[] = 'From: ' . getenv('PROJECT') . ' Webmaster <webmaster@' . getenv('PROJECT_DOMAIN') . '>';
-	if (!DEBUG) :
-		$headers[] = 'CC: ' . getenv('PROJECT') . ' <' . getenv('ADMIN_MAIL') . '>';
-	endif;
-	if (isset($_SESSION['email']) && !empty($_SESSION['email']) && filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL)) :
-		$headers[] = 'Reply-To: ' . (isset($_SESSION['name']) ? $_SESSION['name'] : getenv('PROJECT') . ' Webmaster') . ' <' . $_SESSION['email'] . '>';
-	endif;
-	//return mail(ADMIN_MAIL, getenv('PROJECT') . $subject, 'PHP ' . $subject . ':' .  $message, $headers);;
-	return error_log('PHP ' . $subject . ': ' . $message, 1, $email, implode("\r\n", $headers));
-}
-
-
-/**
- * Error handler, passes flow over the exception logger with new ErrorException.
- *
- * @param  int  $errno
- * @param  string  $errstr
- * @param  string  $errfile
- * @param  int $errline
- * @uses mail_error
- * @return bool  true on success or false on failure.
- */
-function log_error($errno, $errstr, $errfile, $errline)
-{
-	// $errstr may need to be escaped:
-	$errstr = htmlspecialchars($errstr);
-	$color = 'notice';
-
-	$email = getenv('ADMIN_MAIL');
-	switch ($errno) {
-		case E_ERROR:
-		case E_CORE_ERROR:
-		case E_COMPILE_ERROR:
-		case E_USER_ERROR:
-		case E_WARNING:
-		case E_CORE_WARNING:
-		case E_COMPILE_WARNING:
-		case E_USER_WARNING:
-		case E_NOTICE:
-		case E_USER_NOTICE:
-		case E_DEPRECATED:
-		case E_USER_DEPRECATED:
-			if (array_key_exists('SERVER_NAME', $_SERVER)) :
-				$email = $_SERVER['SERVER_NAME'];
-				if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-					$email = 'portal.' . getenv('PROJECT_DOMAIN') . '@' . getenv('SUPPORT_DOMAIN');
-				endif;
-			endif;
-			break;
-		default:
-			$email = getenv('PROJECT_NAMESPACE') . '@' . getenv('SUPPORT_DOMAIN');
-			break;
-	}
-
-	switch ($errno) {
-		case E_ERROR:
-		case E_CORE_ERROR:
-		case E_COMPILE_ERROR:
-		case E_USER_ERROR:
-			$subject = "ERROR [$errno] $errstr";
-			$message = "Fatal error on line $errline in file $errfile, PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-			$color = 'danger';
-			break;
-		case E_WARNING:
-		case E_CORE_WARNING:
-		case E_COMPILE_WARNING:
-		case E_USER_WARNING:
-			$subject = "WARNING [$errno] $errstr";
-			$message = "Warning on line $errline in file $errfile";
-			$color = 'warning';
-			break;
-		case E_NOTICE:
-		case E_USER_NOTICE:
-			$subject = "NOTICE [$errno] $errstr";
-			$message = "Notice on line $errline in file $errfile";
-			$color = 'notice';
-			break;
-		case E_DEPRECATED:
-		case E_USER_DEPRECATED:
-			/* Don't execute PHP internal error handler */
-			$subject = "DEPRECATED [$errno] $errstr";
-			$message = "Deprecated on line $errline in file $errfile";
-			$color = 'info';
-			break;
-		default:
-			$subject = "Unknown error type: [$errno] $errstr";
-			$message = "Unknown error on line $errline in file $errfile";
-			$color = 'danger';
-			break;
-	}
-
-	if (array_key_exists('SERVER_NAME', $_SERVER)) :
-		$email = $_SERVER['SERVER_NAME'];
-		if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-			$email = 'portal.' . getenv('PROJECT_DOMAIN') . '@' . getenv('SUPPORT_DOMAIN');
-		endif;
-	endif;
-
-	Log::error_message($message);
-	$email = getenv('ADMIN_MAIL');
-	mail_error(
-		$subject,
-		$message,
-		$email
-	);
-
-	log_exception(new ErrorException($errstr, 0, $errno, $errfile, $errline));
-}
-
-/**
- * Uncaught exception handler.
- */
-function log_exception(Exception $e): bool
-//function log_error(int $errno, string $errstr, string $errfile, int $errline) : bool
-{
-	if (DEBUG) {
-		print "<div style='text-align: center;'>";
-		print "<h2 style='color: rgb(190, 50, 50);'>Exception Occurred:</h2>";
-		print "<table style='width: 800px; display: inline-block;'>";
-		print "<tr style='background-color:rgb(230,230,230);'><th style='width: 80px;'>Type</th><td>" . get_class($e) . "</td></tr>";
-		print "<tr style='background-color:rgb(240,240,240);'><th>Message</th><td>{$e->getMessage()}</td></tr>";
-		print "<tr style='background-color:rgb(230,230,230);'><th>File</th><td>{$e->getFile()}</td></tr>";
-		print "<tr style='background-color:rgb(240,240,240);'><th>Line</th><td>{$e->getLine()}</td></tr>";
-		print "</table></div>";
-	} else {
-		$message = "Type: " . get_class($e) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
-		//file_put_contents($config["app_dir"] . "/tmp/logs/exceptions.log", $message . PHP_EOL, FILE_APPEND);
-		//header("Location: {$config["error_page"]}");
-	}
-
-	exit();
-	if (!(error_reporting() & $errno)) {
-		// This error code is not included in error_reporting, so let it fall
-		// through to the standard PHP error handler
-		return false;
-	}
-
-	// $errstr may need to be escaped:
-	$errstr = htmlspecialchars($errstr);
-	$color = 'notice';
-
-	$email = getenv('ADMIN_MAIL');
-	switch ($errno) {
-		case E_ERROR:
-		case E_CORE_ERROR:
-		case E_COMPILE_ERROR:
-		case E_USER_ERROR:
-		case E_WARNING:
-		case E_CORE_WARNING:
-		case E_COMPILE_WARNING:
-		case E_USER_WARNING:
-		case E_NOTICE:
-		case E_USER_NOTICE:
-		case E_DEPRECATED:
-		case E_USER_DEPRECATED:
-			if (array_key_exists('SERVER_NAME', $_SERVER)) :
-				$email = $_SERVER['SERVER_NAME'];
-				if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-					$email = 'portal.' . getenv('PROJECT_DOMAIN') . '@' . getenv('SUPPORT_DOMAIN');
-				endif;
-			endif;
-			break;
-		default:
-			$email = getenv('PROJECT_NAMESPACE') . '@' . getenv('SUPPORT_DOMAIN');
-			break;
-	}
-
-	switch ($errno) {
-		case E_ERROR:
-		case E_CORE_ERROR:
-		case E_COMPILE_ERROR:
-		case E_USER_ERROR:
-			$subject = "ERROR [$errno] $errstr";
-			$message = "Fatal error on line $errline in file $errfile, PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-			$color = 'danger';
-			break;
-		case E_WARNING:
-		case E_CORE_WARNING:
-		case E_COMPILE_WARNING:
-		case E_USER_WARNING:
-			$subject = "WARNING [$errno] $errstr";
-			$message = "Warning on line $errline in file $errfile";
-			$color = 'warning';
-			break;
-		case E_NOTICE:
-		case E_USER_NOTICE:
-			$subject = "NOTICE [$errno] $errstr";
-			$message = "Notice on line $errline in file $errfile";
-			$color = 'notice';
-			break;
-		case E_DEPRECATED:
-		case E_USER_DEPRECATED:
-			/* Don't execute PHP internal error handler */
-			$subject = "DEPRECATED [$errno] $errstr";
-			$message = "Deprecated on line $errline in file $errfile";
-			$color = 'info';
-			break;
-		default:
-			$subject = "Unknown error type: [$errno] $errstr";
-			$message = "Unknown error on line $errline in file $errfile";
-			$color = 'danger';
-			break;
-	}
-
-	if (array_key_exists('SERVER_NAME', $_SERVER)) :
-		$email = $_SERVER['SERVER_NAME'];
-		if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-			$email = 'portal.' . getenv('PROJECT_DOMAIN') . '@' . getenv('SUPPORT_DOMAIN');
-		endif;
-	endif;
-
-	Log::error_message($message);
-	$email = getenv('ADMIN_MAIL');
-	if (!DEBUG && ($errno !== (E_DEPRECATED | E_USER_DEPRECATED | E_NOTICE | E_USER_NOTICE))) :
-		mail_error(
-			$subject,
-			$message,
-			$email
-		);
-
-
-		if (DEBUG) :
-			Log::error_handler(
-				$color,
-				$subject,
-				$message
-			);
-		endif;
-	elseif (!DEBUG) :
-		Log::error_handler(
-			$color,
-			$subject,
-			$message
-		);
-	endif;
-
-	/* Don't execute PHP internal error handler */
-	return true;
-}
-
-/**
- * PHP shutdown function
- *
- * @return void
- */
-function my_shutdown_function(): void
-{
-
-	$error = error_get_last();
-	if ($error["type"] == E_ERROR) :
-		//var_dump($error);
-		//die();
-		log_error($error["type"], $error["message"], $error["file"], $error["line"]);
-	endif;
-	//if ($error != null) :
-	//	// Fatal error, E_ERROR === 1
-	//	if ($error['type'] === E_ERROR) :
-	//		extract($error);
-
-	//		global $mysqli;
-	//		if (!empty($mysqli->error)) {
-	//			$message .= $mysqli->error;
-	//		}
-
-	//		if (!DEBUG) :
-	//			mail_error(
-	//				"Error",
-	//				"in '$file', line $line:\r\n\r\n$message\n",
-	//				getenv('PROJECT_NAMESPACE') . '@' . getenv('SUPPORT_DOMAIN')
-	//			);
-	//			http_response_code(500);
-	//			header('location: /oops/500');
-	//		else :
-	//			echo '<script>document.getElementById("loading").style.display = "none";</script>';
-	//		endif;
-	//	endif;
-	//endif;
-}
-//register_shutdown_function('my_shutdown_function');
-//set_error_handler('log_error');
 ?>
