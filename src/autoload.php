@@ -1,5 +1,5 @@
 <?php
-
+namespace KerkEnIT;
 /**
  * Autoloader for the Kerk en IT Framework
  *
@@ -14,14 +14,55 @@
  * @since      Class available since Release 1.0.0
  **/
 
+ // Load the environment variables
+if(!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0) :
+	$_ENV = parse_ini_file('.env');
+endif;
+// Load the environment variables for the CLI
+if (php_sapi_name() == 'cli' && (!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0)) :
+	$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
+	if ($file !== false) :
+		$env = explode(PHP_EOL, file_get_contents($file));
+		foreach ($env as $line) :
+			$line = explode('=', $line);
+			if (count($line) == 2) :
+				putenv(trim($line[0], '"') . "=" . trim($line[1], '"'));
+				$_ENV[trim($line[0], '"')] = trim($line[1], '"');
+			endif;
+		endforeach;
+	endif;
+endif;
+
+// Get debug hosts from the environment
+if(isset($_ENV['debug_hosts']) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
+	if(!defined('DEBUG')) :
+		define('DEBUG', true);
+	endif;
+endif;
+
+// Set the error reporting level
+if(defined('DEBUG')) :
+	if(DEBUG) :
+		error_reporting(E_ALL);
+		ini_set('display_errors', '1');
+	else :
+		error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
+		ini_set('display_errors', '0');
+	endif;
+endif;
 
 /**
  * Require a class file for a specific PHP version
  *
- * @param  string|bool $filename
+ * @param  string $class The class to require
  * @return void
  */
- function require_class(string|bool $filename):void {
+ function require_class(string $class): void {
+
+	$filename = realpath(dirname(__FILE__) . '/class.' . $class . '.php');
+	if ($filename === FALSE) :
+		$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
+	endif;
 	if ($filename !== FALSE) :
 		if (substr(PHP_VERSION, 0, 3) === '8.4') :
 			require_once($filename);
@@ -36,7 +77,6 @@
 		endif;
 	endif;
  }
-
 /**
  * Autoloader for the Kerk en IT Framework
  *
@@ -44,36 +84,21 @@
  * @return void
  */
 spl_autoload_register(function ($class) {
-	$filename = realpath(dirname(__FILE__). '/class.' . $class . '.php');
-	if($filename === FALSE) :
-		$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
-	endif;
-	require_class($filename);
+	$class = str_replace(__NAMESPACE__ . '\\', '', $class);
+	require_class($class);
 });
 
-/**
- * Require specific classes
- *
- */
-foreach(
-	array(
-		'Format',
-		'DateTime'
-	) as $class) :
-	$filename = realpath(dirname(__FILE__) . '/class.' . $class . '.php');
-	if($filename === FALSE) :
-		$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
-	endif;
-	require_class($filename);
-endforeach;
 
 /**
  * Require all classes within the src directory which arn't already required
  *
  */
-/*
+
 foreach (glob(realpath(__DIR__) . '/class.*.php') as $filename) :
-	require_class($filename);
+	$filename = pathinfo($filename, PATHINFO_FILENAME);
+	$class = str_replace('class.', '', $filename);
+	if (!class_exists('\\' . __NAMESPACE__ . '\\' . $class)) :
+		require_class($class);
+	endif;
 endforeach;
-*/
 ?>
