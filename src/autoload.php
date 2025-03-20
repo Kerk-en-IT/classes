@@ -52,13 +52,13 @@ if(defined('DEBUG')) :
 endif;
 
 /**
- * Require a class file for a specific PHP version
+ * Autoloader for the Kerk en IT Framework
  *
- * @param  string $class The class to require
+ * @param  string $class
  * @return void
  */
- function require_class(string $class): void {
-
+spl_autoload_register(function ($class) {
+	$class = str_replace(__NAMESPACE__ . '\\', '', $class);
 	$filename = realpath(dirname(__FILE__) . '/class.' . $class . '.php');
 	if ($filename === FALSE) :
 		$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
@@ -76,29 +76,35 @@ endif;
 			require_once($filename);
 		endif;
 	endif;
- }
-/**
- * Autoloader for the Kerk en IT Framework
- *
- * @param  string $class
- * @return void
- */
-spl_autoload_register(function ($class) {
-	$class = str_replace(__NAMESPACE__ . '\\', '', $class);
-	require_class($class);
 });
 
 
 /**
  * Require all classes within the src directory which arn't already required
- *
+ * @deprecated deprecated since version 1.2.0. Will be removed in version 1.3.0
+ * @since      Method available since Release 1.1.0
  */
-
 foreach (glob(realpath(__DIR__) . '/class.*.php') as $filename) :
 	$filename = pathinfo($filename, PATHINFO_FILENAME);
 	$class = str_replace('class.', '', $filename);
 	if (!class_exists('\\' . __NAMESPACE__ . '\\' . $class)) :
-		require_class($class);
+		$filename = realpath(dirname(__FILE__) . '/class.' . $class . '.php');
+		if ($filename === FALSE) :
+			$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
+		endif;
+		if ($filename !== FALSE) :
+			if (substr(PHP_VERSION, 0, 3) === '8.4') :
+				require_once($filename);
+			elseif (substr(PHP_VERSION, 0, 3) === '8.3') :
+				if (!str_contains(file_get_contents($filename), 'PHP versions 8.4')) :
+					require_once($filename);
+				elseif (!str_contains(file_get_contents($filename), 'PHP versions')) :
+					require_once($filename);
+				endif;;
+			else :
+				require_once($filename);
+			endif;
+		endif;
 	endif;
 endforeach;
 ?>
