@@ -422,7 +422,7 @@ class Format
 	 * @param  string $double pluralized text
 	 * @return string
 	 */
-	private static function pluralize($count, $single, $double)
+	public static function pluralize($count, $single, $double)
 	{
 		return $count . ($count == 1 ? $single : $double);
 	}
