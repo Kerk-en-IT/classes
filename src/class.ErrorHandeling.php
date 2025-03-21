@@ -30,6 +30,7 @@ if (defined('DEBUG')) :
 	endif;
 endif;
 
+
 class ErrorHandeling
 {
 
@@ -64,16 +65,16 @@ class ErrorHandeling
 
 	private static function Project(): string
 	{
-		if(getenv('PROJECT') !== false) :
-			return getenv('PROJECT');
-		elseif (!array_key_exists('PROJECT', $_ENV) || $_ENV['PROJECT'] === false) :
-			putenv('PROJECT="My Fantastic App"');
+		if(getenv('PROJECT_NAME') !== false) :
+			return getenv('PROJECT_NAME');
+		elseif (!array_key_exists('PROJECT_NAME', $_ENV) || $_ENV['PROJECT_NAME'] === false) :
+			putenv('PROJECT_NAME="My Fantastic App"');
 		endif;
 
-		if (getenv('PROJECT') !== false) :
-			return getenv('PROJECT');
-		elseif (array_key_exists('PROJECT', $_ENV)) :
-			return $_ENV['PROJECT'];
+		if (getenv('PROJECT_NAME') !== false) :
+			return getenv('PROJECT_NAME');
+		elseif (array_key_exists('PROJECT_NAME', $_ENV)) :
+			return $_ENV['PROJECT_NAME'];
 		endif;
 
 		return '';
@@ -165,6 +166,159 @@ class ErrorHandeling
 		return '';
 	}
 
+	private static function GetLogPath(): string|bool
+	{
+		if (getenv('LOG_PATH') !== false) :
+			$path = getenv('LOG_PATH');
+		elseif (!array_key_exists('LOG_PATH', $_ENV) || $_ENV['LOG_PATH'] === false) :
+			$path = $_SERVER["HOME"] . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'php_log';
+			putenv('LOG_PATH="' . $path . '"');
+		endif;
+
+
+		if (getenv('LOG_PATH') !== false) :
+			$path = getenv('LOG_PATH');
+		elseif (array_key_exists('LOG_PATH', $_ENV)) :
+			$path = $_ENV['LOG_PATH'];
+		endif;
+
+		if (!file_exists($path)) :
+			touch($path);
+		endif;
+
+		return realpath($path);
+	}
+
+	private static function getEmail(?int $errno = null): string
+	{
+		$email = self::ServerAdmin();
+		if ($errno === null) :
+			return $email;
+		endif;
+		switch ($errno) {
+			case E_ERROR:
+			case E_CORE_ERROR:
+			case E_COMPILE_ERROR:
+			case E_USER_ERROR:
+			case E_WARNING:
+			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
+			case E_USER_WARNING:
+			case E_NOTICE:
+			case E_USER_NOTICE:
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+				if (array_key_exists('SERVER_NAME', $_SERVER)) :
+					$email = $_SERVER['SERVER_NAME'];
+					if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
+						$email = 'portal.' . self::ProjectDomain() . '@' . self::SupportDomain();
+					endif;
+				endif;
+				break;
+			default:
+				$email = self::ProjectNamespace() . '@' . self::SupportDomain();
+				break;
+		}
+
+		return $email;
+	}
+
+	private static function getColor(?int $errno = null): string
+	{
+		$color = 'notice';
+		switch ($errno) {
+			case E_ERROR:
+			case E_CORE_ERROR:
+			case E_COMPILE_ERROR:
+			case E_USER_ERROR:
+				$color = 'danger';
+				break;
+			case E_WARNING:
+			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
+			case E_USER_WARNING:
+				$color = 'warning';
+				break;
+			case E_NOTICE:
+			case E_USER_NOTICE:
+				$color = 'notice';
+				break;
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+				$color = 'info';
+				break;
+			default:
+				$color = 'danger';
+				break;
+		}
+		return $color;
+	}
+
+	private static function getSubject(?int $errno = null): string
+	{
+		$errstr = self::Project();
+		$subject = '';
+		switch ($errno) {
+			case E_ERROR:
+			case E_CORE_ERROR:
+			case E_COMPILE_ERROR:
+			case E_USER_ERROR:
+				$subject = "$errstr: ERROR [$errno]";
+				break;
+			case E_WARNING:
+			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
+			case E_USER_WARNING:
+				$subject = "$errstr: WARNING [$errno]";
+				break;
+			case E_NOTICE:
+			case E_USER_NOTICE:
+				$subject = "$errstr: NOTICE [$errno]";
+				break;
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+				/* Don't execute PHP internal error handler */
+				$subject = "$errstr: DEPRECATED [$errno]";
+				break;
+			default:
+				$subject = "$errstr: Unknown error type: [$errno]";
+				break;
+		}
+		return $subject;
+	}
+
+	private static function getMessage(?int $errno, string $errline, string $errfile, string $errstr): string
+	{
+		$message = '';
+		switch ($errno) {
+			case E_ERROR:
+			case E_CORE_ERROR:
+			case E_COMPILE_ERROR:
+			case E_USER_ERROR:
+				$message = "Fatal error on line $errline in file $errfile, PHP " . PHP_VERSION . " (" . PHP_OS . ")";
+				break;
+			case E_WARNING:
+			case E_CORE_WARNING:
+			case E_COMPILE_WARNING:
+			case E_USER_WARNING:
+				$message = "Warning on line $errline in file $errfile";
+				break;
+			case E_NOTICE:
+			case E_USER_NOTICE:
+				$message = "Notice on line $errline in file $errfile";
+				break;
+			case E_DEPRECATED:
+			case E_USER_DEPRECATED:
+				/* Don't execute PHP internal error handler */
+				$message = "Deprecated on line $errline in file $errfile";
+				break;
+			default:
+				$message = "Unknown error on line $errline in file $errfile";
+				break;
+		}
+		return $message . ': ' . $errstr;
+	}
+
 
 	/**
 	 * mail error to the developer
@@ -183,7 +337,7 @@ class ErrorHandeling
 			die();
 		endif;
 
-		$email = self::ServerAdmin();
+		$email = self::getEmail();
 		$headers = array();
 
 		// To send HTML mail, the Content-type header must be set
@@ -212,98 +366,30 @@ class ErrorHandeling
 	 * @uses mail_error
 	 * @return bool  true on success or false on failure.
 	 */
-	public static function log_error($errno, $errstr, $errfile, $errline)
+	public static function log_error($errno, $errstr, $errfile, $errline) : bool
 	{
 		// $errstr may need to be escaped:
 		$errstr = htmlspecialchars($errstr);
-		$color = 'notice';
 
-		$email = self::ServerAdmin();
-		switch ($errno) {
-			case E_ERROR:
-			case E_CORE_ERROR:
-			case E_COMPILE_ERROR:
-			case E_USER_ERROR:
-			case E_WARNING:
-			case E_CORE_WARNING:
-			case E_COMPILE_WARNING:
-			case E_USER_WARNING:
-			case E_NOTICE:
-			case E_USER_NOTICE:
-			case E_DEPRECATED:
-			case E_USER_DEPRECATED:
-				if (array_key_exists('SERVER_NAME', $_SERVER)) :
-					$email = $_SERVER['SERVER_NAME'];
-					if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-						$email = 'portal.' . self::ProjectDomain() . '@' . self::SupportDomain();
-					endif;
-				endif;
-				break;
-			default:
-				$email = self::ProjectNamespace() . '@' . self::SupportDomain();
-				break;
-		}
-
-		switch ($errno) {
-			case E_ERROR:
-			case E_CORE_ERROR:
-			case E_COMPILE_ERROR:
-			case E_USER_ERROR:
-				$subject = "ERROR [$errno] $errstr";
-				$message = "Fatal error on line $errline in file $errfile, PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-				$color = 'danger';
-				break;
-			case E_WARNING:
-			case E_CORE_WARNING:
-			case E_COMPILE_WARNING:
-			case E_USER_WARNING:
-				$subject = "WARNING [$errno] $errstr";
-				$message = "Warning on line $errline in file $errfile";
-				$color = 'warning';
-				break;
-			case E_NOTICE:
-			case E_USER_NOTICE:
-				$subject = "NOTICE [$errno] $errstr";
-				$message = "Notice on line $errline in file $errfile";
-				$color = 'notice';
-				break;
-			case E_DEPRECATED:
-			case E_USER_DEPRECATED:
-				/* Don't execute PHP internal error handler */
-				$subject = "DEPRECATED [$errno] $errstr";
-				$message = "Deprecated on line $errline in file $errfile";
-				$color = 'info';
-				break;
-			default:
-				$subject = "Unknown error type: [$errno] $errstr";
-				$message = "Unknown error on line $errline in file $errfile";
-				$color = 'danger';
-				break;
-		}
-
-		if (array_key_exists('SERVER_NAME', $_SERVER)) :
-			$email = $_SERVER['SERVER_NAME'];
-			if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-				$email = 'portal.' . self::ProjectDomain() . '@' . self::SupportDomain();
-			endif;
-		endif;
 
 		Log::error_message($message);
-		$email = self::ServerAdmin();
+
 		self::mail_error(
-			$subject,
-			$message,
-			$email
+			self::getSubject($errno),
+			self::getMessage($errno, $errline, $errfile, $errline, $errstr),
+			self::getEmail($errno)
 		);
 
-		self::log_exception(new ErrorException($errstr, 0, $errno, $errfile, $errline));
+		return self::log_exception(new ErrorException($errstr, 0, $errno, $errfile, $errline));
+
+		/* Don't execute PHP internal error handler */
+		return true;
 	}
 
 	/**
 	 * Uncaught exception handler.
 	 */
 	public static function log_exception(Exception $e): bool
-	//function log_error(int $errno, string $errstr, string $errfile, int $errline) : bool
 	{
 		if (DEBUG) :
 			print "<div style='text-align: center;'>";
@@ -316,12 +402,18 @@ class ErrorHandeling
 			print "</table></div>";
 		elseif ($e !== null) :
 			// Log the exception
-			$message = "Type: " . get_class($e) . "; Message: " . $e->getMessage() . "; File: " . $e->getFile() . "; Line: " . $e->getLine() . ";";
-		//file_put_contents($config["app_dir"] . "/tmp/logs/exceptions.log", $message . PHP_EOL, FILE_APPEND);
-		//header("Location: {$config["error_page"]}");
+			$message = array(date('Y-m-d H:i:s'));
+			$message[] = "Type: " . get_class($e);
+			$message[] = "Message: " . $e->getMessage();
+			$message[] = "File: " . $e->getFile();
+			$message[] = "Line: " . $e->getLine();
+			$message = implode(";\t", $message;
+			file_put_contents(self::GetLogPath(), date('Y-m-d H:i:s') . "\t" . $message . PHP_EOL, FILE_APPEND);
 		endif;
-
-		exit();
+		$errstr = $e->getMessage();
+		$errno = $e->getCode();
+		$errfile = $e->getFile();
+		$errline = $e->getLine();
 		if (!(error_reporting() & $errno)) {
 			// This error code is not included in error_reporting, so let it fall
 			// through to the standard PHP error handler
@@ -330,77 +422,12 @@ class ErrorHandeling
 
 		// $errstr may need to be escaped:
 		$errstr = htmlspecialchars($errstr);
-		$color = 'notice';
 
-		$email = self::ServerAdmin();
-		switch ($errno) {
-			case E_ERROR:
-			case E_CORE_ERROR:
-			case E_COMPILE_ERROR:
-			case E_USER_ERROR:
-			case E_WARNING:
-			case E_CORE_WARNING:
-			case E_COMPILE_WARNING:
-			case E_USER_WARNING:
-			case E_NOTICE:
-			case E_USER_NOTICE:
-			case E_DEPRECATED:
-			case E_USER_DEPRECATED:
-				if (array_key_exists('SERVER_NAME', $_SERVER)) :
-					$email = $_SERVER['SERVER_NAME'];
-					if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-						$email = 'portal.' . self::ProjectDomain() . '@' . self::SupportDomain();
-					endif;
-				endif;
-				break;
-			default:
-				$email = self::ProjectNamespace() . '@' . self::SupportDomain();
-				break;
-		}
+		$email = self::getEmail($errno);
+		$subject = self::getSubject($errno);
+		$message = self::getMessage($errno, $errline, $errfile, $errstr);
+		$color = self::getColor($errno);
 
-		switch ($errno) {
-			case E_ERROR:
-			case E_CORE_ERROR:
-			case E_COMPILE_ERROR:
-			case E_USER_ERROR:
-				$subject = "ERROR [$errno] $errstr";
-				$message = "Fatal error on line $errline in file $errfile, PHP " . PHP_VERSION . " (" . PHP_OS . ")";
-				$color = 'danger';
-				break;
-			case E_WARNING:
-			case E_CORE_WARNING:
-			case E_COMPILE_WARNING:
-			case E_USER_WARNING:
-				$subject = "WARNING [$errno] $errstr";
-				$message = "Warning on line $errline in file $errfile";
-				$color = 'warning';
-				break;
-			case E_NOTICE:
-			case E_USER_NOTICE:
-				$subject = "NOTICE [$errno] $errstr";
-				$message = "Notice on line $errline in file $errfile";
-				$color = 'notice';
-				break;
-			case E_DEPRECATED:
-			case E_USER_DEPRECATED:
-				/* Don't execute PHP internal error handler */
-				$subject = "DEPRECATED [$errno] $errstr";
-				$message = "Deprecated on line $errline in file $errfile";
-				$color = 'info';
-				break;
-			default:
-				$subject = "Unknown error type: [$errno] $errstr";
-				$message = "Unknown error on line $errline in file $errfile";
-				$color = 'danger';
-				break;
-		}
-
-		if (array_key_exists('SERVER_NAME', $_SERVER)) :
-			$email = $_SERVER['SERVER_NAME'];
-			if (str_contains($_SERVER['SERVER_NAME'], 'portal.')) :
-				$email = 'portal.' . self::ProjectDomain() . '@' . self::SupportDomain();
-			endif;
-		endif;
 
 		Log::error_message($message);
 		$email = self::ServerAdmin();
@@ -410,15 +437,12 @@ class ErrorHandeling
 				$message,
 				$email
 			);
-
-
-			if (DEBUG) :
-				Log::error_handler(
-					$color,
-					$subject,
-					$message
-				);
-			endif;
+		elseif (DEBUG) :
+			Log::error_handler(
+				$color,
+				$subject,
+				$message
+			);
 		elseif (!DEBUG) :
 			Log::error_handler(
 				$color,
