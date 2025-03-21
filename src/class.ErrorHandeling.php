@@ -32,6 +32,13 @@ endif;
 
 class ErrorHandeling
 {
+	public static function register()
+	{
+		$error = new ErrorHandeling();
+		set_error_handler(array($error, 'log_error'));
+		register_shutdown_function(array($error, 'shutdown_function'));
+	}
+
 	private static function Project(): string
 	{
 		if($_ENV['PROJECT'] === false) :
@@ -398,9 +405,7 @@ class ErrorHandeling
 		endif;
 	}
 }
-$error = new ErrorHandeling();
-set_error_handler(array($error, 'log_error'));
-register_shutdown_function(array($error, 'shutdown_function'));
+
 //set_error_handler(array(ErrorHandeling, 'log_error'));
 ////register_shutdown_function('my_shutdown_function');
 ////set_error_handler('my_log_error');
