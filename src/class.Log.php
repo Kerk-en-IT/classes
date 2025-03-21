@@ -20,6 +20,10 @@ use ErrorException;
  **/
 class Log
 {
+	public static function register(): void
+	{
+		$that = new self();
+	}
 	private static function buffer_output(?string $color = null, ?string $param = null): string
 	{
 		if ($param === null) :
@@ -155,7 +159,7 @@ class Log
 						continue 2;
 					else :
 						if ($key !== 'file') :
-							if($key == 'function' && $value == 'shutdown_function') :
+							if ($key == 'function' && $value == 'shutdown_function') :
 								continue 2;
 							endif;
 							if (is_array($value)) :
@@ -222,4 +226,3 @@ if (!function_exists('error')) :
 		varDie($params);
 	}
 endif;
-?>
