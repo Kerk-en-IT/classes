@@ -40,16 +40,6 @@ if(isset($_ENV['debug_hosts']) && in_array($_SERVER['REMOTE_ADDR'], array_map('g
 	endif;
 endif;
 
-// Set the error reporting level
-if(defined('DEBUG')) :
-	if(DEBUG) :
-		error_reporting(E_ALL);
-		ini_set('display_errors', '1');
-	else :
-		error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
-		ini_set('display_errors', '0');
-	endif;
-endif;
 
 /**
  * Autoloader for the Kerk en IT Framework

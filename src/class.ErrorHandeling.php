@@ -19,6 +19,17 @@ use ErrorException;
  * @since      Class available since Release 1.2.0
  */
 
+// Set the error reporting level
+if (defined('DEBUG')) :
+	if (DEBUG) :
+		error_reporting(E_ALL);
+		ini_set('display_errors', '1');
+	else :
+		error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
+		ini_set('display_errors', '0');
+	endif;
+endif;
+
 class ErrorHandeling
 {
 	private static function Project(): string
