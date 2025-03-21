@@ -64,18 +64,29 @@ class ErrorHandeling
 
 	private static function Project(): string
 	{
-		if($_ENV['PROJECT'] === false) :
+		if(getenv('PROJECT') !== false) :
+			return getenv('PROJECT');
+		elseif (!array_key_exists('PROJECT', $_ENV) || $_ENV['PROJECT'] === false) :
 			putenv('PROJECT="My Fantastic App"');
 		endif;
-		return $_ENV['PROJECT'];
+
+		if (getenv('PROJECT') !== false) :
+			return getenv('PROJECT');
+		elseif (array_key_exists('PROJECT', $_ENV)) :
+			return $_ENV['PROJECT'];
+		endif;
+
+		return '';
 	}
 
 	private static function ProjectDomain(): string
 	{
-		if ($_ENV['PROJECT_DOMAIN'] === false) :
-			if(isset($_SERVER) && array_key_exists('SERVER_NAME', $_SERVER)) :
+		if (getenv('PROJECT_DOMAIN') !== false) :
+			return getenv('PROJECT_DOMAIN');
+		elseif (!array_key_exists('PROJECT_DOMAIN', $_ENV) || $_ENV['PROJECT_DOMAIN'] === false) :
+			if (isset($_SERVER) && array_key_exists('SERVER_NAME', $_SERVER)) :
 				$domain = explode('.', $_SERVER['SERVER_NAME']);
-				if(count($domain) === 3) :
+				if (count($domain) === 3) :
 					putenv('PROJECT_DOMAIN="' . $domain[1] . '.' . $domain[2] . '"');
 				else :
 					putenv('PROJECT_DOMAIN="' . $_SERVER['SERVER_NAME'] . '"');
@@ -84,28 +95,55 @@ class ErrorHandeling
 				putenv('PROJECT_DOMAIN="app.com"');
 			endif;
 		endif;
-		return $_ENV['PROJECT_DOMAIN'];
+
+		if (getenv('PROJECT_DOMAIN') !== false) :
+			return getenv('PROJECT_DOMAIN');
+		elseif (array_key_exists('PROJECT_DOMAIN', $_ENV)) :
+			return $_ENV['PROJECT_DOMAIN'];
+		endif;
+
+		return '';
 	}
 
 	private static function SupportDomain(): string
 	{
-		if ($_ENV['SUPPORT_DOMAIN'] === false) :
+		if (getenv('SUPPORT_DOMAIN') !== false) :
+			return getenv('SUPPORT_DOMAIN');
+		elseif (!array_key_exists('SUPPORT_DOMAIN', $_ENV) || $_ENV['SUPPORT_DOMAIN'] === false) :
 			putenv('SUPPORT_DOMAIN="domain.support"');
 		endif;
-		return $_ENV['PROJECT_DOMAIN'];
+
+		if (getenv('SUPPORT_DOMAIN') !== false) :
+			return getenv('SUPPORT_DOMAIN');
+		elseif (array_key_exists('SUPPORT_DOMAIN', $_ENV)) :
+			return $_ENV['SUPPORT_DOMAIN'];
+		endif;
+
+		return '';
 	}
 
 	private static function ProjectNamespace(): string
 	{
-		if ($_ENV['PROJECT_NAMESPACE'] === false) :
+		if (getenv('PROJECT_NAMESPACE') !== false) :
+			return getenv('PROJECT_NAMESPACE');
+		elseif (!array_key_exists('PROJECT_NAMESPACE', $_ENV) || $_ENV['PROJECT_NAMESPACE'] === false) :
 			putenv('PROJECT_DOMAIN="app"');
 		endif;
-		return $_ENV['PROJECT_NAMESPACE'];
+
+		if (getenv('PROJECT_NAMESPACE') !== false) :
+			return getenv('PROJECT_NAMESPACE');
+		elseif (array_key_exists('PROJECT_NAMESPACE', $_ENV)) :
+			return $_ENV['PROJECT_NAMESPACE'];
+		endif;
+
+		return '';
 	}
 
 	private static function ServerAdmin(): string
 	{
-		if(!isset($_ENV['SERVER_ADMIN']) || $_ENV['SERVER_ADMIN'] === false || empty($_ENV['SERVER_ADMIN']) || !filter_var($_ENV['SERVER_ADMIN'], FILTER_VALIDATE_EMAIL)) :
+		if (getenv('SERVER_ADMIN') !== false) :
+			return getenv('SERVER_ADMIN');
+		elseif (!array_key_exists('SERVER_ADMIN', $_ENV) || !isset($_ENV['SERVER_ADMIN']) || $_ENV['SERVER_ADMIN'] === false || empty($_ENV['SERVER_ADMIN']) || !filter_var($_ENV['SERVER_ADMIN'], FILTER_VALIDATE_EMAIL)) :
 			if (isset($_SERVER) && array_key_exists('SERVER_NAME', $_SERVER)) :
 				$domain = explode('.', $_SERVER['SERVER_NAME']);
 				if (count($domain) === 3) :
@@ -117,7 +155,14 @@ class ErrorHandeling
 				return 'webmaster@domain.com';
 			endif;
 		endif;
-		return $_ENV['SERVER_ADMIN'];
+
+		if (getenv('SERVER_ADMIN') !== false) :
+			return getenv('SERVER_ADMIN');
+		elseif (array_key_exists('SERVER_ADMIN', $_ENV)) :
+			return $_ENV['SERVER_ADMIN'];
+		endif;
+
+		return '';
 	}
 
 
@@ -260,7 +305,7 @@ class ErrorHandeling
 	public static function log_exception(Exception $e): bool
 	//function log_error(int $errno, string $errstr, string $errfile, int $errline) : bool
 	{
-		if (DEBUG) {
+		if (DEBUG) :
 			print "<div style='text-align: center;'>";
 			print "<h2 style='color: rgb(190, 50, 50);'>Exception Occurred:</h2>";
 			print "<table style='width: 800px; display: inline-block;'>";
@@ -269,11 +314,12 @@ class ErrorHandeling
 			print "<tr style='background-color:rgb(230,230,230);'><th>File</th><td>{$e->getFile()}</td></tr>";
 			print "<tr style='background-color:rgb(240,240,240);'><th>Line</th><td>{$e->getLine()}</td></tr>";
 			print "</table></div>";
-		} else {
-			$message = "Type: " . get_class($e) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
-			//file_put_contents($config["app_dir"] . "/tmp/logs/exceptions.log", $message . PHP_EOL, FILE_APPEND);
-			//header("Location: {$config["error_page"]}");
-		}
+		elseif ($e !== null) :
+			// Log the exception
+			$message = "Type: " . get_class($e) . "; Message: " . $e->getMessage() . "; File: " . $e->getFile() . "; Line: " . $e->getLine() . ";";
+		//file_put_contents($config["app_dir"] . "/tmp/logs/exceptions.log", $message . PHP_EOL, FILE_APPEND);
+		//header("Location: {$config["error_page"]}");
+		endif;
 
 		exit();
 		if (!(error_reporting() & $errno)) {
@@ -422,13 +468,9 @@ class ErrorHandeling
 			endif;
 		endif;
 
-		if(\http_response_code() === 500) :
+		if (\http_response_code() === 500) :
 			header('location: /oops/500');
 			exit();
 		endif;
 	}
 }
-
-//set_error_handler(array(ErrorHandeling, 'log_error'));
-////register_shutdown_function('my_shutdown_function');
-////set_error_handler('my_log_error');
