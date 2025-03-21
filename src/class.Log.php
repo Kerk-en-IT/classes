@@ -20,7 +20,6 @@ use ErrorException;
  **/
 class Log
 {
-
 	private static function buffer_output(?string $color = null, ?string $param = null): string
 	{
 		if ($param === null) :
@@ -31,6 +30,7 @@ class Log
 			$rtn .= '</div>';
 			echo $rtn;
 		endif;
+		return '';
 	}
 
 	private static function write_output(mixed ...$params): mixed

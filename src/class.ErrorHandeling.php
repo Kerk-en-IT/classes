@@ -227,7 +227,7 @@ class ErrorHandeling
 	/**
 	 * Uncaught exception handler.
 	 */
-	public static function  log_exception(Exception $e): bool
+	public static function log_exception(Exception $e): bool
 	//function log_error(int $errno, string $errstr, string $errfile, int $errline) : bool
 	{
 		if (DEBUG) {
@@ -360,7 +360,7 @@ class ErrorHandeling
 	 *
 	 * @return void
 	 */
-	public static function  shutdown_function()
+	public static function shutdown_function()
 	{
 		$error = \error_get_last();
 
@@ -397,8 +397,6 @@ class ErrorHandeling
 			exit();
 		endif;
 	}
-
-
 }
 $error = new ErrorHandeling();
 set_error_handler(array($error, 'log_error'));
