@@ -34,8 +34,27 @@ endif;
 class ErrorHandeling
 {
 
+	/**
+	 * Register the error handler
+	 *
+	 * @return void
+	 */
 	public static function register(): void
 	{
+		$that = new self();
+		self::env();
+		set_error_handler(array($that, 'log_error'));
+		register_shutdown_function(array($that, 'shutdown_function'));
+	}
+
+	/**
+	 * Set the environment variables
+	 *
+	 * @return void
+	 */
+	protected static function env(): void
+	{
+		$file = FALSE;
 		// Load the environment variables
 		if (!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0) :
 			$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
@@ -45,7 +64,6 @@ class ErrorHandeling
 		endif;
 		// Load the environment variables for the CLI
 		if ((!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0)) :
-			$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
 			if ($file !== FALSE) :
 				$env = explode(PHP_EOL, file_get_contents($file));
 				foreach ($env as $line) :
@@ -57,33 +75,37 @@ class ErrorHandeling
 				endforeach;
 			endif;
 		endif;
-
-		$that = new self();
-		set_error_handler(array($that, 'log_error'));
-		register_shutdown_function(array($that, 'shutdown_function'));
 	}
 
-	private static function Project(): string
+	/**
+	 * Get the project name
+	 *
+	 * @return string|null
+	 */
+	private static function ProjectName(): string|null
 	{
-		if(getenv('PROJECT_NAME') !== false) :
-			return getenv('PROJECT_NAME');
-		elseif (!array_key_exists('PROJECT_NAME', $_ENV) || $_ENV['PROJECT_NAME'] === false) :
+		if (getenv('PROJECT_NAME') !== false) :
+			return trim(getenv('PROJECT_NAME'), '"');
+		elseif (array_key_exists('PROJECT_NAME', $_ENV)) :
+			return trim($_ENV['PROJECT_NAME'], '"');
+		elseif (!array_key_exists('PROJECT_NAME', $_ENV) || empty($_ENV['PROJECT_NAME'])) :
 			putenv('PROJECT_NAME="My Fantastic App"');
 		endif;
 
-		if (getenv('PROJECT_NAME') !== false) :
-			return getenv('PROJECT_NAME');
-		elseif (array_key_exists('PROJECT_NAME', $_ENV)) :
-			return $_ENV['PROJECT_NAME'];
-		endif;
-
-		return '';
+		return null;
 	}
 
-	private static function ProjectDomain(): string
+	/**
+	 * Get the project domain
+	 *
+	 * @return string|null
+	 */
+	private static function ProjectDomain(): string|null
 	{
 		if (getenv('PROJECT_DOMAIN') !== false) :
-			return getenv('PROJECT_DOMAIN');
+			return trim(getenv('PROJECT_DOMAIN'), '"');
+		elseif (array_key_exists('PROJECT_DOMAIN', $_ENV)) :
+			return trim($_ENV['PROJECT_DOMAIN'], '"');
 		elseif (!array_key_exists('PROJECT_DOMAIN', $_ENV) || $_ENV['PROJECT_DOMAIN'] === false) :
 			if (isset($_SERVER) && array_key_exists('SERVER_NAME', $_SERVER)) :
 				$domain = explode('.', $_SERVER['SERVER_NAME']);
@@ -93,57 +115,60 @@ class ErrorHandeling
 					putenv('PROJECT_DOMAIN="' . $_SERVER['SERVER_NAME'] . '"');
 				endif;
 			else :
-				putenv('PROJECT_DOMAIN="app.com"');
+				putenv('PROJECT_DOMAIN="kerkenit.nl"');
 			endif;
 		endif;
 
-		if (getenv('PROJECT_DOMAIN') !== false) :
-			return getenv('PROJECT_DOMAIN');
-		elseif (array_key_exists('PROJECT_DOMAIN', $_ENV)) :
-			return $_ENV['PROJECT_DOMAIN'];
-		endif;
-
-		return '';
+		return null;
 	}
 
+	/**
+	 * Get the support domain
+	 *
+	 * @return string
+	 */
 	private static function SupportDomain(): string
 	{
 		if (getenv('SUPPORT_DOMAIN') !== false) :
-			return getenv('SUPPORT_DOMAIN');
-		elseif (!array_key_exists('SUPPORT_DOMAIN', $_ENV) || $_ENV['SUPPORT_DOMAIN'] === false) :
-			putenv('SUPPORT_DOMAIN="domain.support"');
-		endif;
-
-		if (getenv('SUPPORT_DOMAIN') !== false) :
-			return getenv('SUPPORT_DOMAIN');
+			return trim(getenv('SUPPORT_DOMAIN'), '"');
 		elseif (array_key_exists('SUPPORT_DOMAIN', $_ENV)) :
-			return $_ENV['SUPPORT_DOMAIN'];
+			return trim($_ENV['SUPPORT_DOMAIN'], '"');
+		elseif (!array_key_exists('SUPPORT_DOMAIN', $_ENV) || $_ENV['SUPPORT_DOMAIN'] === false) :
+			putenv('SUPPORT_DOMAIN="kerkenit.support"');
 		endif;
 
-		return '';
+		return 'kerkenit.support';
 	}
 
-	private static function ProjectNamespace(): string
+	/**
+	 * Get the project namespace
+	 *
+	 * @return string|null
+	 */
+	private static function ProjectNamespace(): string|null
 	{
 		if (getenv('PROJECT_NAMESPACE') !== false) :
-			return getenv('PROJECT_NAMESPACE');
-		elseif (!array_key_exists('PROJECT_NAMESPACE', $_ENV) || $_ENV['PROJECT_NAMESPACE'] === false) :
-			putenv('PROJECT_DOMAIN="app"');
-		endif;
-
-		if (getenv('PROJECT_NAMESPACE') !== false) :
-			return getenv('PROJECT_NAMESPACE');
+			return trim(getenv('PROJECT_NAMESPACE'), '"');
 		elseif (array_key_exists('PROJECT_NAMESPACE', $_ENV)) :
-			return $_ENV['PROJECT_NAMESPACE'];
+			return trim($_ENV['PROJECT_NAMESPACE'], '"');
+		elseif (!array_key_exists('PROJECT_NAMESPACE', $_ENV) || $_ENV['PROJECT_NAMESPACE'] === false) :
+			putenv('PROJECT_NAMESPACE="app"');
 		endif;
 
-		return '';
+		return null;
 	}
 
-	private static function ServerAdmin(): string
+	/**
+	 * Get the server admin email
+	 *
+	 * @return string|null
+	 */
+	private static function ServerAdmin(): string|null
 	{
 		if (getenv('SERVER_ADMIN') !== false) :
-			return getenv('SERVER_ADMIN');
+			return trim(getenv('SERVER_ADMIN'), '"');
+		elseif (array_key_exists('SERVER_ADMIN', $_ENV)) :
+			return trim($_ENV['SERVER_ADMIN'], '"');
 		elseif (!array_key_exists('SERVER_ADMIN', $_ENV) || !isset($_ENV['SERVER_ADMIN']) || $_ENV['SERVER_ADMIN'] === false || empty($_ENV['SERVER_ADMIN']) || !filter_var($_ENV['SERVER_ADMIN'], FILTER_VALIDATE_EMAIL)) :
 			if (isset($_SERVER) && array_key_exists('SERVER_NAME', $_SERVER)) :
 				$domain = explode('.', $_SERVER['SERVER_NAME']);
@@ -157,29 +182,25 @@ class ErrorHandeling
 			endif;
 		endif;
 
-		if (getenv('SERVER_ADMIN') !== false) :
-			return getenv('SERVER_ADMIN');
-		elseif (array_key_exists('SERVER_ADMIN', $_ENV)) :
-			return $_ENV['SERVER_ADMIN'];
-		endif;
-
-		return '';
+		return null;
 	}
 
+	/**
+	 * Get the log path
+	 *
+	 * @return string|bool
+	 */
 	private static function GetLogPath(): string|bool
 	{
 		if (getenv('LOG_PATH') !== false) :
-			$path = getenv('LOG_PATH');
-		elseif (!array_key_exists('LOG_PATH', $_ENV) || $_ENV['LOG_PATH'] === false) :
-			$path = $_SERVER["HOME"] . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'php_log';
-			putenv('LOG_PATH="' . $path . '"');
-		endif;
-
-
-		if (getenv('LOG_PATH') !== false) :
-			$path = getenv('LOG_PATH');
+			$path = trim(getenv('LOG_PATH'), '"');
 		elseif (array_key_exists('LOG_PATH', $_ENV)) :
-			$path = $_ENV['LOG_PATH'];
+			$path = trim($_ENV['LOG_PATH'], '"');
+		elseif (!array_key_exists('LOG_PATH', $_ENV) || empty($_ENV['LOG_PATH']) || $_ENV['LOG_PATH'] === false) :
+			if (array_key_exists('HOME', $_SERVER)) :
+				$path = $_SERVER["HOME"] . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'php_log';
+			endif;
+			putenv('LOG_PATH="' . $path . '"');
 		endif;
 
 		if (!file_exists($path)) :
@@ -189,6 +210,12 @@ class ErrorHandeling
 		return realpath($path);
 	}
 
+	/**
+	 * Get the email address
+	 *
+	 * @param  int|null $errno
+	 * @return string
+	 */
 	private static function getEmail(?int $errno = null): string
 	{
 		$email = self::ServerAdmin();
@@ -223,6 +250,12 @@ class ErrorHandeling
 		return $email;
 	}
 
+	/**
+	 * Get the color
+	 *
+	 * @param  int|null $errno
+	 * @return string
+	 */
 	private static function getColor(?int $errno = null): string
 	{
 		$color = 'notice';
@@ -254,9 +287,15 @@ class ErrorHandeling
 		return $color;
 	}
 
+	/**
+	 * Get the subject
+	 *
+	 * @param  int|null $errno
+	 * @return string
+	 */
 	private static function getSubject(?int $errno = null): string
 	{
-		$errstr = self::Project();
+		$errstr = self::ProjectName();
 		$subject = '';
 		switch ($errno) {
 			case E_ERROR:
@@ -287,6 +326,15 @@ class ErrorHandeling
 		return $subject;
 	}
 
+	/**
+	 * Get the message
+	 *
+	 * @param  int|null $errno
+	 * @param  string $errline
+	 * @param  string $errfile
+	 * @param  string $errstr
+	 * @return string
+	 */
 	private static function getMessage(?int $errno, string $errline, string $errfile, string $errstr): string
 	{
 		$message = '';
@@ -337,22 +385,24 @@ class ErrorHandeling
 			die();
 		endif;
 
-		$email = self::getEmail();
 		$headers = array();
 
 		// To send HTML mail, the Content-type header must be set
 		//$headers[] = 'MIME-Version: 1.0';
 		//$headers[] = 'Content-type: text/html; charset=iso-8859-1';
 		$headers[] = 'X-Mailer: PHP/' . phpversion();
-		$headers[] = 'From: ' . self::Project() . ' Webmaster <webmaster@' . self::ProjectDomain() . '>';
+		$headers[] = 'From: ' . self::ProjectName() . ' Webmaster <webmaster@' . self::ProjectDomain() . '>';
 		if (!DEBUG) :
-			$headers[] = 'CC: ' . self::Project() . ' <' . self::ServerAdmin() . '>';
+			$headers[] = 'CC: ' . self::ProjectName() . ' <' . self::ServerAdmin() . '>';
 		endif;
 		if (isset($_SESSION['email']) && !empty($_SESSION['email']) && filter_var($_SESSION['email'], FILTER_VALIDATE_EMAIL)) :
-			$headers[] = 'Reply-To: ' . (isset($_SESSION['name']) ? $_SESSION['name'] : self::Project() . ' Webmaster') . ' <' . $_SESSION['email'] . '>';
+			$headers[] = 'Reply-To: ' . (isset($_SESSION['name']) ? $_SESSION['name'] : self::ProjectName() . ' Webmaster') . ' <' . $_SESSION['email'] . '>';
 		endif;
-		//return mail(ADMIN_MAIL, self::Project() . $subject, 'PHP ' . $subject . ':' .  $message, $headers);;
-		return error_log('PHP ' . $subject . ': ' . $message, 1, $email, implode("\r\n", $headers));
+		//return mail(ADMIN_MAIL, self::ProjectName() . $subject, 'PHP ' . $subject . ':' .  $message, $headers);;
+		if (filter_var($email, FILTER_VALIDATE_EMAIL)) :
+			return error_log('PHP ' . $subject . ': ' . $message, 1, $email, implode("\r\n", $headers));
+		endif;
+		return false;
 	}
 
 
@@ -366,21 +416,19 @@ class ErrorHandeling
 	 * @uses mail_error
 	 * @return bool  true on success or false on failure.
 	 */
-	public static function log_error($errno, $errstr, $errfile, $errline) : bool
+	public static function log_error($errno, $errstr, $errfile, $errline): bool
 	{
+		self::env();
 		// $errstr may need to be escaped:
 		$errstr = htmlspecialchars($errstr);
 
-
-		Log::error_message($message);
-
 		self::mail_error(
 			self::getSubject($errno),
-			self::getMessage($errno, $errline, $errfile, $errline, $errstr),
+			self::getMessage($errno, $errline, $errfile, $errline),
 			self::getEmail($errno)
 		);
 
-		return self::log_exception(new ErrorException($errstr, 0, $errno, $errfile, $errline));
+		return self::log_exception(new ErrorException($errstr, $errno, $errno, $errfile, $errline));
 
 		/* Don't execute PHP internal error handler */
 		return true;
@@ -388,6 +436,9 @@ class ErrorHandeling
 
 	/**
 	 * Uncaught exception handler.
+	 *
+	 * @param  Exception $e
+	 * @return bool
 	 */
 	public static function log_exception(Exception $e): bool
 	{
@@ -402,23 +453,27 @@ class ErrorHandeling
 			print "</table></div>";
 		elseif ($e !== null) :
 			// Log the exception
-			$message = array(date('Y-m-d H:i:s'));
-			$message[] = "Type: " . get_class($e);
-			$message[] = "Message: " . $e->getMessage();
-			$message[] = "File: " . $e->getFile();
-			$message[] = "Line: " . $e->getLine();
-			$message = implode(";\t", $message;
-			file_put_contents(self::GetLogPath(), date('Y-m-d H:i:s') . "\t" . $message . PHP_EOL, FILE_APPEND);
+			$message = array(
+				"Type: " . get_class($e),
+				"Code: " . $e->getCode(),
+				"Message: " . $e->getMessage(),
+				"File: " . $e->getFile() . ':' . $e->getLine(),
+				"Line:" . $e->getLine(),
+				"E-mail: " . self::getEmail($e->getCode())
+			);
+			$message = implode(PHP_EOL . "\t\t\t", $message);
+			$trace = "\t\t\tTrace: " . implode(PHP_EOL . "\t\t\t",  explode(PHP_EOL, $e->getTraceAsString()));
+			$message .= PHP_EOL . $trace;
+			$path = self::GetLogPath();
+			if ($path !== false) :
+				file_put_contents($path, date('Y-m-d H:i:s') . "\t" . $message, FILE_APPEND);
+			endif;
 		endif;
 		$errstr = $e->getMessage();
 		$errno = $e->getCode();
 		$errfile = $e->getFile();
 		$errline = $e->getLine();
-		if (!(error_reporting() & $errno)) {
-			// This error code is not included in error_reporting, so let it fall
-			// through to the standard PHP error handler
-			return false;
-		}
+
 
 		// $errstr may need to be escaped:
 		$errstr = htmlspecialchars($errstr);
@@ -430,20 +485,13 @@ class ErrorHandeling
 
 
 		Log::error_message($message);
-		$email = self::ServerAdmin();
 		if (!DEBUG && ($errno !== (E_DEPRECATED | E_USER_DEPRECATED | E_NOTICE | E_USER_NOTICE))) :
 			self::mail_error(
 				$subject,
 				$message,
 				$email
 			);
-		elseif (DEBUG) :
-			Log::error_handler(
-				$color,
-				$subject,
-				$message
-			);
-		elseif (!DEBUG) :
+		else :
 			Log::error_handler(
 				$color,
 				$subject,
@@ -451,6 +499,11 @@ class ErrorHandeling
 			);
 		endif;
 
+		if (!(error_reporting() & $errno)) {
+			// This error code is not included in error_reporting, so let it fall
+			// through to the standard PHP error handler
+			return false;
+		}
 		/* Don't execute PHP internal error handler */
 		return true;
 	}
@@ -460,8 +513,9 @@ class ErrorHandeling
 	 *
 	 * @return void
 	 */
-	public static function shutdown_function()
+	public static function shutdown_function(): void
 	{
+		self::env();
 		$error = \error_get_last();
 
 		if ($error != null) :
