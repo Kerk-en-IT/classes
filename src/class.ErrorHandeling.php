@@ -32,11 +32,34 @@ endif;
 
 class ErrorHandeling
 {
-	public static function register()
+
+	public static function register(): void
 	{
-		$error = new ErrorHandeling();
-		set_error_handler(array($error, 'log_error'));
-		register_shutdown_function(array($error, 'shutdown_function'));
+		// Load the environment variables
+		if (!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0) :
+			$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
+			if ($file !== FALSE) :
+				$_ENV = parse_ini_file($file);
+			endif;
+		endif;
+		// Load the environment variables for the CLI
+		if ((!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0)) :
+			$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
+			if ($file !== FALSE) :
+				$env = explode(PHP_EOL, file_get_contents($file));
+				foreach ($env as $line) :
+					$line = explode('=', $line);
+					if (count($line) == 2) :
+						putenv(trim($line[0], '"') . "=" . trim($line[1], '"'));
+						$_ENV[trim($line[0], '"')] = trim($line[1], '"');
+					endif;
+				endforeach;
+			endif;
+		endif;
+
+		$that = new self();
+		set_error_handler(array($that, 'log_error'));
+		register_shutdown_function(array($that, 'shutdown_function'));
 	}
 
 	private static function Project(): string
