@@ -14,14 +14,17 @@ namespace KerkEnIT;
  * @since      Class available since Release 1.0.0
  **/
 
- // Load the environment variables
+// Load the environment variables
 if(!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0) :
-	$_ENV = parse_ini_file('.env');
+	$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
+	if ($file !== FALSE) :
+		$_ENV = parse_ini_file($file);
+	endif;
 endif;
 // Load the environment variables for the CLI
-if (php_sapi_name() == 'cli' && (!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0)) :
+if ((!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0)) :
 	$file = realpath($_SERVER["DOCUMENT_ROOT"] . '/.env');
-	if ($file !== false) :
+	if ($file !== FALSE) :
 		$env = explode(PHP_EOL, file_get_contents($file));
 		foreach ($env as $line) :
 			$line = explode('=', $line);
