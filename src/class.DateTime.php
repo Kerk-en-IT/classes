@@ -26,8 +26,8 @@ class DateTime
 	 */
 	public static function GetDate(mixed $datetime, string|bool|\DateTimeZone $timezone = false): \DateTime
 	{
-		if (!($timezone instanceof \DateTimeZone)) :
-			if ($timezone !== false && empty($timezone)) :
+		if (($timezone instanceof \DateTimeZone) === false) :
+			if ($timezone === false || empty($timezone)) :
 				$timezone = date_default_timezone_get();
 			endif;
 			if (is_string($timezone)) :
@@ -320,9 +320,16 @@ class DateTime
 	public static function RFC5545($datetime = 'now', string|\DateTimeZone|bool $timezone = false): string
 	{
 		$date = self::GetDate($datetime);
-		if ($timezone !== false) :
-			$date->setTimezone(new \DateTimeZone($timezone));
+		if (($timezone instanceof \DateTimeZone) === false) :
+			if ($timezone === false || empty($timezone)) :
+				$timezone = date_default_timezone_get();
+			endif;
+			if (is_string($timezone)) :
+				$timezone = new \DateTimeZone($timezone);
+			endif;
 		endif;
+
+		$date->setTimezone($timezone);
 		return $date->format('Ymd\THis');
 	}
 
