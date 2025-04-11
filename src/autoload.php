@@ -37,7 +37,7 @@ if ((!isset($_ENV) || !is_array($_ENV) || !count($_ENV) == 0)) :
 endif;
 
 // Get debug hosts from the environment
-if(isset($_ENV['debug_hosts']) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
+if(isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
 	if(!defined('DEBUG')) :
 		define('DEBUG', true);
 	endif;
@@ -70,34 +70,4 @@ spl_autoload_register(function ($class) {
 		endif;
 	endif;
 });
-
-
-/**
- * Require all classes within the src directory which arn't already required
- * @deprecated deprecated since version 1.2.0. Will be removed in version 1.3.0
- * @since      Method available since Release 1.1.0
- */
-foreach (glob(realpath(__DIR__) . '/class.*.php') as $filename) :
-	$filename = pathinfo($filename, PATHINFO_FILENAME);
-	$class = str_replace('class.', '', $filename);
-	if (!class_exists('\\' . __NAMESPACE__ . '\\' . $class)) :
-		$filename = realpath(dirname(__FILE__) . '/class.' . $class . '.php');
-		if ($filename === FALSE) :
-			$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
-		endif;
-		if ($filename !== FALSE) :
-			if (substr(PHP_VERSION, 0, 3) === '8.4') :
-				require_once($filename);
-			elseif (substr(PHP_VERSION, 0, 3) === '8.3') :
-				if (!str_contains(file_get_contents($filename), 'PHP versions 8.4')) :
-					require_once($filename);
-				elseif (!str_contains(file_get_contents($filename), 'PHP versions')) :
-					require_once($filename);
-				endif;;
-			else :
-				require_once($filename);
-			endif;
-		endif;
-	endif;
-endforeach;
 ?>
