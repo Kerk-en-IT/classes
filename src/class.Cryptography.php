@@ -212,6 +212,9 @@ class Cryptography
 	 */
 	public static function get_integrity(string $file, $type = 'sha384'): string|false
 	{
+		if (\PHP_OS == 'Darwin') :
+			return false;
+		endif;
 		global $html_path;
 		if (isset($html_path) && str_ends_with($html_path, '.shtml')) :
 			return false;
