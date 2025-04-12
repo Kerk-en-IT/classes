@@ -93,4 +93,65 @@ class ColorPalette
 		}
 		return $colorPalette;
 	}
+
+
+	/**
+	 * Get the contrast color of a given HEX color
+	 *
+	 * @param  string $hexColor The HEX color
+	 * @return string $contrastColor The contrast color of the given HEX color
+	 */
+	public static function get_contrast_color(string $hexColor): string
+	{
+		// hexColor RGB
+		$R1 = hexdec(substr($hexColor, 1, 2));
+		$G1 = hexdec(substr($hexColor, 3, 2));
+		$B1 = hexdec(substr($hexColor, 5, 2));
+
+		// Black RGB
+		$blackColor = "#000000";
+		$R2BlackColor = hexdec(substr($blackColor, 1, 2));
+		$G2BlackColor = hexdec(substr($blackColor, 3, 2));
+		$B2BlackColor = hexdec(substr($blackColor, 5, 2));
+
+		// Calc contrast ratio
+		$L1 = 0.2126 * pow($R1 / 255, 2.2) +
+			0.7152 * pow($G1 / 255, 2.2) +
+			0.0722 * pow($B1 / 255, 2.2);
+
+		$L2 = 0.2126 * pow($R2BlackColor / 255, 2.2) +
+			0.7152 * pow($G2BlackColor / 255, 2.2) +
+			0.0722 * pow($B2BlackColor / 255, 2.2);
+
+		$contrastRatio = 0;
+		if ($L1 > $L2) :
+			$contrastRatio = (int)(($L1 + 0.05) / ($L2 + 0.05));
+		else :
+			$contrastRatio = (int)(($L2 + 0.05) / ($L1 + 0.05));
+		endif;
+
+
+		// If contrast is more than 5, return black color
+		if ($contrastRatio > 3) :
+			return '#000000';
+		else :
+			// if not, return white color.
+			return '#FFFFFF';
+		endif;
+	}
+
+
+	/**
+	 * Converts HEX color to RGB
+	 *
+	 * @param  string $hexColor
+	 * @return object $rgb The RGB object
+	 */
+	public static function hex_to_rgb(string $hexColor)
+	{
+		$hexColor = ltrim($hexColor, '#');
+		list($r, $g, $b) = array((float)hexdec(substr($hexColor, 0, 2)), (float)hexdec(substr($hexColor, 2, 2)), (float)hexdec(substr($hexColor, 4, 2)));
+
+		return (object)array('r' => $r, 'g' => $g, 'b' => $b, 'avg' => ($r + $g + $b) / 3.00);
+	}
 }
