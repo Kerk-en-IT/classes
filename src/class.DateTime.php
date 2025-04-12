@@ -488,6 +488,26 @@ class DateTime
 	}
 
 	/**
+	 * Get the text from
+	 *
+	 * @return string
+	 */
+	private static function from(): string
+	{
+		return 'van';
+	}
+
+	/**
+	 * Get the text to
+	 *
+	 * @return string
+	 */
+	private static function to(): string
+	{
+		return 'tot';
+	}
+
+	/**
 	 * Format in a long date format maandag 20 december 2010
 	 *
 	 * @param object datetime
@@ -732,6 +752,26 @@ class DateTime
 	{
 		$datetime = self::GetDate($datetime);
 		return self::days_full()[$datetime->format('w')] . ' ' . $datetime->format('j') . ' ' . self::months_full()[$datetime->format('m') - 1] . ' ' . self::at() . ' ' . $datetime->format('G:i');
+	}
+
+	/**
+	 * maandag 20 december om 9:42 tot 10:42
+	 *
+	 * @param object datetime
+	 * @param object datetime
+	 * @return string maandag 20 december om 9:42 tot 10:42
+	 */
+	public static function FullDateWithoutYearFromTill($from, $to = null): string
+	{
+		$from = self::GetDate($from);
+		$to = self::GetDate($to);
+		if ($to !== null && $from->format('Y-m-d') == $to->format('Y-m-d')) :
+			return self::days_full()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_full()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i') . ' ' . self::to() . ' ' . $to->format('G:i');
+		elseif ($to !== null && $from->format('Y-m-d') != $to->format('Y-m-d')) :
+			return self::days_full()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_full()[$from->format('m') - 1] . ' ' . self::at() . ' ' . $from->format('G:i') . ' ' . self::to() . ' ' . self::days_full()[$to->format('w')] . ' ' . $to->format('j') . ' ' . self::months_full()[$to->format('m') - 1] . ' ' . self::at() . ' ' . $to->format('G:i');
+		else :
+			return self::days_full()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_full()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i');
+		endif;
 	}
 
 	/**
