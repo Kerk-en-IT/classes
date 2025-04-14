@@ -44,6 +44,30 @@ class GeoLocation {
 	 */
 	public $longitude = 0.000000;
 
+	/**
+	 * Street
+	 *
+	 * @var string
+	 */
+	public $street = NULL;
+	/**
+	 * Zipcode
+	 *
+	 * @var string
+	 */
+	public $postalCode = NULL;
+	/**
+	 * City
+	 *
+	 * @var string
+	 */
+	public $city = NULL;
+	/**
+	 * Country
+	 *
+	 * @var string
+	 */
+	public $country = NULL;
 /*
 	public $street = NULL;
 	public $zipcode = NULL;
@@ -63,12 +87,13 @@ class GeoLocation {
 	 * @param  string $address
 	 * @param  string $zipcode
 	 * @param  string $city
+	 * @param  string $country
 	 * @return bool
 	 */
-	public function search($address, $zipcode, $city): bool
+	public function search(?string $address, ?string $zipcode = null, ?string $city = null, ?string $country = null): bool
 	{
-		$this->address = $address . ', ' . $zipcode . ', ' . $city;
-		if($this->address != '') :
+		$this->address = trim(trim(trim(trim(($address ?? '') . ', ' . ($zipcode  !== null ? ($zipcode ?? '') . ', ' : '') . ($city ?? ''), ',')), ',')) . ($country  !== null ? ', ' . ($country ?? '') : '');
+		if(!empty(($address ?? '') . ($zipcode ?? '') . ($city ?? ''))) :
 			$address = urlencode($this->address);
 			if(!empty($this->GOOGLE_MAPS_API_KEY)) :
 
@@ -108,7 +133,13 @@ class GeoLocation {
 				$geo_json = json_decode($data, true);
 				$this->latitude = $geo_json[0]['lat'];
 				$this->longitude = $geo_json[0]['lon'];
-
+				$this->street = $geo_json[0]['address']['road'] ?? null;
+				if($this->street !== null):
+					$this->street .= ' ' . ($geo_json[0]['address']['house_number'] ?? '1');
+				endif;
+				$this->postalCode = $geo_json[0]['address']['postcode'] ?? null;
+				$this->city = $geo_json[0]['address']['city'] ?? null;
+				$this->country = $geo_json[0]['address']['country'] ?? null;
 				return true;
 			endif;
 		else :
