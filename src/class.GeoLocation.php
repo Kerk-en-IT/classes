@@ -68,32 +68,52 @@ class GeoLocation {
 	public function search($address, $zipcode, $city): bool
 	{
 		$this->address = $address . ', ' . $zipcode . ', ' . $city;
-		if($this->address != '' && !empty($this->GOOGLE_MAPS_API_KEY))
-		{
+		if($this->address != '') :
 			$address = urlencode($this->address);
+			if(!empty($this->GOOGLE_MAPS_API_KEY)) :
 
-			$url = "https://maps.google.com/maps/api/geocode/json?address=".$address ."&key=".$this->GOOGLE_MAPS_API_KEY;
-			ini_set('safe_mode', false);
-			$ch = curl_init();
+				$url = "https://maps.google.com/maps/api/geocode/json?address=".$address ."&key=".$this->GOOGLE_MAPS_API_KEY;
+				ini_set('safe_mode', false);
+				$ch = curl_init();
 
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_HEADER,0);
-			curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_HEADER,0);
+				curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
+				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-			$data = curl_exec($ch);
-			curl_close($ch);
-			ini_set('safe_mode', true);
-			$geo_json = json_decode($data, true);
+				$data = curl_exec($ch);
+				curl_close($ch);
+				ini_set('safe_mode', true);
+				$geo_json = json_decode($data, true);
 
-			$this->latitude = $geo_json['results'][0]['geometry']['location']["lat"];
-			$this->longitude = $geo_json['results'][0]['geometry']['location']["lng"];
+				$this->latitude = $geo_json['results'][0]['geometry']['location']["lat"];
+				$this->longitude = $geo_json['results'][0]['geometry']['location']["lng"];
 
-			return true;
-		} else {
+				return true;
+			else :
+				ini_set('safe_mode', false);
+				$url = "https://nominatim.openstreetmap.org/search?q=".$address."&format=json&polygon=1&addressdetails=1";
+				$ch = curl_init();
+
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_HEADER, 0);
+				curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
+				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+				$data = curl_exec($ch);
+				curl_close($ch);
+				ini_set('safe_mode', true);
+				$geo_json = json_decode($data, true);
+				$this->latitude = $geo_json[0]['lat'];
+				$this->longitude = $geo_json[0]['lon'];
+
+				return true;
+			endif;
+		else :
 			return false;
-		}
+		endif;
 	}
 
 	/**
