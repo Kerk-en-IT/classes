@@ -1,5 +1,8 @@
 <?php
 if (!class_exists('\Memcache')) :
+	if(!defined('MEMCACHE_COMPRESSED')) :
+		define('MEMCACHE_COMPRESSED', 2);
+	endif;
 	/**
 	 * MemcacheDummy clone of \Memcache
 	 */
