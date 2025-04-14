@@ -15,54 +15,61 @@ namespace KerkEnIT;
  * @since      Class available since Release 1.2.0
  **/
 
-class Cache extends \Memcache
+class Cache
 {
 	/**
-	 * connect
-	 *
-	 * @param  string $host
-	 * @param  int $port
-	 * @param  mixed $timeout
-	 * @return bool
+	 * @var string $host
 	 */
-	public static function connect(?string $host = null, ?int $port = null, ?int $timeout = null): bool
+	protected $host = 'localhost';
+
+	/**
+	 * @var int $port
+	 */
+	protected $port = 11211;
+
+	/**
+	 * @var int $timeout
+	 */
+	protected $timeout = 30;
+
+	protected \Memcache $memcache;
+	/**
+	 * Constructor
+	 *
+	 */
+	public function __construct()
 	{
-		if (!isset($_ENV) || !is_array($_ENV) || count($_ENV) == 0) :
-			// Load the .env file
-			$file = realpath(self::getEnvPath(dirname(__FILE__)) . '/.env');
-
-			if ($file !== FALSE) : (
-					$_ENV = parse_ini_file($file, true, INI_SCANNER_RAW));
-			else :
-				$_ENV = array();
+		if (isset($_ENV) && is_array($_ENV) && count($_ENV) > 0) :
+			if (isset($_ENV['MEMCACHE_HOST'])) :
+				$this->host = $_ENV['MEMCACHE_HOST'];
 			endif;
-		else :
-			$_ENV = array();
+			if (isset($_ENV['MEMCACHE_PORT'])) :
+				$this->port = $_ENV['MEMCACHE_PORT'];
+			endif;
+			if (isset($_ENV['MEMCACHE_TIMEOUT'])) :
+				$this->timeout = $_ENV['MEMCACHE_TIMEOUT'];
+			endif;
 		endif;
-
-		if (isset($_ENV['MEMCACHE_HOST'])) :
-			$host = $_ENV['MEMCACHE_HOST'];
+		$this->memcache = new \Memcache();
+		$this->memcache->connect($this->host, $this->port, $this->timeout);
+		if ($this->memcache === false) :
+			throw new \Exception('Could not connect to Memcache server');
 		endif;
-		if (isset($_ENV['MEMCACHE_PORT'])) :
-			$port = $_ENV['MEMCACHE_PORT'];
-		endif;
-
-		return parent::connect($host ?? 'localhost', $port, $timeout);
 	}
 
 	/**
 	 * Add data to the data array
 	 *
-	 * @param  string $key
+	 * @param  array|string  $key
 	 * @param  mixed $var
-	 * @param  mixed $flag
-	 * @param  mixed $expire
+	 * @param  int $flags
+	 * @param  int $expire
 	 * @return bool
 	 */
-	public static function set($key, $var, $flag = null, $expire = null): bool
+	public function set(string $key, mixed $value, ?int $flags = 0, ?int $expiration = 0): bool
 	{
 		$key = self::key($key);
-		return parent::set($key, $var, $flag = null, $expire = null);
+		return $this->memcache->set($key, $value, $flags, $expiration);
 	}
 
 	/**
@@ -72,10 +79,10 @@ class Cache extends \Memcache
 	 * @param  mixed $flags
 	 * @return mixed $data or false when not exists
 	 */
-	public static function get($key, &$flags = null)
+	public function get($key, &$flags = null)
 	{
 		$key = self::key($key);
-		return parent::get($key, $flags);
+		return $this->memcache->get($key, $flags);
 	}
 
 	/**
@@ -85,13 +92,13 @@ class Cache extends \Memcache
 	 * @param  mixed $timeout
 	 * @return bool
 	 */
-	public static function delete($key, $timeout = 0): bool
+	public function delete($key, $timeout = 0): bool
 	{
 		$key = self::key($key);
-		return parent::delete($key, $timeout);
+		return $this->memcache->delete($key, $timeout);
 	}
 
-	protected static function key(...$value): string
+	protected function key(...$value): string
 	{
 		$key = array();
 		if (isset($_SERVER) && is_array($_SERVER) && count($_SERVER) > 0 && array_key_exists('SERVER_NAME', $_SERVER)) :
@@ -102,7 +109,7 @@ class Cache extends \Memcache
 		if(count($value) > 0) :
 			$key = array_merge($key, $value);
 		endif;
-		return \implode(DIRECTORY_SEPARATOR, $key);
+		return implode(\DIRECTORY_SEPARATOR, $key);
 	}
 
 	protected static function getEnvPath(string $dir)
