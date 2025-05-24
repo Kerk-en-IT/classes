@@ -84,10 +84,10 @@ class GeoLocation {
 	/**
 	 * Gets the GPS Latitude and Longitude of a given address
 	 *
-	 * @param  string $address
-	 * @param  string $zipcode
-	 * @param  string $city
-	 * @param  string $country
+	 * @param	string $address
+	 * @param	string $zipcode
+	 * @param	string $city
+	 * @param	string $country
 	 * @return bool
 	 */
 	public function search(?string $address, ?string $zipcode = null, ?string $city = null, ?string $country = null): bool
@@ -154,7 +154,7 @@ class GeoLocation {
 	 * @param  float $lng_origins Origin longitude
 	 * @param  float $lat_destinations Destination latitude
 	 * @param  float $lng_destinations Destination longitude
-	 * @return array|bool
+	 * @return	array|bool
 	 */
 	public function matrix($lat_origins, $lng_origins, $lat_destinations, $lng_destinations) :array|bool
 	{

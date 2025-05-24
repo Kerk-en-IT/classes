@@ -156,8 +156,8 @@ class SQL {
 	/**
 	 * strips the slashes from a string or array
 	 *
-	 * @param  string|array $array
-	 * @return string|array type depend on input
+	 * @param	string|array $array
+	 * @return	string|array type depend on input
 	 */
 	private function stripSlashes($array)
 	{

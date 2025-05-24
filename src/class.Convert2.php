@@ -437,16 +437,16 @@ class Convert2
 	 *
 	 * Convert image to JPG
 	 *
-	 * @param string $input_file Source image
+	 * @param string|null $input_file Source image
 	 * @param string $output_file  Destination image
 	 * @param int $width Size in pixels what the expected width should be.
 	 * @param int $height Size in pixels what the expected height should be. Default 0 for auto height
 	 * @return mixed when succeed the file path; otherwise FALSE
 	 */
-	public static function shrink(string $input_file, string $output_file, int $width, int $height = 0)
+	public static function shrink(string|null $input_file, string $output_file, int $width, int $height = 0)
 	{
 		// check if file exists
-		if (!file_exists($input_file)) :
+		if ($input_file === null || !file_exists($input_file)) :
 			return false;
 		endif;
 		$image_dir = pathinfo($output_file, PATHINFO_DIRNAME);
@@ -783,7 +783,7 @@ class Convert2
 	 * @param  mixed $height
 	 * @param  mixed $x
 	 * @param  mixed $y
-	 * @return string|array
+	 * @return	string|array
 	 */
 	public static function get_average_color(string $filename, bool $as_hex_string = true, int $width = 0, int $height = 0, int $x = 0, int $y = 0)
 	{
@@ -854,7 +854,7 @@ class Convert2
 	/**
 	 * Get the dimension on an image
 	 *
-	 * @param  string $filename
+	 * @param	string $filename
 	 * @return object $size The dimension object.
 	 */
 	public static function get_dimension(string $filename) :object
@@ -923,9 +923,9 @@ class Convert2
 	/**
 	 * Replaces the extension of a file
 	 *
-	 * @param  string $filename The filename
-	 * @param  string $new_extension The new extension
-	 * @return string The new filename with the new extension
+	 * @param	string $filename The filename
+	 * @param	string $new_extension The new extension
+	 * @return	string The new filename with the new extension
 	 */
 	private static function replace_extension(string $filename, string $new_extension)
 	{

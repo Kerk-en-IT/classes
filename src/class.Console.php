@@ -28,7 +28,7 @@ class Console
 	/**
 	 * init
 	 *
-	 * @param  int|float $count
+	 * @param	int|float $count
 	 * @return void
 	 */
 	public static function init($count)
@@ -57,8 +57,8 @@ class Console
 	 * info
 	 *
 	 * @param  mixed $param
-	 * @param  int|float $count
-	 * @param  int $index
+	 * @param	int|float $count
+	 * @param	int $index
 	 * @return void
 	 */
 	public static function info($param = null, $count = null, $index = null)
@@ -115,8 +115,8 @@ class Console
 	 * GetPercentage
 	 *
 	 * @param  float $x
-	 * @param  int $decimals
-	 * @return string
+	 * @param	int $decimals
+	 * @return	string
 	 */
 	private static function GetPercentage($x, $decimals = 2)
 	{
@@ -138,8 +138,8 @@ class Console
 	 *
 	 * @param  float|int $index
 	 * @param  float|int $count
-	 * @param  int $decimals
-	 * @return string
+	 * @param	int $decimals
+	 * @return	string
 	 */
 	private static function GetProgress($index, $count, $decimals = 2)
 	{
@@ -154,7 +154,7 @@ class Console
 	/**
 	 * PrintLine
 	 *
-	 * @param  string $param
+	 * @param	string $param
 	 * @return void
 	 */
 	private static function PrintLine(string $param)
@@ -169,7 +169,7 @@ class Console
 	 *
 	 * @param  mixed $first
 	 * @param  mixed|null $second
-	 * @return string
+	 * @return	string
 	 */
 	private static function WriteLine($first, $second = null)
 	{

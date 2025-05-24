@@ -7,13 +7,13 @@ use Exception;
  *
  * PHP versions 8.3, 8.4
  *
- * @package    KerkEnIT
- * @subpackage Cryptography
- * @author     Marco van 't Klooster <info@kerkenit.nl>
- * @copyright  2025-2025 © Kerk en IT
- * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
- * @link       https://www.kerkenit.nl
- * @since      Class available since Release 1.1.0
+ * @package		KerkEnIT
+ * @subpackage	Cryptography
+ * @author		Marco van 't Klooster <info@kerkenit.nl>
+ * @copyright	2025-2025 © Kerk en IT
+ * @license		https://www.gnu.org/licenses/gpl-3.0.html	GNU General Public License v3.0
+ * @link		https://www.kerkenit.nl
+ * @since		Class available since Release 1.1.0
  **/
 class Cryptography
 {
@@ -22,8 +22,8 @@ class Cryptography
 	 *
 	 * @deprecated This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.
 	 *
-	 * @param  string $string The data to be encrypted.
-	 * @return string Encrypted string
+	 * @param	string $string The data to be encrypted.
+	 * @return	string Encrypted string
 	 */
 	public static function encrypt($string)
 	{
@@ -55,8 +55,8 @@ class Cryptography
 	 *
 	 * @deprecated This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.
 	 *
-	 * @param  encrypted $string The data to be decrypted.
-	 * @return string Decrypted string
+	 * @param	encrypted $string The data to be decrypted.
+	 * @return	string Decrypted string
 	 */
 	public static function decrypt($encrypted)
 	{
@@ -179,11 +179,14 @@ class Cryptography
 	/**
 	 * Get GitHub Hash
 	 *
-	 * @param  string $file
-	 * @return string hash
+	 * @param	string|null $file
+	 * @return	string hash
 	 */
-	public static function get_hash(string $file): string
+	public static function get_hash(string|null $file): string
 	{
+		if($file === null) :
+			return '';
+		endif;
 		$hash = exec('git hash-object "' . $file . '"');
 		$hash = substr($hash, 0, intval(strlen($hash) / 2));
 		$hash = \Aza\Components\Math\NumeralSystem::convert($hash, 16, 62);
@@ -195,8 +198,8 @@ class Cryptography
 	/**
 	 * Get SHA512 hash
 	 *
-	 * @param  string $file
-	 * @return string|false SHA512 hash in base64 format
+	 * @param	string $file
+	 * @return	string|false SHA512 hash in base64 format
 	 */
 	public static function get_SHA512(string $file): string|false
 	{
@@ -206,9 +209,9 @@ class Cryptography
 	/**
 	 * Get integrity hash
 	 *
-	 * @param  string $file
-	 * @param  string $type	[ sha256, sha384, sha512 ]
-	 * @return string|false hash in base64 format or false if file not found
+	 * @param	string $file
+	 * @param	string $type	[ sha256, sha384, sha512 ]
+	 * @return	string|false hash in base64 format or false if file not found
 	 */
 	public static function get_integrity(string $file, $type = 'sha384'): string|false
 	{

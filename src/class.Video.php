@@ -9,13 +9,13 @@ namespace KerkEnIT;
  *
  * PHP versions 8.4
  *
- * @package    KerkEnIT
- * @subpackage Video
- * @author     Marco van 't Klooster <info@kerkenit.nl>
- * @copyright  2025-2025 © Kerk en IT
- * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
- * @link       https://www.kerkenit.nl
- * @since      Class available since Release 1.2.0
+ * @package		KerkEnIT
+ * @subpackage	Video
+ * @author		Marco van 't Klooster <info@kerkenit.nl>
+ * @copyright	2025-2025 © Kerk en IT
+ * @license		https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
+ * @link		https://www.kerkenit.nl
+ * @since		Class available since Release 1.2.0
  */
 class Video
 {
@@ -48,7 +48,7 @@ class Video
 	/**
 	 * Create a new Video object with the source video path to convert video files with ffmpeg
 	 *
-	 * @param  string $source The source video path
+	 * @param	string $source The source video path
 	 * @return void
 	 */
 	public function __construct(string $source)
@@ -61,9 +61,9 @@ class Video
 	/**
 	 * Create a watermark on the video
 	 *
-	 * @param  string $watermark The watermark image path
-	 * @param  string|null $destinationPath The requested destination path
-	 * @return string $destinationPath or throw an \Exception if the file is not found or the command failed
+	 * @param	string $watermark The watermark image path
+	 * @param	string|null $destinationPath The requested destination path
+	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
 	public function watermark(string $watermark, ?string $destinationPath): string
 	{
@@ -92,7 +92,7 @@ class Video
 			if ($watermark === false) :
 				throw new \Exception('Failed to create watermark. File not found');
 			endif;
-			$command = "ffmpeg -i '{$this->source}' -i '{$watermark}' -filter_complex \"{$filter}\" -c:a copy  '{$destinationPath}' -y";
+			$command = "ffmpeg -i '{$this->source}' -i '{$watermark}' -filter_complex \"{$filter}\" -c:a copy '{$destinationPath}' -y";
 			//Disable Watermark for protecting copyright
 			//$command = "cp '{$vidpath} '{$destinationPath}'";
 			if (shell_exec($command) === FALSE) :
@@ -110,8 +110,8 @@ class Video
 	/**
 	 * The getter for the video path
 	 *
-	 * @param  string $name
-	 * @return string $videoPath or throw an \Exception
+	 * @param	string $name
+	 * @return	string $videoPath or throw an \Exception
 	 */
 	public string $source {
 		get {
@@ -128,7 +128,7 @@ class Video
 	/**
 	 * The getter for the color space
 	 *
-	 * @return string $colorSpace or an empty string
+	 * @return	string $colorSpace or an empty string
 	 */
 	private string $colorSpace {
 		get {
@@ -163,8 +163,8 @@ class Video
 	/**
 	 * Create a poster image of the video
 	 *
-	 * @param  string|null $destinationPath The requested destination path
-	 * @return string $destinationPath or throw an \Exception if the file is not found or the command failed
+	 * @param	string|null $destinationPath The requested destination path
+	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
 	public function poster(?string $destinationPath): string
 	{
@@ -198,8 +198,8 @@ class Video
 	 * The video is converted to the theora codec
 	 * The audio is converted to the vorbis codec
 	 *
-	 * @param  string|null $destinationPath The requested destination path
-	 * @return string $destinationPath or throw an \Exception if the file is not found or the command failed
+	 * @param	string|null $destinationPath The requested destination path
+	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
 	public function ogv(?string $destinationPath): string
 	{
@@ -235,8 +235,8 @@ class Video
 	 * The video is converted to the h264 codec
 	 * The audio is converted to the aac codec
 	 *
-	 * @param  string|null $destinationPath The requested destination path
-	 * @return string $destinationPath or throw an \Exception if the file is not found or the command failed
+	 * @param	string|null $destinationPath The requested destination path
+	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
 	public function mp4(?string $destinationPath): string
 	{
@@ -293,8 +293,8 @@ class Video
 	 * The video is converted to the h265 codec
 	 * The audio is converted to the aac codec
 	 *
-	 * @param  string|null $destinationPath The requested destination path
-	 * @return string $destinationPath or throw an \Exception if the file is not found or the command failed
+	 * @param	string|null $destinationPath The requested destination path
+	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
 	public function h265(?string $destinationPath): string
 	{
@@ -345,8 +345,8 @@ class Video
 	 * The video is converted to the vp9 codec
 	 * The audio is converted to the opus codec
 	 *
-	 * @param  string|null $destinationPath The requested destination path
-	 * @return string $destinationPath or throw an \Exception if the file is not found or the command failed
+	 * @param	string|null $destinationPath The requested destination path
+	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
 	public function webm(?string $destinationPath): string
 	{
@@ -432,8 +432,8 @@ class Video
 	 * The video is converted to the vp8 codec
 	 * The audio is converted to the vorbis codec
 	 *
-	 * @param  string|null $destinationPath The requested destination path
-	 * @return string $destinationPath or throw an \Exception if the file is not found or the command failed
+	 * @param	string|null $destinationPath The requested destination path
+	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
 	public function vp8(?string $destinationPath): string
 	{

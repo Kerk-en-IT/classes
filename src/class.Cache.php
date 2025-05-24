@@ -62,8 +62,8 @@ class Cache
 	 *
 	 * @param  array|string  $key
 	 * @param  mixed $var
-	 * @param  int $flags
-	 * @param  int $expire
+	 * @param	int $flags
+	 * @param	int $expire
 	 * @return bool
 	 */
 	public function set(string $key, mixed $value, ?int $flags = 0, ?int $expiration = 0): bool

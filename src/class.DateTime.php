@@ -7,13 +7,13 @@ use KerkEnIT\Format;
  *
  * PHP versions 8.3, 8.4
  *
- * @package    KerkEnIT
- * @subpackage DateTime
- * @author     Marco van 't Klooster <info@kerkenit.nl>
- * @copyright  2010-2025 © Kerk en IT
- * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
- * @link       https://www.kerkenit.nl
- * @since      Class available since Release 1.1.0
+ * @package		KerkEnIT
+ * @subpackage	DateTime
+ * @author		Marco van 't Klooster <info@kerkenit.nl>
+ * @copyright	2010-2025 © Kerk en IT
+ * @license		https://www.gnu.org/licenses/gpl-3.0.html	GNU General Public License v3.0
+ * @link		https://www.kerkenit.nl
+ * @since		Class available since Release 1.1.0
  **/
 class DateTime
 {
@@ -148,19 +148,11 @@ class DateTime
 	 * Get the date for the current culture
 	 *
 	 * @param string $date input date
-	 * @return string formatted date
+	 * @return	string formatted date
 	 */
 	public static function culture_date($date, $style = \IntlDateFormatter::LONG): string
 	{
-		$time = time();
-
-		if (is_numeric($date)) :
-			$time = $date;
-		elseif (is_object($date) && $date instanceof \DateTime) :
-			$time = $date;
-		else :
-			$time = strtotime($date);
-		endif;
+		$time = self::GetDate($date);
 		global $culture;
 		$formatter = new \IntlDateFormatter(str_replace('-', '_', $culture), $style, \IntlDateFormatter::NONE);
 		return $formatter->format($time);
@@ -171,7 +163,7 @@ class DateTime
 	 * Get the date for the current culture
 	 *
 	 * @param string $date input date
-	 * @return string formatted date
+	 * @return	string formatted date
 	 */
 	public static function culture_time($date, $style = \IntlDateFormatter::SHORT): string
 	{
@@ -194,7 +186,7 @@ class DateTime
 	 * Get the date and time for the current culture
 	 *
 	 * @param string $date input date
-	 * @return string formatted date
+	 * @return	string formatted date
 	 */
 	public static function culture_datetime($date): string
 	{
@@ -206,7 +198,7 @@ class DateTime
 	 * Get the weekday, date and time for the current culture
 	 *
 	 * @param string $date input date
-	 * @return string formatted date
+	 * @return	string formatted date
 	 */
 	public static function culture_full_datetime($date): string
 	{
@@ -220,7 +212,7 @@ class DateTime
 	 *
 	 * @param string $date input date
 	 * @param string $timezone destination TimeZone
-	 * @return string formatted date in RSS standard
+	 * @return	string formatted date in RSS standard
 	 * E.g. Thu, 07 Dec 2023 14:19:00 +0100
 	 * When TimeZone = UTC it will return Thu, 07 Dec 2023 13:19:00 +0000
 	 */
@@ -235,7 +227,7 @@ class DateTime
 		if ($timezone == 'UTC') :
 			if ((int)$datetime->format('His') === 0) :
 				$datetime->setTimezone(new \DateTimeZone($timezone));
-				$datetime->setTime(0, 0, 0, 0);
+				$datetime->setTime(0, 0);
 			else :
 				$datetime->setTimezone(new \DateTimeZone($timezone));
 			endif;
@@ -243,7 +235,7 @@ class DateTime
 		elseif ($timezone == 'GMT') :
 			if ((int)$datetime->format('His') === 0) :
 				$datetime->setTimezone(new \DateTimeZone($timezone));
-				$datetime->setTime(0, 0, 0, 0);
+				$datetime->setTime(0, 0);
 			else :
 				$datetime->setTimezone(new \DateTimeZone($timezone));
 			endif;
@@ -251,7 +243,7 @@ class DateTime
 		else :
 			if ((int)$datetime->format('His') === 0) :
 				$datetime->setTimezone(new \DateTimeZone($timezone));
-				$datetime->setTime(0, 0, 0, 0);
+				$datetime->setTime(0, 0);
 			else :
 				$datetime->setTimezone(new \DateTimeZone($timezone));
 			endif;
@@ -267,7 +259,7 @@ class DateTime
 	 *
 	 * @param mixed $datetime input date
 	 * @param string|bool $timezone destination TimeZone
-	 * @return string formatted date in ISO 8601 standard
+	 * @return	string formatted date in ISO 8601 standard
 	 * E.g. 2022-12-01T13:47:24+01:00
 	 * When TimeZone = UTC it will return 2009-02-28T18:56:23Z
 	 */
@@ -293,7 +285,7 @@ class DateTime
 	 *
 	 * @param mixed $datetime input date
 	 * @param string|bool $timezone destination TimeZone
-	 * @return string formatted date in ISO 8601 standard
+	 * @return	string formatted date in ISO 8601 standard
 	 * E.g. 2022-12-01T13:47:24+01:00
 	 */
 	public static function ATOM($datetime = 'now', $timezone = 'Europe/Amsterdam'): string
@@ -314,7 +306,7 @@ class DateTime
 	 *
 	 * @param mixed $datetime input date
 	 * @param string|DateTimeZone|bool $timezone destination TimeZone
-	 * @return string formatted date in ISO 8601 standard
+	 * @return	string formatted date in ISO 8601 standard
 	 * E.g. 20221201T134724
 	 */
 	public static function RFC5545($datetime = 'now', string|\DateTimeZone|bool $timezone = false): string
@@ -337,7 +329,7 @@ class DateTime
 	 * Get the duration in ISO 8601 standard.
 	 *
 	 * @param mixed $duration
-	 * @return string P1Y2M10DT2H30M
+	 * @return	string P1Y2M10DT2H30M
 	 */
 	public static function ISO8601Duration($duration): string
 	{
@@ -356,8 +348,8 @@ class DateTime
 	/**
 	 * IsoDate
 	 *
-	 * @param  mixed $datetime
-	 * @return string 20161220T094200
+	 * @param	mixed $datetime
+	 * @return	string 20161220T094200
 	 */
 	public static function IsoDate($datetime): string
 	{
@@ -369,7 +361,7 @@ class DateTime
 	 * Get Time Ago
 	 *
 	 * @param mixed $datetime
-	 * @return string
+	 * @return	string
 	 */
 	public static function TimeAgo($datetime): string
 	{
@@ -387,7 +379,7 @@ class DateTime
 	/**
 	 * Get's a list with the full names of all months
 	 *
-	 * @return array
+	 * @return	array
 	 */
 	private static function months_full(): array
 	{
@@ -397,7 +389,7 @@ class DateTime
 	/**
 	 * Get's a list with the short names of all months
 	 *
-	 * @return array
+	 * @return	array
 	 */
 	private static function months_short(): array
 	{
@@ -407,7 +399,7 @@ class DateTime
 	/**
 	 * Get's a list with the full names of the days of the week
 	 *
-	 * @return array
+	 * @return	array
 	 */
 	private static function days_full(): array
 	{
@@ -417,7 +409,7 @@ class DateTime
 	/**
 	 * Get's a list with the short names of the days of the week
 	 *
-	 * @return array
+	 * @return	array
 	 */
 	private static function days_short(): array
 	{
@@ -427,8 +419,8 @@ class DateTime
 	/**
 	 * Get name of the part of the day
 	 *
-	 * @param  int $hour
-	 * @return string morgen
+	 * @param	int $hour
+	 * @return	string morgen
 	 */
 	public static function days_part($hour): string
 	{
@@ -446,8 +438,8 @@ class DateTime
 	/**
 	 * Get name of the part of the day in another form
 	 *
-	 * @param  int $hour
-	 * @return string ochtend
+	 * @param	int $hour
+	 * @return	string ochtend
 	 */
 	public static function days_part2($hour): string
 	{
@@ -465,8 +457,8 @@ class DateTime
 	/**
 	 * Get's a list of timing periods
 	 *
-	 * @param  bool $plural
-	 * @return array
+	 * @param	bool $plural
+	 * @return	array
 	 */
 	private static function period($plural = false): array
 	{
@@ -480,7 +472,7 @@ class DateTime
 	/**
 	 * Get the text at
 	 *
-	 * @return string
+	 * @return	string
 	 */
 	private static function at(): string
 	{
@@ -490,7 +482,7 @@ class DateTime
 	/**
 	 * Get the text from
 	 *
-	 * @return string
+	 * @return	string
 	 */
 	private static function from(): string
 	{
@@ -500,7 +492,7 @@ class DateTime
 	/**
 	 * Get the text to
 	 *
-	 * @return string
+	 * @return	string
 	 */
 	private static function to(): string
 	{
@@ -510,8 +502,8 @@ class DateTime
 	/**
 	 * Format in a long date format maandag 20 december 2010
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 december 2010
+	 * @param	object datetime
+	 * @return	string maandag 20 december 2010
 	 */
 	public static function LongDate($datetime, $locale = NULL): string
 	{
@@ -536,8 +528,8 @@ class DateTime
 	/**
 	 * maandag 20 december 2010
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 dec. 2010
+	 * @param	object datetime
+	 * @return	string maandag 20 dec. 2010
 	 */
 	public static function ShortMonthDate($datetime): string
 	{
@@ -548,8 +540,8 @@ class DateTime
 	/**
 	 * december 2010
 	 *
-	 * @param object datetime
-	 * @return string december 2010
+	 * @param	object datetime
+	 * @return	string december 2010
 	 */
 	public static function MonthAndYear($datetime): string
 	{
@@ -560,8 +552,8 @@ class DateTime
 	/**
 	 * maandag 20 december
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 december
+	 * @param	object datetime
+	 * @return	string maandag 20 december
 	 */
 	public static function DayDateMonth($datetime): string
 	{
@@ -572,9 +564,9 @@ class DateTime
 	/**
 	 * maandag 20 december
 	 *
-	 * @param object datetime
+	 * @param	object datetime
 	 * @param string period
-	 * @return string maandag 20 december
+	 * @return	string maandag 20 december
 	 */
 	public static function DayDateMonthPeriod($datetime, $period = 'morgen'): string
 	{
@@ -585,8 +577,8 @@ class DateTime
 	/**
 	 * maandag
 	 *
-	 * @param object datetime
-	 * @return string maandag
+	 * @param	object datetime
+	 * @return	string maandag
 	 */
 	public static function DayOfWeekName($value): string
 	{
@@ -603,8 +595,8 @@ class DateTime
 	/**
 	 * maandag 20 december 2010
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 december 2010
+	 * @param	object datetime
+	 * @return	string maandag 20 december 2010
 	 */
 	public static function FullDate($datetime): string
 	{
@@ -614,8 +606,8 @@ class DateTime
 	/**
 	 * 20 december 2010
 	 *
-	 * @param object datetime
-	 * @return string 20 december 2010
+	 * @param	object datetime
+	 * @return	string 20 december 2010
 	 */
 	public static function DutchDate($datetime): string
 	{
@@ -626,8 +618,8 @@ class DateTime
 	/**
 	 * maandag 20 december 2010 9:42
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 december 2010 9:42
+	 * @param	object datetime
+	 * @return	string maandag 20 december 2010 9:42
 	 */
 	public static function FullDateTime($datetime): string
 	{
@@ -638,8 +630,8 @@ class DateTime
 	/**
 	 * ma 20 dec 2010 9:42
 	 *
-	 * @param object datetime
-	 * @return string ma 20 dec 2010 9:42
+	 * @param	object datetime
+	 * @return	string ma 20 dec 2010 9:42
 	 */
 	public static function ShortDateAndTime($datetime): string
 	{
@@ -650,8 +642,8 @@ class DateTime
 	/**
 	 * 20 dec
 	 *
-	 * @param object datetime
-	 * @return string 20 dec
+	 * @param	object datetime
+	 * @return	string 20 dec
 	 */
 	public static function ShortDateAndMonth($datetime): string
 	{
@@ -662,8 +654,8 @@ class DateTime
 	/**
 	 * 20 december
 	 *
-	 * @param object datetime
-	 * @return string 20 december
+	 * @param	object datetime
+	 * @return	string 20 december
 	 */
 	public static function ShortDateAndFullMonth($datetime): string
 	{
@@ -674,8 +666,8 @@ class DateTime
 	/**
 	 * 9:42
 	 *
-	 * @param object datetime
-	 * @return string 9:42
+	 * @param	object datetime
+	 * @return	string 9:42
 	 */
 	public static function ShortTime($datetime): string
 	{
@@ -686,8 +678,8 @@ class DateTime
 	/**
 	 * 9.42
 	 *
-	 * @param object datetime
-	 * @return string 9.42
+	 * @param	object datetime
+	 * @return	string 9.42
 	 */
 	public static function DutchShortTime($datetime): string
 	{
@@ -698,8 +690,8 @@ class DateTime
 	/**
 	 * 09:42
 	 *
-	 * @param object datetime
-	 * @return string 09:42
+	 * @param	object datetime
+	 * @return	string 09:42
 	 */
 	public static function Time($datetime): string
 	{
@@ -710,8 +702,8 @@ class DateTime
 	/**
 	 * ma 20 december 2010
 	 *
-	 * @param object datetime
-	 * @return string ma 20 december 2010
+	 * @param	object datetime
+	 * @return	string ma 20 december 2010
 	 */
 	public static function ShortDate($datetime): string
 	{
@@ -722,8 +714,8 @@ class DateTime
 	/**
 	 * maandag 20 december 2010 om 9:42
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 december 2010 om 9:42
+	 * @param	object datetime
+	 * @return	string maandag 20 december 2010 om 9:42
 	 */
 	public static function FullDateAt($datetime): string
 	{
@@ -734,8 +726,8 @@ class DateTime
 	/**
 	 * maandag 20 december 2010 om 9:42
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 december 2010 om 9:42
+	 * @param	object datetime
+	 * @return	string maandag 20 december 2010 om 9:42
 	 */
 	public static function FullDateAtNullTime($datetime): string
 	{
@@ -745,8 +737,8 @@ class DateTime
 	/**
 	 * maandag 20 december om 9:42
 	 *
-	 * @param object datetime
-	 * @return string maandag 20 december om 9:42
+	 * @param	object datetime
+	 * @return	string maandag 20 december om 9:42
 	 */
 	public static function FullDateWithoutYearAt($datetime): string
 	{
@@ -757,9 +749,9 @@ class DateTime
 	/**
 	 * maandag 20 december om 9:42 tot 10:42
 	 *
-	 * @param object datetime
-	 * @param object datetime
-	 * @return string maandag 20 december om 9:42 tot 10:42
+	 * @param	object datetime
+	 * @param	object datetime
+	 * @return	string maandag 20 december om 9:42 tot 10:42
 	 */
 	public static function FullDateWithoutYearFromTill($from, $to = null): string
 	{
@@ -777,8 +769,8 @@ class DateTime
 	/**
 	 * ma 20-12 9:42
 	 *
-	 * @param object datetime
-	 * @return string ma 20-12 9:42
+	 * @param	object datetime
+	 * @return	string ma 20-12 9:42
 	 */
 	public static function ShortDateTimeMonth($datetime): string
 	{
@@ -790,8 +782,8 @@ class DateTime
 	/**
 	 * ma 20-12-2015 9:42
 	 *
-	 * @param object datetime
-	 * @return string ma 20-12-2015 9:42
+	 * @param	object datetime
+	 * @return	string ma 20-12-2015 9:42
 	 */
 	public static function ShortDateTime($datetime): string
 	{
@@ -802,8 +794,8 @@ class DateTime
 	/**
 	 * ma 20-12-2015 09:42
 	 *
-	 * @param object datetime
-	 * @return string ma 20-12-2015 09:42
+	 * @param	object datetime
+	 * @return	string ma 20-12-2015 09:42
 	 */
 	public static function ShortDateTimeHour($datetime): string
 	{
@@ -816,7 +808,7 @@ class DateTime
 	/**
 	 * Calculates the Easter date for a given year
 	 *
-	 * @param  int $y
+	 * @param	int $y
 	 * @return \DateTime
 	 */
 	public static function easter_date($y)
@@ -874,7 +866,7 @@ class DateTime
 	public static function FeastDate_YN($date)
 	{
 		$datetime = self::GetDate($date);
-		if ($datetime->format('N') >= 6) :
+		if ($datetime->format('N') > 5) :
 			return true;
 		endif;
 		$feasts = array('08-12', '25-12', '01-01', '06-01', '19-03', '25-03', '24-06', '29-06', '15-08', '01-11', '07-11');
@@ -897,7 +889,7 @@ class DateTime
 	 * Get Duration text
 	 *
 	 * @param int $minutes Minutes to add or subtract from the time of now
-	 * @return string
+	 * @return	string
 	 */
 	public static function Duration($minutes)
 	{
@@ -945,8 +937,8 @@ class DateTime
 	/**
 	 * Gets the time from now in
 	 *
-	 * @param  string $date
-	 * @return string
+	 * @param	string $date
+	 * @return	string
 	 */
 	public static function Ago($date)
 	{
@@ -983,7 +975,7 @@ class DateTime
 	 * Gets the date for a datetime picker
 	 *
 	 * @param  mixed $datetime
-	 * @return string 20-12-2016 09:42:00
+	 * @return	string 20-12-2016 09:42:00
 	 */
 	public static function DateTimePicker($datetime)
 	{
@@ -994,8 +986,8 @@ class DateTime
 	 * Gets the date for a date picker
 	 *
 	 * @param  mixed $datetime
-	 * @param  bool $nullable Default false
-	 * @return string 2016-12-20
+	 * @param	bool $nullable Default false
+	 * @return	string 2016-12-20
 	 */
 	public static function DatePicker($datetime, $nullable = false)
 	{
@@ -1016,8 +1008,8 @@ class DateTime
 	 * Gets the date for a time picker
 	 *
 	 * @param  mixed $datetime
-	 * @param  bool $nullable Default false
-	 * @return string 09:42
+	 * @param	bool $nullable Default false
+	 * @return	string 09:42
 	 */
 	public static function TimePicker($datetime, $nullable = false)
 	{
@@ -1058,9 +1050,9 @@ class DateTime
 	 * Add days to a datetime object
 	 *
 	 * @param  mixed $datetime
-	 * @param  int $days
-	 * @param  string $format Output format.
-	 * @return string
+	 * @param	int $days
+	 * @param	string $format Output format.
+	 * @return	string
 	 */
 	public static function DateTimeAdd($datetime, $days, $format = 'd-m-Y H:i:s')
 	{
@@ -1082,7 +1074,7 @@ class DateTime
 	 * Get a logical structure of a date.
 	 *
 	 * @param  mixed $datetime
-	 * @param  string $type
+	 * @param	string $type
 	 * @return object $logic
 	 */
 	public static function GetDateTimeLogic($datetime, $type)
@@ -1176,7 +1168,7 @@ class DateTime
 	 * Check if given date is within the given days in ```$x```
 	 *
 	 * @param  mixed $datetime
-	 * @param  int|float $x Add days to datetime. When negative it subtract the amount of days.
+	 * @param	int|float $x Add days to datetime. When negative it subtract the amount of days.
 	 * @return bool
 	 */
 	public static function isWithinXDays($datetime, $x)
@@ -1206,7 +1198,7 @@ class DateTime
 	 * @param  mixed $datetime \DateTime to compare.
 	 * @param  mixed $begin \DateTime ot the beginning.
 	 * @param  mixed $end \DateTime of the end.
-	 * @param  int|float $x Add days to datetime. When negative it subtract the amount of days.
+	 * @param	int|float $x Add days to datetime. When negative it subtract the amount of days.
 	 * @return bool
 	 */
 	public static function isBetween($datetime, $begin, $end, $x = 0)
@@ -1227,7 +1219,7 @@ class DateTime
 	 * @deprecated in 1.3.107 @see \KerkEnIT\DateTime::ISO8601()
 	 *
 	 * @param  mixed $datetime
-	 * @return string
+	 * @return	string
 	 */
 	public static function jsDateTime($datetime)
 	{
@@ -1238,7 +1230,7 @@ class DateTime
 	 * Gets a order by based on the TimeStamp
 	 *
 	 * @param  mixed $datetime
-	 * @param  int $order
+	 * @param	int $order
 	 * @return int 2016355094200
 	 */
 	public static function TimeStampOrder($datetime, $order)
@@ -1249,7 +1241,7 @@ class DateTime
 	/**
 	 * Get The Unix Timestamp from a datetime object
 	 *
-	 * @param object datetime
+	 * @param	object datetime
 	 * @return int 1450600974
 	 */
 	public static function TimeStamp($datetime)
@@ -1262,8 +1254,8 @@ class DateTime
 	 * Added minutes to the start time to calculate the end time
 	 *
 	 * @param  mixed $datetime
-	 * @param  int $duration
-	 * @return string
+	 * @param	int $duration
+	 * @return	string
 	 */
 	public static function jsEndDateTime($datetime, $duration)
 	{
@@ -1295,7 +1287,7 @@ class DateTime
 	 * Get the SQL DateTime
 	 *
 	 * @param  mixed $datetime
-	 * @return string 2016-12-20 09:42:00
+	 * @return	string 2016-12-20 09:42:00
 	 */
 	public static function sqlDateTime($datetime)
 	{
@@ -1306,7 +1298,7 @@ class DateTime
 	 * Get the SQL Date
 	 *
 	 * @param  mixed $datetime
-	 * @return string 2016-12-20
+	 * @return	string 2016-12-20
 	 */
 	public static function sqlDate($datetime)
 	{
@@ -1317,7 +1309,7 @@ class DateTime
 	 * Get the SQL Time
 	 *
 	 * @param  mixed $datetime
-	 * @return string 09:42:00
+	 * @return	string 09:42:00
 	 */
 	public static function sqlTime($datetime)
 	{

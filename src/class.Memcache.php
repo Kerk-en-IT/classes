@@ -16,8 +16,8 @@ if (!class_exists('\Memcache')) :
 		/**
 		 * connect
 		 *
-		 * @param  string $host
-		 * @param  int $port
+		 * @param	string $host
+		 * @param	int $port
 		 * @param  mixed $timeout
 		 * @return bool
 		 */
@@ -32,7 +32,7 @@ if (!class_exists('\Memcache')) :
 		/**
 		 * Add data to the data array
 		 *
-		 * @param  string $key
+		 * @param	string $key
 		 * @param  mixed $var
 		 * @param  mixed $flag
 		 * @param  mixed $expire

@@ -31,8 +31,8 @@ class Image
 	 * Create an HTML Img Tag with Base64 Image Data
 	 *
 	 * @param  resource|\GdImage $image
-	 * @param  string $format Image Mimetype @see ```ImageMimeTypes```
-	 * @return string|null Base64 image with correct mimetype
+	 * @param	string $format Image Mimetype @see ```ImageMimeTypes```
+	 * @return	string|null Base64 image with correct mimetype
 	 */
 	public static function ToBase64($image, $format = ImageMimeTypes::JPG)
 	{
@@ -74,11 +74,11 @@ class Image
 	/**
 	 * Resize the image to the correct size
 	 *
-	 * @param  string $file
-	 * @param  int|float $w Destination width
-	 * @param  int|float $h Destination height
-	 * @param  bool $crop Crops the extra information of the image
-	 * @param  string $format Image Mimetype @see ```ImageMimeTypes``
+	 * @param	string $file
+	 * @param	int|float $w Destination width
+	 * @param	int|float $h Destination height
+	 * @param	bool $crop Crops the extra information of the image
+	 * @param	string $format Image Mimetype @see ```ImageMimeTypes``
 	 * @return resource|\GdImage|false
 	 */
 	public static function Resize($file, $w, $h, $crop = FALSE, $format = ImageMimeTypes::JPG)

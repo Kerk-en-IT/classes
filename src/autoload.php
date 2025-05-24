@@ -60,7 +60,7 @@ endif;
 /**
  * Autoloader for the Kerk en IT Framework
  *
- * @param  string $class
+ * @param	string $class
  * @return void
  */
 spl_autoload_register(function ($class) {

@@ -34,9 +34,9 @@ class ColorPalette
 	/**
 	 * Modify Color
 	 *
-	 * @param  string $hex Hex color code
-	 * @param  int $diff (positive or negative) Min 0, Max 255
-	 * @return string Modified color code
+	 * @param	string $hex Hex color code
+	 * @param	int $diff (positive or negative) Min 0, Max 255
+	 * @return	string Modified color code
 	 */
 	public function color_mod(string $hex, int $diff): string
 	{
@@ -58,8 +58,8 @@ class ColorPalette
 	/**
 	 * Create Color Palette
 	 *
-	 * @param  int $colorCount Number of colors in palette
-	 * @return array Color palette
+	 * @param	int $colorCount Number of colors in palette
+	 * @return	array Color palette
 	 */
 	public function createPalette($colorCount = 5): array
 	{
@@ -98,8 +98,8 @@ class ColorPalette
 	/**
 	 * Get the contrast color of a given HEX color
 	 *
-	 * @param  string $hexColor The HEX color
-	 * @return string $contrastColor The contrast color of the given HEX color
+	 * @param	string $hexColor The HEX color
+	 * @return	string $contrastColor The contrast color of the given HEX color
 	 */
 	public static function get_contrast_color(string $hexColor): string
 	{
@@ -144,7 +144,7 @@ class ColorPalette
 	/**
 	 * Converts HEX color to RGB
 	 *
-	 * @param  string $hexColor
+	 * @param	string $hexColor
 	 * @return object $rgb The RGB object
 	 */
 	public static function hex_to_rgb(string $hexColor)

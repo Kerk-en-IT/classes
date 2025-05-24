@@ -54,8 +54,8 @@ class Math
 	/**
 	 * Round Up To Any
 	 *
-	 * @param  int:float $n
-	 * @param  int $x
+	 * @param	int:float $n
+	 * @param	int $x
 	 * @return int
 	 */
 	public static function roundUpToAny($n, $x = 5): int
