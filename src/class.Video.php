@@ -67,7 +67,7 @@ class Video
 	 */
 	public function watermark(string $watermark, ?string $destinationPath): string
 	{
-		if ($destinationPath !== null) :
+		if ($destinationPath !== null && !is_file($destinationPath)) :
 			$filter = null;
 			//$img = new \Imagick();
 			//$img->readImage($this->_poster);
