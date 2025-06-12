@@ -36,9 +36,9 @@ class Format
 	 * Menu
 	 * @deprecated in 1.3.107
 	 *
-	 * @param	string $url
-	 * @param	string $name
-	 * @return	string
+	 * @param  string $url
+	 * @param  string $name
+	 * @return string
 	 */
 	public static function Menu($url, $name)
 	{
@@ -55,10 +55,10 @@ class Format
 	/**
 	 * Gets the full name of a user
 	 *
-	 * @param	string $firstname
-	 * @param	string $infix
-	 * @param	string $lastname
-	 * @return	string
+	 * @param  string $firstname
+	 * @param  string $infix
+	 * @param  string $lastname
+	 * @return string
 	 */
 	public static function Name($firstname, $infix, $lastname)
 	{
@@ -68,14 +68,14 @@ class Format
 	/**
 	 * Gets the full name of a user including the name of the husband
 	 *
-	 * @param	string $firstname
-	 * @param	string $infix
-	 * @param	string $lastname
-	 * @param	string $lastname_partner
-	 * @param	int $gender
-	 * @param	int $gender_partner
-	 * @param	int|null $maritalstatus			Marital status person (Nullable)
-	 * @return	string
+	 * @param  string $firstname
+	 * @param  string $infix
+	 * @param  string $lastname
+	 * @param  string $lastname_partner
+	 * @param  int $gender
+	 * @param  int $gender_partner
+	 * @param  int|null $maritalstatus			Marital status person (Nullable)
+	 * @return string
 	 */
 	public static function NameMarried(?string $firstname = '', ?string $infix = null, ?string $lastname = null, ?string $lastname_partner = null, ?int $gender = null, ?int $gender_partner = null, ?int $maritalstatus = null)
 	{
@@ -85,17 +85,17 @@ class Format
 	/**
 	 * Gets the full name of a user including the name of the husband
 	 *
-	 * @param	string $firstname				Firstname of person
-	 * @param	string $infix					Infix of person
-	 * @param	string $lastname					Last name of person
-	 * @param	string $lastname_partner			Lastname of partner
-	 * @param	int $gender						Gender of person
-	 * @param	int $gender_partner				Last name of person
-	 * @param	int|null $maritalstatus			Marital status person (Nullable)
-	 * @param	int|null $age					Age of person (Nullable)
-	 * @param	string|\DateTime|null $dateofbirth	Birthday. This can be empty (When `null` the age is used.)
-	 * @param	string|\DateTime|null $dateofdeath	Date of death. Can be the date of death of the current date. Leave empty to use current date.
-	 * @return	string
+	 * @param  string $firstname				Firstname of person
+	 * @param  string $infix					Infix of person
+	 * @param  string $lastname					Last name of person
+	 * @param  string $lastname_partner			Lastname of partner
+	 * @param  int $gender						Gender of person
+	 * @param  int $gender_partner				Last name of person
+	 * @param  int|null $maritalstatus			Marital status person (Nullable)
+	 * @param  int|null $age					Age of person (Nullable)
+	 * @param  string|\DateTime|null $dateofbirth	Birthday. This can be empty (When `null` the age is used.)
+	 * @param  string|\DateTime|null $dateofdeath	Date of death. Can be the date of death of the current date. Leave empty to use current date.
+	 * @return string
 	 */
 	public static function NameMarriedAge(?string $firstname = '', ?string $infix = null, ?string $lastname = null, ?string $lastname_partner = null, ?int $gender = null, ?int $gender_partner = null, ?int $maritalstatus = null, ?int $age = null, $dateofbirth = null, $dateofdeath = null)
 	{
@@ -117,17 +117,17 @@ class Format
 	 * Gets the full name of a user including the name of the husband.
 	 * Almost equal to ```self::NameMarriedAge```. But this has a prefix for the gender.
 	 *
-	 * @param	string $firstname				Firstname of person
-	 * @param	string $infix					Infix of person
-	 * @param	string $lastname					Last name of person
-	 * @param	string $lastname_partner			Lastname of partner
-	 * @param	int $gender						Gender of person
-	 * @param	int $gender_partner				Last name of person
-	 * @param	int|null $maritalstatus			Marital status person (Nullable)
-	 * @param	int|null $age					Age of person (Nullable)
-	 * @param	string|DateTime|null $dateofbirth	Birthdate. This can be empty (When `null` the age is used.)
-	 * @param	string|DateTime|null $dateofdeath	Date of death. Can be the date of death of the current date. Leave empty to use current date.
-	 * @return	string
+	 * @param  string $firstname				Firstname of person
+	 * @param  string $infix					Infix of person
+	 * @param  string $lastname					Last name of person
+	 * @param  string $lastname_partner			Lastname of partner
+	 * @param  int $gender						Gender of person
+	 * @param  int $gender_partner				Last name of person
+	 * @param  int|null $maritalstatus			Marital status person (Nullable)
+	 * @param  int|null $age					Age of person (Nullable)
+	 * @param  string|DateTime|null $dateofbirth	Birthdate. This can be empty (When `null` the age is used.)
+	 * @param  string|DateTime|null $dateofdeath	Date of death. Can be the date of death of the current date. Leave empty to use current date.
+	 * @return string
 	 */
 	public static function NameMarriedAgeGender(?string $firstname = null, ?string $infix = null, ?string $lastname = null, ?string $lastname_partner = null, ?int $gender = null, ?int $gender_partner = null, ?int $maritalstatus = null, ?int $age = null, $dateofbirth = null, $dateofdeath = null)
 	{
@@ -149,7 +149,7 @@ class Format
 	 * @param  mixed $firstname
 	 * @param  mixed $infix
 	 * @param  mixed $lastname
-	 * @return	string
+	 * @return string
 	 */
 	public static function NameAbbreviation($firstname, $infix, $lastname)
 	{
@@ -168,7 +168,7 @@ class Format
 	 *
 	 * @param  mixed $infix
 	 * @param  mixed $lastname
-	 * @return	string
+	 * @return string
 	 */
 	public static function LastName($infix, $lastname)
 	{
@@ -180,7 +180,7 @@ class Format
 	 *
 	 * @param  mixed $infix
 	 * @param  mixed $lastname
-	 * @return	string
+	 * @return string
 	 */
 	public static function InfixLastName($infix, $lastname)
 	{
@@ -190,10 +190,10 @@ class Format
 	/**
 	 * Gets the address from s street and house number
 	 *
-	 * @param	string $street
-	 * @param	string $number
-	 * @param	string $suffix Can be empty
-	 * @return	string
+	 * @param  string $street
+	 * @param  string $number
+	 * @param  string $suffix Can be empty
+	 * @return string
 	 */
 	public static function Address($street, $number, $suffix = '')
 	{
@@ -203,8 +203,8 @@ class Format
 	/**
 	 * Get's the phone number. Use full for ```tel:``` hyperlinks
 	 *
-	 * @param	string $phone
-	 * @return	string
+	 * @param  string $phone
+	 * @return string
 	 */
 	public static function PhoneURL($phone)
 	{
@@ -219,7 +219,7 @@ class Format
 	 * Format number to currency
 	 *
 	 * @param  mixed $number
-	 * @return	string 9,99
+	 * @return string 9,99
 	 */
 	public static function Currency($number)
 	{
@@ -232,7 +232,7 @@ class Format
 	 * Format Money to Euro
 	 *
 	 * @param  mixed $number
-	 * @return	string € 9,99
+	 * @return string € 9,99
 	 */
 	public static function Money($number)
 	{
@@ -270,8 +270,8 @@ class Format
 	/**
 	 * Gets the text ```Ja``` or ```Nee```
 	 *
-	 * @param	bool|mixed $object
-	 * @return	string
+	 * @param  bool|mixed $object
+	 * @return string
 	 */
 	public static function YesNo($object)
 	{
@@ -285,8 +285,8 @@ class Format
 	/**
 	 * Mark the checkbox as checked
 	 *
-	 * @param	bool|mixed $object
-	 * @return	string
+	 * @param  bool|mixed $object
+	 * @return string
 	 */
 	public static function Checked($object)
 	{
@@ -322,7 +322,7 @@ class Format
 	/**
 	 * Create a GUID
 	 *
-	 * @return	string GUID
+	 * @return string GUID
 	 */
 	public static function GUID(): string
 	{
@@ -354,7 +354,7 @@ class Format
 	 *
 	 * @param string $email E-mail adres or GUID of user ID
 
-	 * @return	string|null  Returns the name of the user. If not a valid e-mail it returns the default data
+	 * @return string|null  Returns the name of the user. If not a valid e-mail it returns the default data
 	 */
 	public static function GetUserName($email)
 	{
@@ -376,7 +376,7 @@ class Format
 	 *
 	 * @param string $email E-mail adres or GUID of user ID
 
-	 * @return	string|null  Returns the e-mail of the user. If not a valid e-mail it returns ```null```
+	 * @return string|null  Returns the e-mail of the user. If not a valid e-mail it returns ```null```
 	 */
 	public static function GetUserMail($email)
 	{
@@ -417,10 +417,10 @@ class Format
 	/**
 	 * pluralize s string
 	 *
-	 * @param	int $count
-	 * @param	string $single text without pluralized string
-	 * @param	string $double pluralized text
-	 * @return	string
+	 * @param  int $count
+	 * @param  string $single text without pluralized string
+	 * @param  string $double pluralized text
+	 * @return string
 	 */
 	public static function pluralize($count, $single, $double)
 	{
@@ -433,9 +433,9 @@ class Format
 	/**
 	 * Eclipse a text
 	 *
-	 * @param	string $string source text
-	 * @param	int $length length to cut the text
-	 * @return	string
+	 * @param  string $string source text
+	 * @param  int $length length to cut the text
+	 * @return string
 	 */
 	public static function Eclipse($string, $length)
 	{
@@ -449,9 +449,9 @@ class Format
 	/**
 	 * Escapte the input value
 	 *
-	 * @param	string $value
-	 * @param	string $escape
-	 * @return	string
+	 * @param  string $value
+	 * @param  string $escape
+	 * @return string
 	 */
 	public static function InputValue($value, $escape)
 	{
@@ -461,8 +461,8 @@ class Format
 	/**
 	 * Get a list of subscription types
 	 *
-	 * @param	string $sender
-	 * @return	string
+	 * @param  string $sender
+	 * @return string
 	 */
 	public static function subscriptionTypes($sender)
 	{
@@ -476,9 +476,9 @@ class Format
 	/**
 	 * Get the attendee status for the timetable subscription
 	 *
-	 * @param	int $index
-	 * @param	int $count
-	 * @return	string
+	 * @param  int $index
+	 * @param  int $count
+	 * @return string
 	 */
 	public static function Status($index, $count = 2)
 	{
@@ -506,8 +506,8 @@ class Format
 	/**
 	 * Gets the hex color by class name
 	 *
-	 * @param	string $class
-	 * @return	string
+	 * @param  string $class
+	 * @return string
 	 */
 	public static function HexTextColor($class)
 	{
@@ -528,8 +528,8 @@ class Format
 	 * Gets the hexadecimal color by class name.
 	 * Especially for the border.
 	 *
-	 * @param	string $class
-	 * @return	string
+	 * @param  string $class
+	 * @return string
 	 */
 	public static function HexBorderColor($class)
 	{
@@ -595,8 +595,8 @@ class Format
 	/**
 	 * Get Contrast Color
 	 *
-	 * @param	string $hexColor
-	 * @return	string
+	 * @param  string $hexColor
+	 * @return string
 	 */
 	public static function GetContrastColor($hexColor)
 	{
@@ -645,8 +645,8 @@ class Format
 	/**
 	 * iCal Color in W3C.REC-css3-color-20110607 format
 	 *
-	 * @param	string $class
-	 * @return	string color name
+	 * @param  string $class
+	 * @return string color name
 	 */
 	public static function iCalColor($class)
 	{
@@ -679,8 +679,8 @@ class Format
 	/**
 	 * Gets the CSS style from a specific class name
 	 *
-	 * @param	string $class
-	 * @return	string
+	 * @param  string $class
+	 * @return string
 	 */
 	public static function ColorCSS($class)
 	{
@@ -723,7 +723,7 @@ class Format
 	/**
 	 * Gender enum
 	 *
-	 * @return	array
+	 * @return array
 	 */
 	public static function Gender()
 	{
@@ -744,6 +744,7 @@ class Format
 			'bishop'			=> 'Bisschop',
 			'archbishop'		=> 'Aartsbisschop',
 			'cardinal'			=> 'Kardinaal',
+			'pope'				=> 'Paus',
 			'choir'				=> 'Koor'
 		);
 	}
@@ -751,7 +752,7 @@ class Format
 	/**
 	 * Gender enum
 	 *
-	 * @return	array
+	 * @return array
 	 */
 	public static function Genders()
 	{
@@ -772,6 +773,7 @@ class Format
 			'bishop'			=> 'Bisschoppen',
 			'archbishop'		=> 'Aartsbisschoppen',
 			'cardinal'			=> 'Kardinalen',
+			'pope'				=> 'Paus',
 			'choir'				=> 'Koren'
 		);
 	}
@@ -779,7 +781,7 @@ class Format
 	/**
 	 * Title enum
 	 *
-	 * @return	array
+	 * @return array
 	 */
 	public static function Title()
 	{
@@ -800,6 +802,7 @@ class Format
 			'bishop'			=> 'Bisschop',
 			'archbishop'		=> 'Aartsbisschop',
 			'cardinal'			=> 'Kardinaal',
+			'pope'				=> 'Paus',
 			'choir'				=> 'Koor'
 		);
 	}
@@ -823,6 +826,7 @@ class Format
 			'bishop'			=> 'Zijne Hoogwaardige Excellentie Monseigneur',
 			'archbishop'		=> 'Zijne Hoogwaardige Excellentie Monseigneur',
 			'cardinal'			=> 'Zijne Eminentie',
+			'pope'				=> 'Heilige Vader',
 			'choir'				=> 'Geacht koor'
 		);
 	}
@@ -832,7 +836,7 @@ class Format
 	/**
 	 * Function enum
 	 *
-	 * @return	array
+	 * @return array
 	 */
 	public static function Function()
 	{
@@ -853,6 +857,7 @@ class Format
 			'bishop'			=> 'Bisschop',
 			'archbishop'		=> 'Aartsbisschop',
 			'cardinal'			=> 'Kardinaal',
+			'pope'				=> 'Paus',
 			'choir'				=> 'Koor'
 		);
 	}
@@ -860,7 +865,7 @@ class Format
 	/**
 	 * Function enum
 	 *
-	 * @return	array
+	 * @return array
 	 */
 	public static function FunctionChoir()
 	{
@@ -881,6 +886,7 @@ class Format
 			'bishop'			=> 'Bisschop',
 			'archbishop'		=> 'Aartsbisschop',
 			'cardinal'			=> 'Kardinaal',
+			'pope'				=> 'Paus',
 			'choir'				=> 'Koor	'
 		);
 	}
@@ -888,7 +894,7 @@ class Format
 	/**
 	 * Function enum
 	 *
-	 * @return	array
+	 * @return array
 	 */
 	public static function FunctionMusician()
 	{
@@ -909,6 +915,7 @@ class Format
 			'bishop'			=> 'Bisschop',
 			'archbishop'		=> 'Aartsbisschop',
 			'cardinal'			=> 'Kardinaal',
+			'pope'				=> 'Paus',
 			'choir'				=> 'Koor'
 		);
 	}
@@ -916,7 +923,7 @@ class Format
 	/**
 	 * Marital Status
 	 *
-	 * @return	array
+	 * @return array
 	 */
 	public static function MaritalStatus($gender = NULL, $empty = 'Niet bekend')
 	{
@@ -1029,8 +1036,8 @@ class Format
 	/**
 	 * Gets the name of the gender
 	 *
-	 * @param	string $gender
-	 * @return	string
+	 * @param  string $gender
+	 * @return string
 	 */
 	public static function GetGenderName($gender)
 	{
@@ -1040,9 +1047,9 @@ class Format
 	/**
 	 * Gets the name of the gender
 	 *
-	 * @param	int $gender,
-	 * @param	int $age
-	 * @return	string
+	 * @param  int $gender,
+	 * @param  int $age
+	 * @return string
 	 */
 	public static function GetGender($gender, $age = 0)
 	{
@@ -1080,6 +1087,8 @@ class Format
 					return 'Aartsbisschop';
 				case 16:
 					return 'Kardinaal';
+				case 17:
+					return 'Heilige Vader de Paus';
 				default:
 					return '';
 			endswitch;
@@ -1117,6 +1126,8 @@ class Format
 					return 'Emeritus aartsbisschop';
 				case 16:
 					return 'Emeritus kardinaal';
+				case 17:
+					return 'Heilige Vader de Paus';
 				default:
 					return '';
 			endswitch;
@@ -1154,6 +1165,8 @@ class Format
 					return 'Emeritus aartsbisschop';
 				case 16:
 					return 'Emeritus kardinaal';
+				case 17:
+					return 'Heilige Vader de Paus';
 				default:
 					return '';
 			endswitch;
@@ -1168,8 +1181,8 @@ class Format
 	/**
 	 * Gets the name of a function
 	 *
-	 * @param	string $gender
-	 * @return	string
+	 * @param  string $gender
+	 * @return string
 	 */
 	public static function GetFunction($gender)
 	{
@@ -1183,8 +1196,8 @@ class Format
 	/**
 	 * Gets the name of a function for the choir
 	 *
-	 * @param	string $gender
-	 * @return	string
+	 * @param  string $gender
+	 * @return string
 	 */
 	public static function GetFunctionChoir($gender)
 	{
@@ -1194,8 +1207,8 @@ class Format
 	/**
 	 * Gets the name of a function for the musician
 	 *
-	 * @param	string $gender
-	 * @return	string
+	 * @param  string $gender
+	 * @return string
 	 */
 	public static function GetFunctionMusician($gender)
 	{
@@ -1205,7 +1218,7 @@ class Format
 	/**
 	 * Gets the title of a person
 	 *
-	 * @param	string $gender
+	 * @param  string $gender
 	 * @return void
 	 */
 	public static function GetTitle($gender)
@@ -1216,7 +1229,7 @@ class Format
 	/**
 	 * Gets the address letterhead of a person
 	 *
-	 * @param	string $gender
+	 * @param  string $gender
 	 * @return void
 	 */
 	public static function GetAddressLetterhead($gender)
@@ -1241,7 +1254,7 @@ class Format
 	/**
 	 * Get the information of a mass my ID
 	 *
-	 * @param	string|guid $masses_ID
+	 * @param  string|guid $masses_ID
 	 * @return object|null
 	 */
 	public static function GetMass($masses_ID)
@@ -1275,8 +1288,8 @@ class Format
 	/**
 	 * Clean the filename by removing all special charters
 	 *
-	 * @param	string $name
-	 * @return	string
+	 * @param  string $name
+	 * @return string
 	 */
 	public static function CleanFileName($name)
 	{
@@ -1572,7 +1585,7 @@ class Format
 	 * The the text between the HTML comment
 	 *
 	 * @param string $text html
-	 * @return	string result
+	 * @return string result
 	 */
 	public static function html_comment($text)
 	{
@@ -1584,7 +1597,7 @@ class Format
 	 * Protect email addresses from spam bots
 	 *
 	 * @param string $email email address
-	 * @return	string javascript protected email
+	 * @return string javascript protected email
 	 */
 	public static function hide_email(string $email): string
 	{
@@ -1598,7 +1611,7 @@ class Format
 	 *
 	 * @param string $phone telephone number in international format
 	 * @param string $phon2 telephone number in	national format
-	 * @return	string javascript protected email
+	 * @return string javascript protected email
 	 */
 	public static function hide_phone(string $phone, string $phone2): string
 	{
@@ -1610,8 +1623,8 @@ class Format
 	/**
 	 * Protect HTML from spam bots
 	 *
-	 * @param	string $html HTML
-	 * @return	string javascript protected html
+	 * @param  string $html HTML
+	 * @return string javascript protected html
 	 */
 	public static function protect_HTML(string $html): string
 	{
@@ -1630,7 +1643,7 @@ class Format
 	 *
 	 * @param string $title title without HTML
 	 * @param string $text HTML body
-	 * @return	string result
+	 * @return string result
 	 */
 	public static function clean_body($title, $text)
 	{
@@ -1654,7 +1667,7 @@ class Format
 	 *
 	 * @param string $comment HTML comment
 	 * @param string $text HTML body
-	 * @return	string result
+	 * @return string result
 	 */
 	public static function clean_description($title, $text)
 	{
@@ -1682,7 +1695,7 @@ class Format
 	 * Cleans the meta tag
 	 *
 	 * @param  mixed $text
-	 * @return	string result
+	 * @return string result
 	 */
 	public static function clean_meta($text)
 	{
@@ -1694,7 +1707,7 @@ class Format
 	 * Create a correct formatted RSS valid text
 	 *
 	 * @param string $text HTML body
-	 * @return	string result
+	 * @return string result
 	 */
 	public static function clean_rss($text)
 	{
@@ -1732,7 +1745,7 @@ class Format
 	/**
 	 * Remove all Image attributes
 	 * @param string $html
-	 * @return	string
+	 * @return string
 	 */
 	public static function stripImageAttributes($html)
 	{
@@ -1867,7 +1880,7 @@ class Format
 	 * Gets the correct Price format.
 	 * @see https://schema.org/price
 	 * @param  float|double
-	 * @return	string Price
+	 * @return string Price
 	 */
 	public static function Price($money)
 	{
@@ -1878,7 +1891,6 @@ class Format
 	public static function srcset(string|array $images)
 	{
 		global $dist_path;
-		$image_width = 0;
 		$rtn = array();
 		if (!is_array($images)) :
 			$srcset_image = $images;
@@ -1894,11 +1906,7 @@ class Format
 		$images = array_map('trim', $images);
 		foreach ($images as $image) :
 			if (file_exists($image) || realpath($dist_path . '/' . $image) !== false) :
-				$image_size = getimagesize($dist_path . '/' . $image);
-				if($image_size !== false) :
-					$image_width = $image_size[0];
-				endif;
-				$rtn[] = ltrim($image, '/') . '?v=' . Cryptography::get_hash($dist_path . '/' . $image) . ' ' . $image_width . 'w';
+				$rtn[] = ltrim($image, '/') . '?v=' . Cryptography::get_hash($dist_path . '/' . $image) . ' ' . getimagesize($dist_path . '/' . $image)[0] . 'w';
 			endif;
 		endforeach;
 		return implode(', ', $rtn);
@@ -1994,7 +2002,7 @@ class Format
 
 	/**
 	 * @param int month
-	 * @return	string december
+	 * @return string december
 	 */
 	public static function Month($month)
 	{
