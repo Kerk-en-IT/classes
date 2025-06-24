@@ -377,6 +377,20 @@ class DateTime
 	}
 
 	/**
+	 * Get the age in years
+	 *
+	 * @param mixed $datetime
+	 * @return	int
+	 */
+	public static function Age($datetime): int
+	{
+		$datetime = self::GetDate($datetime);
+		$now = new \DateTime();
+		$interval = $datetime->diff($now);
+		return $interval->y;
+	}
+
+	/**
 	 * Get's a list with the full names of all months
 	 *
 	 * @return	array
