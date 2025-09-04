@@ -25,6 +25,7 @@ class Cryptography
 	 * @param	string $string The data to be encrypted.
 	 * @return	string Encrypted string
 	 */
+	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0', replacement: 'Cryptography::Encrypting()')]
 	public static function encrypt($string)
 	{
 		if (function_exists('mcrypt_create_iv') && function_exists('mcrypt_get_iv_size') && function_exists('mcrypt_encrypt')) :
@@ -58,6 +59,7 @@ class Cryptography
 	 * @param	encrypted $string The data to be decrypted.
 	 * @return	string Decrypted string
 	 */
+	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0', replacement: 'Cryptography::Decrypting()')]
 	public static function decrypt($encrypted)
 	{
 		$data = base64_decode($encrypted);
@@ -77,9 +79,42 @@ class Cryptography
 		return $decrypted;
 	}
 
+	/**
+	 * Encrypt a string using AES-256-CBC
+	 * This method uses OpenSSL for encryption and is more secure than the deprecated mcrypt functions.
+	 * Please specify the environment variable ENCKEY for the encryption key.
+	 * Otherwise, it will use a default key 'KerkEnITCryptography'.
+	 *
+	 * @param	string $string The data to be encrypted.
+	 * @return	string Encrypted string in base64 format
+	 */
+	public static function Encrypting(string $string): string
+	{
+		$key = md5(getenv('ENCKEY') ?? 'KerkEnITCryptography');
+		$iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+		$encrypted = openssl_encrypt($string, 'aes-256-cbc', $key, 0, $iv);
+		return base64_encode($encrypted . '::' . $iv);
+	}
+
+	/**
+	 * Decrypt a string using AES-256-CBC
+	 * This method uses OpenSSL for decryption and is more secure than the deprecated mcrypt functions.
+	 * Please specify the environment variable ENCKEY for the decryption key.
+	 * Otherwise, it will use a default key 'KerkEnITCryptography'.
+	 *
+	 * @param	string $encrypted The data to be decrypted in base64 format.
+	 * @return	string Decrypted string
+	 */
+	public static function Decrypting(string $encrypted): string
+	{
+		$key = md5(getenv('ENCKEY') ?? 'KerkEnITCryptography');
+		list($encrypted_data, $iv) = explode('::', base64_decode($encrypted), 2);
+		return openssl_decrypt($encrypted_data, 'aes-256-cbc', $key, 0, $iv);
+	}
+
 	private static $hashesFiles = array();
 
-	public static function getGitFileVersion(string|null $file): array|int|string
+	public static function getGitFileVersion(string|null $file): int|string
 	{
 		if ($file !== null) :
 			if (!empty($file)) :
@@ -104,6 +139,7 @@ class Cryptography
 				if ($filePath !== false && array_key_exists($filePath, self::$hashesFiles)) :
 					return self::$hashesFiles[$filePath];
 				endif;
+
 				$mtime = time();
 				$ctime = time();
 				global $first_blog_time;
@@ -118,29 +154,41 @@ class Cryptography
 
 			$ctime = log10(abs($ctime));
 			$mtime = log10(abs($mtime));
-			if ($filePath !== false && str_ends_with($filePath, '.css') && preg_match('~[0-9]+~', md5_file($filePath))) :
-				self::$hashesFiles[$filePath] = preg_replace("/[^0-9]/", '', md5_file($filePath)) % 9998;;
-				return self::$hashesFiles[$filePath];
-			endif;
-			if ($filePath !== false && $mtime - $ctime > 5) :
-				self::$hashesFiles[$filePath] = $mtime - $ctime;
-				return self::$hashesFiles[$filePath];
-			endif;
-			if ($filePath !== false && ((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189) > 10.0) :
+			$rtn = 0;
+
+			if ($filePath !== false && (str_ends_with($filePath, '.css') || str_ends_with($filePath, '.js')) && preg_match('~[0-9]+~', md5_file($filePath))) :
+				self::$hashesFiles[$filePath] = substr(md5_file($filePath), 8, 8);
+				$rtn = self::$hashesFiles[$filePath];
+			elseif ($filePath !== false && $mtime - $ctime > 5) :
+				self::$hashesFiles[$filePath] = intval($mtime - $ctime);
+				$rtn = self::$hashesFiles[$filePath];
+			elseif ($filePath !== false && ((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189) > 10.0) :
 				self::$hashesFiles[$filePath] = intval(log10(abs(intval(log10(abs($mtime)) % 3.77) + intval(log10(abs($ctime)) % 6.99)) / 0.189));
-				return self::$hashesFiles[$filePath];
-			endif;
-			//return ;
-			if ($filePath !== false && preg_match('~[0-9]+~', md5_file($filePath))) :
-				self::$hashesFiles[$filePath] = preg_replace("/[^0-9]/", '', md5_file($filePath)) % 9999;
-				self::$hashesFiles[$filePath];
+				$rtn = self::$hashesFiles[$filePath];
+			elseif ($filePath !== false && !empty($filePath)&& preg_match('~[0-9]+~', md5_file($filePath))) :
+				$mod = 8765;
+				self::$hashesFiles[$filePath] = intval(preg_replace("/[^0-9]/", '', md5_file($filePath))) % $mod;
+				$rtn = self::$hashesFiles[$filePath];
 			else :
-				return $mtime;
+				$rtn = $mtime;
 			endif;
-			return self::$hashesFiles[$filePath];
-		else :
-			return time();
+
+			if (empty($rtn)) :
+				$rtn = self::$hashesFiles[$filePath];
+			endif;
+			if ((empty($rtn)) && \defined('VERSION')) :
+				$rtn = VERSION;
+			endif;
+
+			if (empty($rtn)) :
+				$mod = 7654;
+				$rtn = time() % $mod;
+			endif;
+
+			return $rtn;
 		endif;
+		$mod = 6543;
+		return time() % $mod;
 	}
 
 	public static function getFileVersion(string|null  $file)
