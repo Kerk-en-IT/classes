@@ -26,6 +26,7 @@ class DateTime
 	 */
 	public static function GetDate(mixed $datetime, string|bool|\DateTimeZone $timezone = false): \DateTime
 	{
+		$date = null;
 		if (($timezone instanceof \DateTimeZone) === false) :
 			if ($timezone === false || empty($timezone)) :
 				$timezone = date_default_timezone_get();
@@ -34,15 +35,37 @@ class DateTime
 				$timezone = new \DateTimeZone($timezone);
 			endif;
 		endif;
-		$date = new \DateTime();
+
 		if ($datetime !== null && is_object($datetime) && $datetime instanceof \DateTime) :
 			return $datetime;
+		elseif ($datetime !== null && is_object($datetime) && $datetime instanceof \DateTimeImmutable) :
+			$date = new \DateTime('now', $datetime->getTimezone());
+			$date->setTimestamp($datetime->getTimestamp());
+			return $date;
+		elseif ($datetime !== null && \is_array($datetime) && isset($datetime['date']) && is_string($datetime['date'])) :
+			$date = new \DateTime($datetime['date']);
+			if (isset($datetime['timezone']) && $datetime['timezone'] instanceof \DateTimeZone) :
+				$date->setTimezone($datetime['timezone']);
+			elseif (isset($datetime['timezone']) && is_string($datetime['timezone'])) :
+				$date->setTimezone(new \DateTimeZone($datetime['timezone']));
+			endif;
+			return $date;
+		elseif ($datetime !== null && \is_object($datetime) && isset($datetime->date) && is_string($datetime->date)) :
+			$date = new \DateTime($datetime->date);
+			if (isset($datetime->timezone) && $datetime->timezone instanceof \DateTimeZone) :
+				$date->setTimezone($datetime->timezone);
+			elseif (isset($datetime->timezone) && is_string($datetime->timezone)) :
+				$date->setTimezone(new \DateTimeZone($datetime->timezone));
+			endif;
+			return $date;
 		elseif ($datetime !== null && (is_numeric($datetime) || is_integer($datetime) || is_long($datetime))) :
+			$date = new \DateTime();
 			$date->setTimestamp($datetime);
 		elseif ($datetime !== null && is_string($datetime) && (strlen($datetime) == 8 || strlen($datetime) == 5) && is_numeric(str_replace(':', '', $datetime))) :
 			$date = new \DateTime((new \DateTime())->format('Y-m-d ') . $datetime);
 		elseif (!is_object($datetime)) :
 			try {
+				$date = new \DateTime();
 				if (is_numeric($datetime)) :
 					$date = new \DateTime();
 					$date->setTimestamp($datetime);
@@ -124,10 +147,18 @@ class DateTime
 			}
 
 		endif;
+		if($date === null) :
+			$date = new \DateTime();
+		endif;
 		if ($timezone !== false && ($timezone instanceof \DateTimeZone)) :
 			$date->setTimezone($timezone);
 		endif;
 		return $date;
+	}
+
+	public static function GetTimestamp(mixed $datetime, string|bool|\DateTimeZone $timezone = false): int
+	{
+		return self::GetDate($datetime, $timezone)->getTimestamp();
 	}
 
 	public static function GetTimezoneDate($time): \DateTime
@@ -222,7 +253,7 @@ class DateTime
 		if (is_numeric($date)) :
 			$datetime->setTimestamp($date);
 		else :
-			$datetime = new \DateTime($date, new \DateTimeZone('Europe/Amsterdam'));
+			$datetime = self::GetDate($date, new \DateTimeZone('Europe/Amsterdam'));
 		endif;
 		if ($timezone == 'UTC') :
 			if ((int)$datetime->format('His') === 0) :
@@ -265,7 +296,7 @@ class DateTime
 	 */
 	public static function ISO8601($datetime = 'now', $timezone = 'Europe/Amsterdam'): string
 	{
-		$date = self::GetDate($datetime);
+		$date = self::GetDate($datetime, $timezone);
 		if ($timezone !== false) :
 			$date->setTimezone(new \DateTimeZone($timezone));
 		endif;
@@ -511,6 +542,16 @@ class DateTime
 	private static function to(): string
 	{
 		return 'tot';
+	}
+
+	/**
+	 * Get the text to
+	 *
+	 * @return	string
+	 */
+	private static function till(): string
+	{
+		return 't/m';
 	}
 
 	/**
@@ -777,6 +818,49 @@ class DateTime
 			return self::days_full()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_full()[$from->format('m') - 1] . ' ' . self::at() . ' ' . $from->format('G:i') . ' ' . self::to() . ' ' . self::days_full()[$to->format('w')] . ' ' . $to->format('j') . ' ' . self::months_full()[$to->format('m') - 1] . ' ' . self::at() . ' ' . $to->format('G:i');
 		else :
 			return self::days_full()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_full()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i');
+		endif;
+	}
+
+
+
+	/**
+	 * ma 20 dec om 9:42 tot 10:42
+	 *
+	 * @param	object datetime
+	 * @param	object datetime
+	 * @return	string ma 20 dec om 9:42 tot 10:42
+	 */
+	public static function ShortDateWithoutYearFromTill($from, $to = null): string
+	{
+		$from = self::GetDate($from);
+		$to = self::GetDate($to);
+		if ($to !== null && $from->format('Y-m-d') == $to->format('Y-m-d')) :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i') . ' ' . self::till() . ' ' . $to->format('G:i');
+		elseif ($to !== null && $from->format('Y-m-d') != $to->format('Y-m-d')) :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . '. ' . $from->format('G:i') . ' ' . self::till() . ' ' . self::days_short()[$to->format('w')] . ' ' . $to->format('j') . ' ' . self::months_short()[$to->format('m') - 1] . '. ' . $to->format('G:i');
+		else :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i');
+		endif;
+	}
+
+
+	/**
+	 * ma 20 dec om 9:42 tot 10:42
+	 *
+	 * @param	object datetime
+	 * @param	object datetime
+	 * @return	string ma 20 dec om 9:42 tot 10:42
+	 */
+	public static function ShortDayWithoutYearFromTill($from, $to = null): string
+	{
+		$from = self::GetDate($from);
+		$to = self::GetDate($to);
+		if ($to !== null && $from->format('Y-m-d') == $to->format('Y-m-d')) :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i') . ' ' . self::till() . ' ' . $to->format('G:i');
+		elseif ($to !== null && $from->format('Y-m-d') != $to->format('Y-m-d')) :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . '. ' . self::till() . ' ' . self::days_short()[$to->format('w')] . ' ' . $to->format('j') . ' ' . self::months_short()[$to->format('m') - 1] . '.';
+		else :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i');
 		endif;
 	}
 
@@ -1119,14 +1203,6 @@ class DateTime
 			$logic['interval'] = 'Fourth';
 			$logic['repeat'] = 'Vierde';
 		endif;
-		//for($year = 2022; $year <= 2023; $year++) :
-
-		//	for($month = 1; $month <= 12; $month++) :
-		//		var_dump((new \DateTime('Last Tuesday of ' . (new \DateTime('01-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-' . $year))->format('F Y')))->format('l j F Y'));
-		//		echo '<br />';
-		//	endfor;
-		//endfor;
-
 		return (object)$logic;
 	}
 
@@ -1220,7 +1296,6 @@ class DateTime
 		$currentDate = self::GetDate($datetime);
 		$begin = self::GetDate($begin);
 		$end = self::GetDate($end);
-		//var_dump($currentDate);
 		if ($currentDate >= $begin && $currentDate <= $end) :
 			return TRUE;
 		endif;
@@ -1258,7 +1333,7 @@ class DateTime
 	 * @param	object datetime
 	 * @return int 1450600974
 	 */
-	public static function TimeStamp($datetime)
+	public static function TimeStamp($datetime) :int
 	{
 		return self::GetDate($datetime)->getTimeStamp();
 	}
