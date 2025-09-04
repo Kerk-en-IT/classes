@@ -21,7 +21,7 @@ class GeoLocation {
 	 *
 	 * @var string
 	 */
-	private $address = NULL;
+	private $_address = NULL;
 
 	/**
 	 * Google Maps API Key
@@ -48,8 +48,24 @@ class GeoLocation {
 	 * Street
 	 *
 	 * @var string
+	 * @deprecated please use `address` or `road` instead
 	 */
 	public $street = NULL;
+
+	/**
+	 * Road
+	 *
+	 * @var string
+	 */
+	public $road = NULL;
+
+	/**
+	 * Address
+	 *
+	 * @var string
+	 */
+	public $address = NULL;
+
 	/**
 	 * Zipcode
 	 *
@@ -92,9 +108,9 @@ class GeoLocation {
 	 */
 	public function search(?string $address, ?string $zipcode = null, ?string $city = null, ?string $country = null): bool
 	{
-		$this->address = trim(trim(trim(trim(($address ?? '') . ', ' . ($zipcode  !== null ? ($zipcode ?? '') . ', ' : '') . ($city ?? ''), ',')), ',')) . ($country  !== null ? ', ' . ($country ?? '') : '');
+		$this->_address = trim(trim(trim(trim(($address ?? '') . ', ' . ($zipcode  !== null ? ($zipcode ?? '') . ', ' : '') . ($city ?? ''), ',')), ',')) . ($country  !== null ? ', ' . ($country ?? '') : '');
 		if(!empty(($address ?? '') . ($zipcode ?? '') . ($city ?? ''))) :
-			$address = urlencode($this->address);
+			$address = urlencode($this->_address);
 			if(!empty($this->GOOGLE_MAPS_API_KEY)) :
 
 				$url = "https://maps.google.com/maps/api/geocode/json?address=".$address ."&key=".$this->GOOGLE_MAPS_API_KEY;
@@ -133,12 +149,18 @@ class GeoLocation {
 				$geo_json = json_decode($data, true);
 				$this->latitude = $geo_json[0]['lat'];
 				$this->longitude = $geo_json[0]['lon'];
-				$this->street = $geo_json[0]['address']['road'] ?? null;
-				if($this->street !== null):
-					$this->street .= ' ' . ($geo_json[0]['address']['house_number'] ?? '1');
+				$this->road = $geo_json[0]['address']['road'] ?? null;
+				if($this->road !== null):
+					$this->address = $this->road . ' ' . ($geo_json[0]['address']['house_number'] ?? '1');
 				endif;
+				$this->street = $this->address;
 				$this->postalCode = $geo_json[0]['address']['postcode'] ?? null;
 				$this->city = $geo_json[0]['address']['city'] ?? null;
+				if($this->city === null) :
+					//var_dump($geo_json[0]['address']);
+					//die();
+					$this->city = $geo_json[0]['address']["village"] ?? null;
+				endif;
 				$this->country = $geo_json[0]['address']['country'] ?? null;
 				return true;
 			endif;
@@ -242,6 +264,12 @@ class GeoLocation {
 		return $distance;
 	}
 
+	/**
+	 * Returns the center latitude and longitude of a set of coordinates.
+	 *
+	 * @param array $coordinates Array of objects with latitude and longitude properties.
+	 * @return array|null Array with center latitude and longitude or null if no coordinates are provided.
+	 */
 	public static function getCenterLatLng($coordinates)
 	{
 		$latitudes = array_map(function ($coordinate) {
