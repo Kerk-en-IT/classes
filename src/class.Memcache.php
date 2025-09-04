@@ -21,7 +21,7 @@ if (!class_exists('\Memcache')) :
 		 * @param  mixed $timeout
 		 * @return bool
 		 */
-		public static function connect(string $host, int $port = null, int $timeout = null): bool
+		public static function connect(string $host, ?int $port = null, ?int $timeout = null): bool
 		{
 			self::$host = $host;
 			self::$port = $port;
