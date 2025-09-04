@@ -20,30 +20,42 @@ namespace KerkEnIT;
 class Video
 {
 	/**
-	 * The video path
-	 *
-	 * @var string
+	 * The source video path
+	 * This is the path to the video file that should be converted
+	 * @var string|null
 	 */
 	protected ?string $_videoPath = null;
+
 	/**
-	 * The color space
-	 *
-	 * @var string
+	 * The color space of the video
+	 * @var string|null
 	 */
 	protected ?string $_colorSpace = null;
+
 	/**
-	 * The hlg
-	 *
+	 * If the video is in HLG (Hybrid Log-Gamma) format
+	 * This is used to determine if the video should be processed with HLG settings
+	 * HLG is a high dynamic range (HDR) format that is used for broadcasting and streaming
+	 * It is used to create videos with a wider color gamut and higher brightness levels
 	 * @var bool
 	 */
 	protected ?bool $_hlg = false;
 
 	/**
-	 * The poster
-	 *
-	 * @var string
+	 * The poster image path
+	 * This is the path to the poster image that is created from the video file
+	 * The poster image is a still image that is used as a preview of the video
+	 * @var string|null
 	 */
 	protected ?string $_poster = null;
+
+	/**
+	 * If the ffmpeg command should use multi-core processing
+	 * This is only available on macOS (Darwin) and not on Linux or Windows
+	 * This is used to speed up the processing of the video files
+	 * @var bool
+	 */
+	protected bool $_multicore = false;
 
 	/**
 	 * Create a new Video object with the source video path to convert video files with ffmpeg
@@ -59,6 +71,25 @@ class Video
 	}
 
 	/**
+	 * The getter and setter for the multi-core processing
+	 * This is only available on macOS (Darwin) and not on Linux or Windows
+	 * This is used to speed up the processing of the video files
+	 *
+	 * @return bool $multicore
+	 */
+	public bool $multicore {
+		get {
+			if (PHP_OS != 'Darwin') {
+				return false;
+			}
+			return $this->_multicore;
+		}
+		set(bool $value) {
+			$this->_multicore = $value;
+		}
+	}
+
+	/**
 	 * Create a watermark on the video
 	 *
 	 * @param	string $watermark The watermark image path
@@ -69,24 +100,7 @@ class Video
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
 			$filter = null;
-			//$img = new \Imagick();
-			//$img->readImage($this->_poster);
-			//$width = $img->getImageWidth();
-			//$height = $img->getImageHeight();
-			////-filter_complex '[0:v:0]colorspace=ispace=bt709:itrc=bt709:iprimaries=bt709:range=tv:primaries=bt2020:space=bt2020ncl:trc=bt2020-10:dither=none, zscale=transferin=2020_10, tonemap=tonemap=gamma:tonemap=0.25, zscale=transfer=2020_10[Output]'
-			//if ($width != 0 && $height !== 0) :
-			//	if ($width > $height) :
-			//		//Landscape
-			//		$filter = '[1][0]scale2ref=oh*mdar:ih*' . (string)((($width / 100) / ($height / 6.00))) . '[logo][video];[video][logo]overlay=(main_w-overlay_w):(main_h-overlay_h):format=auto,format=' . ($this->hlg ? 'yuv420p10le' : 'yuv420p');
-			//	else :
-			//		//Portrait
-			//		$filter = '[1][0]scale2ref=oh*mdar:iw*' . (string)(((($width / 100) / ($height / 6.00))) * 2.34) . '[logo][video];[video][logo]overlay=(main_w-overlay_w):(main_h-overlay_h):format=auto,format=' . ($this->hlg ? 'yuv420p10le' : 'yuv420p');
-			//	endif;
-			//endif;
 			$filter = '[1]scale=iw/2:-1[b];[0:v][b] overlay=x=(main_w-overlay_w):y=(main_h-overlay_h)';
-
-			//$img_poster = new \Imagick($this->_poster);
-			//$watermark = Convert2::watermarks($img_poster, $this->_poster);
 
 			$watermark = realpath($watermark);
 			if ($watermark === false) :
@@ -108,10 +122,11 @@ class Video
 	}
 
 	/**
-	 * The getter for the video path
+	 * The getter and setter for the video path
+	 * This is the path to the video file that should be converted
+	 * If the video path is not set, an exception will be thrown
 	 *
-	 * @param	string $name
-	 * @return	string $videoPath or throw an \Exception
+	 * @return string $source The video path or throw an \Exception if the path is not set
 	 */
 	public string $source {
 		get {
@@ -126,9 +141,9 @@ class Video
 	}
 
 	/**
-	 * The getter for the color space
+	 * The getter for the color space of the video
 	 *
-	 * @return	string $colorSpace or an empty string
+	 * @return string $colorSpace The color space of the video or throw an \Exception if the command failed
 	 */
 	private string $colorSpace {
 		get {
@@ -169,7 +184,11 @@ class Video
 	public function poster(?string $destinationPath): string
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
-			$command = array("ffmpeg");
+			$command = array();
+			if ($this->multicore) :
+				$command[] = 'nohup ';
+			endif;
+			$command[] = "ffmpeg";
 			$command[] = " -y -i '{$this->source}'";
 			$command[] = "-frames:v 1";
 			$command[] = "-ss `ffmpeg -i '{$this->source}' 2>&1 | grep Duration | awk '{print $2}' | tr -d , | awk -F ':' '{print ($3+$2*60+$1*3600)/2}' | sed 's/,/./g'`";
@@ -182,11 +201,14 @@ class Video
 			$command[] = "-pix_fmt yuvj444p";
 			$command[] = "-f mjpeg";
 			$command[] = "'{$destinationPath}'";
+			if ($this->multicore) :
+				$command[] = ' </dev/null >/dev/null 2>&1 &';
+			endif;
 			if (shell_exec(implode(' ', $command)) === FALSE) :
 				throw new \Exception('Failed to create poster. ' . implode(' ', $command));
 			endif;
 		endif;
-		if (!file_exists($destinationPath)) :
+		if (!$this->multicore && !file_exists($destinationPath)) :
 			throw new \Exception('Failed to create poster. File not found');
 		endif;
 		$this->_poster = $destinationPath;
@@ -204,7 +226,11 @@ class Video
 	public function ogv(?string $destinationPath): string
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
-			$command = array("ffmpeg");
+			$command = array();
+			if ($this->multicore) :
+				$command[] = 'nohup ';
+			endif;
+			$command[] = "ffmpeg";
 			$command[] = "-y -i '$this->source'";
 
 			$command[] = "-b:v 10M";
@@ -218,13 +244,16 @@ class Video
 			$command[] = "-g 30";
 
 			$command[] = "'$destinationPath'";
+			if ($this->multicore) :
+				$command[] = ' </dev/null >/dev/null 2>&1 &';
+			endif;
 
 			if (shell_exec(implode(' ', $command)) === FALSE) :
 				throw new \Exception('Failed to create ogv. ' . implode(' ', $command));
 			endif;
 		endif;
 
-		if (!file_exists($destinationPath)) :
+		if (!$this->multicore && !file_exists($destinationPath)) :
 			throw new \Exception('Failed to create ogv. File not found');
 		endif;
 		return $destinationPath;
@@ -241,7 +270,11 @@ class Video
 	public function mp4(?string $destinationPath): string
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
-			$command = array("ffmpeg");
+			$command = array();
+			if ($this->multicore) :
+				$command[] = 'nohup ';
+			endif;
+			$command[] = "ffmpeg";
 			$command[] = "-i '$this->source'";
 
 			$command[] = "-c:v libx264";
@@ -277,12 +310,15 @@ class Video
 			$command[] = "-pass 2";
 			$command[] = "-f mp4";
 			$command[] = "-y '$destinationPath'";
+			if ($this->multicore) :
+				$command[] = ' </dev/null >/dev/null 2>&1 &';
+			endif;
 
 			if (shell_exec(implode(' ', $command)) === FALSE) :
 				throw new \Exception('Failed to create mp4. ' . implode(' ', $command));
 			endif;
 		endif;
-		if (!file_exists($destinationPath)) :
+		if (!$this->multicore && !file_exists($destinationPath)) :
 			throw new \Exception('Failed to create mp4. File not found');
 		endif;
 		return $destinationPath;
@@ -299,15 +335,17 @@ class Video
 	public function h265(?string $destinationPath): string
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
-			$command = array("ffmpeg");
+			$command = array();
+			if ($this->multicore) :
+				$command[] = 'nohup ';
+			endif;
+			$command[] = "ffmpeg";
 			$command[] = "-y -i '$this->source' -pass 1";
 
 			$command[] = "-c:v libx265";
 			$command[] = "-movflags faststart";
 			$command[] = "-preset slower";
 			$command[] = "-tag:v hvc1";
-			//$command[] = "-strict";
-			//$command[] = "-x265-params pass=1";
 
 			$command[] = "-c:a aac";
 			$command[] = "-b:a 128K";
@@ -322,19 +360,20 @@ class Video
 			$command[] = "-movflags faststart";
 			$command[] = "-preset slower";
 			$command[] = "-tag:v hvc1";
-			//$command[] = "-strict";
-			//$command[] = "-x265-params pass=2";
 
 			$command[] = "-c:a aac";
 			$command[] = "-b:a 128K";
 			$command[] = "-f mp4";
 			$command[] = "'$destinationPath'";
+			if ($this->multicore) :
+				$command[] = ' </dev/null >/dev/null 2>&1 &';
+			endif;
 
 			if (shell_exec(implode(' ', $command)) === FALSE) :
 				throw new \Exception('Failed to create h265. ' . implode(' ', $command));
 			endif;
 		endif;
-		if (!file_exists($destinationPath)) :
+		if (!$this->multicore && !file_exists($destinationPath)) :
 			throw new \Exception('Failed to create h265. File not found');
 		endif;
 		return $destinationPath;
@@ -351,12 +390,15 @@ class Video
 	public function webm(?string $destinationPath): string
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
-			$command = array("ffmpeg");
+			$command = array();
+			if ($this->multicore) :
+				$command[] = 'nohup ';
+			endif;
+			$command[] = "ffmpeg";
 			$command[] = "-y -i '$this->source' -pass 1";
 
 			$command[] = "-c:v libvpx-vp9";
 			$command[] = "-b:v 12M";
-			//$command[] = "-speed 4";
 			if ($this->hlg) :
 				$command[] = "-pix_fmt yuv420p10le";
 				$command[] = "-color_primaries 9";
@@ -376,7 +418,6 @@ class Video
 			$command[] = "-minrate 6M";
 			$command[] = "-maxrate 18M";
 			$command[] = "-bufsize 24M";
-			//$command[] = "-profile:v 2";
 
 			$command[] = "-c:a libopus";
 			$command[] = "-b:a 64k";
@@ -390,7 +431,7 @@ class Video
 
 			$command[] = "-c:v libvpx-vp9";
 			$command[] = "-b:v 12M";
-			//$command[] = "-speed 4";
+
 			if ($this->hlg) :
 				$command[] = "-pix_fmt yuv420p10le";
 				$command[] = "-color_primaries 9";
@@ -410,18 +451,20 @@ class Video
 			$command[] = "-minrate 6M";
 			$command[] = "-maxrate 18M";
 			$command[] = "-bufsize 24M";
-			//$command[] = "-profile:v 2";
 
 			$command[] = "-c:a libopus";
 			$command[] = "-b:a 64k";
 			$command[] = "-f webm";
 			$command[] = "'$destinationPath'";
+			if ($this->multicore) :
+				$command[] = ' </dev/null >/dev/null 2>&1 &';
+			endif;
 
-			if (exec(implode(' ', $command)) === FALSE) :
+			if (shell_exec(implode(' ', $command)) === FALSE) :
 				throw new \Exception('Failed to create webm. ' . implode(' ', $command));
 			endif;
 		endif;
-		if (!file_exists($destinationPath)) :
+		if (!$this->multicore && !file_exists($destinationPath)) :
 			throw new \Exception('Failed to create webm. File not found');
 		endif;
 		return $destinationPath;
@@ -438,7 +481,11 @@ class Video
 	public function vp8(?string $destinationPath): string
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
-			$command = array("ffmpeg");
+			$command = array();
+			if ($this->multicore) :
+				$command[] = 'nohup ';
+			endif;
+			$command[] = "ffmpeg";
 			$command[] = "-y -i '{$this->source}' -pass 1";
 
 			$command[] = "-c:v libvpx";
@@ -510,12 +557,15 @@ class Video
 			$command[] = "-b:a 96k";
 			$command[] = "-f webm";
 			$command[] = "'{$destinationPath}'";
+			if ($this->multicore) :
+				$command[] = ' </dev/null >/dev/null 2>&1 &';
+			endif;
 
 			if (shell_exec(implode(' ', $command)) === FALSE) :
 				throw new \Exception('Failed to create vp8. ' . implode(' ', $command));
 			endif;
 		endif;
-		if (!file_exists($destinationPath)) :
+		if (!$this->multicore && !file_exists($destinationPath)) :
 			throw new \Exception('Failed to create vp8. File not found');
 		endif;
 		return $destinationPath;
