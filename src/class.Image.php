@@ -233,4 +233,48 @@ class Image
 			return $size;
 		}
 	}
+
+	private static function ratio($a, $b): string
+	{
+		$_a = $a;
+		$_b = $b;
+
+		while ($_b != 0) {
+
+			$remainder = $_a % $_b;
+			$_a = $_b;
+			$_b = $remainder;
+		}
+
+		$gcd = abs($_a);
+
+		return round($a / $gcd)  . ':' . round($b / $gcd);
+	}
+
+	//private static function ratio(): string
+	//{
+	//	$input = func_get_args();
+	//	$c = func_num_args();
+	//	if ($c < 1)
+	//		return ''; //empty input
+	//	if ($c == 1)
+	//		return $input[0]; //only 1 input
+	//	$gcd = self::gcd($input[0], $input[1]); //find gcd of inputs
+	//	for ($i = 2; $i < $c; $i++)
+	//		$gcd = self::gcd($gcd, $input[$i]);
+	//	$var = $input[0] / $gcd; //init output
+	//	for ($i = 1; $i < $c; $i++)
+	//		$var .= ':' . round($input[$i] / $gcd); //calc ratio
+	//	return $var;
+	//}
+	public static function getImageRatio(string $image): string
+	{
+		$im = new \Imagick($image);
+		$size = $im->getImageGeometry();
+		if($size['width'] < $size['height']) :
+			return  self::ratio($size['width'], $size['height']);
+		else :
+			return  self::ratio($size['height'], $size['width']);
+		endif;
+	}
 }
