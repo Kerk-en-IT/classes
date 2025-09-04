@@ -216,6 +216,71 @@ class Format
 	}
 
 	/**
+	 * Formats the phone number to a standard format
+	 * Don't forget to set the locale before using this function ```\Locale::setDefault('nl_NL');```
+	 *
+	 * @param	string|null $phone
+	 * @param	string|null $country
+	 * @return	string|null
+	 */
+	#[Depends('\libphonenumber\PhoneNumberUtil.
+	See https://github.com/giggsey/libphonenumber-for-php.
+	To install with composer run: `composer require giggsey/libphonenumber-for-php`')]
+	public static function PhoneNumber(string|null $phone, string|null $country = null)
+	{
+		$lang = \Locale::getDefault();
+		if(strlen($lang) >= 5) :
+			$lang = substr($lang, 3, 2);
+		endif;
+		if($country === null) :
+			$country = substr(\Locale::getDefault(), 3, 2);
+		endif;
+		if($phone !== null) :
+			$phoneNumberUtil = \libphonenumber\PhoneNumberUtil::getInstance();
+			try {
+				$phoneNumberObject = $phoneNumberUtil->parse($phone, $country);
+				if($phoneNumberUtil->isValidNumber($phoneNumberObject)) :
+					if($country == $lang) :
+						//var_dump(($country === null ? $lang : null));
+						$phone = $phoneNumberUtil->format($phoneNumberObject, \libphonenumber\PhoneNumberFormat::NATIONAL);
+					else :
+						$phone = $phoneNumberUtil->format($phoneNumberObject, \libphonenumber\PhoneNumberFormat::INTERNATIONAL);
+					endif;
+				else :
+					$phone = '#' . $phone;
+				endif;
+				//var_dump($phone);
+				//die();
+			} catch (\libphonenumber\NumberParseException $e) {
+				Console::error($e);
+			} finally {
+				return $phone;
+			}
+		endif;
+		return null;
+	}
+	/**
+	 * Format the zipcode to the correct format
+	 *
+	 * @param	string|null $zipcode
+	 * @return	string|null
+	 */
+	public static function Zipcode(string|null $zipcode)
+	{
+		if( $zipcode === null || $zipcode === '' || empty($zipcode)) :
+			return null;
+		endif;
+		$zipcodeStrip = preg_replace('/[^0-9a-zA-Z]/', '', $zipcode);
+		if( strlen($zipcodeStrip) == 6 && !str_contains($zipcodeStrip, ' ')) :
+			if(\is_numeric(substr($zipcodeStrip, 0, 4)) && !\is_numeric(substr($zipcodeStrip, 4, 2))) :
+				// When the first 4 characters are numbers and the last 2 characters are numbers
+				$zipcode = substr($zipcodeStrip, 0, 4) . ' ' . strtoupper(substr($zipcodeStrip, 4, 2));
+			endif;
+		endif;
+		return $zipcode;
+	}
+
+	/**
 	 * Format number to currency
 	 *
 	 * @param  mixed $number
