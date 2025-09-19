@@ -14,20 +14,18 @@ namespace KerkEnIT;
  * @since      Class available since Release 1.0.0
  **/
 
-if(!function_exists('getEnvPath')) :
-	function getEnvPath(string $dir)
-	{
-		$file = realpath($dir . '/.env');
-		if ($file !== FALSE) :
-			return $dir;
-		else :
-			$dir = realpath($dir . '/../');
-			if ($dir !== FALSE) :
-				return getEnvPath($dir);
-			endif;
+function getEnvPath(string $dir)
+{
+	$file = realpath($dir . '/.env');
+	if ($file !== FALSE) :
+		return $dir;
+	else :
+		$dir = realpath($dir . '/../');
+		if ($dir !== FALSE) :
+			return getEnvPath($dir);
 		endif;
-	}
-endif;
+	endif;
+}
 
 // Load the environment variables
 if(!isset($_ENV) || !is_array($_ENV) || count($_ENV) == 0) :
@@ -50,7 +48,7 @@ if ((!isset($_ENV) || !is_array($_ENV) || count($_ENV) == 0)) :
 		endforeach;
 	endif;
 endif;
-
+extract($_ENV);
 // Get debug hosts from the environment
 if(isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
 	if(!defined('DEBUG')) :
@@ -58,12 +56,7 @@ if(isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && 
 	endif;
 endif;
 
-$filename = realpath(dirname(__FILE__) . '/class.Log.php');
-if(realpath($filename) !== FALSE) :
-	if(substr(PHP_VERSION, 0, 3) === '8.4') :
-		require_once($filename);
-	endif;
-endif;
+
 /**
  * Autoloader for the Kerk en IT Framework
  *
