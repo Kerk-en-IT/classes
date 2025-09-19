@@ -216,6 +216,7 @@ class Image
 				curl_setopt($ch, CURLOPT_VERBOSE, false);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($ch, CURLOPT_URL, $image);
+				curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 				curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 				$raw = curl_exec($ch);
 				curl_close($ch);
