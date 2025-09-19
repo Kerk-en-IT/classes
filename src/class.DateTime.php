@@ -1404,4 +1404,11 @@ class DateTime
 	{
 		return self::GetDate($datetime)->format('H:i:s');
 	}
+
+	public static function diffInSeconds($start, $end): int
+	{
+		$start = self::GetDate($start);
+		$end = self::GetDate($end);
+		return $end->getTimestamp() - $start->getTimestamp();
+	}
 }
