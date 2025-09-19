@@ -385,11 +385,11 @@ class Format
 	}
 
 	/**
-	 * Create a GUID
+	 * Create a GUID with dashes
 	 *
-	 * @return	string GUID
+	 * @return	string GUID with dashes
 	 */
-	public static function GUID(): string
+	public static function uuid(): string
 	{
 		if (function_exists('com_create_guid') === true) {
 			return trim(com_create_guid(), '{}');
@@ -399,12 +399,25 @@ class Format
 	}
 
 	/**
+	 * @deprecated use uuid() instead
+	 * Create a GUID with dashes
+	 *
+	 * @return	string GUID with dashes
+	 */
+	#[\Deprecated(message: "use uuid() instead")]
+	public static function GUID(): string
+	{
+		return self::uuid();
+	}
+
+
+	/**
 	 * Check if a given string is a valid UUID
 	 *
 	 * @param   string  $uuid   The string to check
 	 * @return  boolean
 	 */
-	public static function is_guid($uuid)
+	public static function is_uuid($uuid)
 	{
 
 		if (!is_string($uuid) || (preg_match('/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i', strtolower($uuid)) !== 1)) {
@@ -412,6 +425,55 @@ class Format
 		}
 
 		return true;
+	}
+
+	/**
+	 * @deprecated use is_uuid() instead
+	 * Check if a given string is a valid GUID
+	 *
+	 * @param   string  $guid   The string to check
+	 * @return  boolean
+	 */
+	#[\Deprecated(message: "use is_uuid() instead")]
+	public static function is_guid($uuid)
+	{
+		return self::is_uuid($uuid);
+	}
+
+	/**
+	 * Convert a MD5 hash to a UUID
+	 *
+	 * @param	string $md5 MD5 hash
+	 * @return	string UUID
+	 */
+	public static function md5_to_uuid($md5): string
+	{
+		if (!is_string($md5) || strlen($md5) !== 32) {
+			throw new \InvalidArgumentException('Input must be a 32-character hexadecimal string.');
+		}
+		$md5 = substr($md5, 0, 8) . '-' .
+			substr($md5, 8, 4) . '-' .
+			substr($md5, 12, 4) . '-' .
+			substr($md5, 16, 4) . '-' .
+			substr($md5, 20);
+		return $md5;
+	}
+
+
+	/**
+	 * Convert a UUID to a MD5 hash
+	 *
+	 * @param	string|null $uuid UUID
+	 * @return	string|null MD5 hash or null if not valid UUID
+	 */
+	public static function uuid_to_md5(?string $uuid): string|null
+	{
+		if (!is_string($uuid) || self::is_uuid($uuid) === false || strlen($uuid) !== 36) {
+			//throw new \InvalidArgumentException('Input must be a 36-character hexadecimal string.');
+			return null;
+		}
+
+		return str_replace('-', '', $uuid);
 	}
 
 	/**
@@ -423,10 +485,10 @@ class Format
 	 */
 	public static function GetUserName($email)
 	{
-		if (self::is_guid($email)) :
+		if (self::is_uuid($email)) :
 			global $mysqli;
 			global $account_ID;
-			if (self::is_guid($account_ID)) :
+			if (self::is_uuid($account_ID)) :
 				if ($result = $mysqli->query("SELECT `gender`, `firstname`, `infix`, `lastname` FROM `users` WHERE `ID` = '$email' AND `account_ID` = '$account_ID'")) :
 					$user = $result->fetch_object();
 					return Format::Name($user->firstname, $user->infix, $user->lastname);
@@ -445,10 +507,10 @@ class Format
 	 */
 	public static function GetUserMail($email)
 	{
-		if (self::is_guid($email)) :
+		if (self::is_uuid($email)) :
 			global $mysqli;
 			global $account_ID;
-			if (self::is_guid($account_ID)) :
+			if (self::is_uuid($account_ID)) :
 				if ($result = $mysqli->query("SELECT `email` FROM `users` WHERE `ID` = '$email' AND `account_ID` = '$account_ID'")) :
 					$email = $result->fetch_object()->email;
 				endif;
@@ -1815,8 +1877,9 @@ class Format
 	{
 		// init document
 		$doc = new \DOMDocument();
+		libxml_use_internal_errors(true);
 		$doc->loadHTML('<!doctype html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>' . $html . '</body></html>');
-
+		libxml_clear_errors();
 		// init xpath
 		$xpath = new \DOMXPath($doc);
 
