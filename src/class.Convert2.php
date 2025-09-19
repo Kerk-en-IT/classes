@@ -859,6 +859,12 @@ class Convert2
 	 */
 	public static function get_dimension(string $filename) :object
 	{
+		$url = null;
+		if (!empty($filename) && !file_exists($filename) && filter_var($filename, FILTER_VALIDATE_URL) && str_starts_with($filename, 'http')) :
+			$url = $filename;
+			$filename = null;
+		endif;
+
 		$width = (\defined('MAX_WIDTH') ? \MAX_WIDTH : 1);
 		$height = (\defined('MAX_HEIGHT') ? \MAX_HEIGHT : 1);
 		if($width == 0) :
@@ -874,15 +880,22 @@ class Convert2
 		);
 		$json = null;
 		try {
-			$filename = realpath($filename);
-			$extension = pathinfo($filename, PATHINFO_EXTENSION);
-			$json = str_replace('.' . $extension, '.dimension', $filename);
-			if (file_exists($json)) :
-				$size = (array)json_decode(file_get_contents($json));
-				if(array_key_exists('dimension', $size)) :
-					$size['dimension'] = str_replace(',', '.', (string)$size['dimension']);
+			if ($filename !== null) :
+				$extension = pathinfo($filename, PATHINFO_EXTENSION);
+				$json = str_replace('.' . $extension, '.dimension', $filename);
+				if (file_exists($json)) :
+					$size = (object)json_decode(file_get_contents($json));
+					$size->dimension = (float)str_replace(',', '.', (string)$size->dimension);
+					return $size;
 				endif;
-				return (object)$size;
+			else :
+				$name = md5($url);
+				$json = sys_get_temp_dir() . '/' . $name . '.dimension';
+				if (file_exists($json)) :
+					$size = (object)json_decode(file_get_contents($json));
+					$size->dimension = (float)str_replace(',', '.', (string)$size->dimension);
+					return $size;
+				endif;
 			endif;
 		} catch (Exception $e) {
 			$json = null;
