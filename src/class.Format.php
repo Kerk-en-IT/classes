@@ -389,8 +389,11 @@ class Format
 	 *
 	 * @return	string GUID with dashes
 	 */
-	public static function uuid(): string
+	public static function uuid(?string $content = null): string
 	{
+		if($content !== null) :
+			return self::md5_to_uuid(md5($content));
+		endif;
 		if (function_exists('com_create_guid') === true) {
 			return trim(com_create_guid(), '{}');
 		}
@@ -1398,12 +1401,13 @@ class Format
 	 * Trim a text by a specific length. Based on the last full word.
 	 * @deprecated 1.3.107 @see wordwrap()
 	 *
-	 * @param  mixed $s Input text
-	 * @param  mixed $max_length Maximum length to trim.
+	 * @param  string | null $s Input text
+	 * @param  int $max_length Maximum length to trim.
 	 * @return void
 	 */
-	public static function Trim($s, $max_length = 300)
+	public static function Trim(string| null $s, int $max_length = 300)
 	{
+		if ($s === null) return '';
 		if (strlen($s) > $max_length) :
 			$offset = ($max_length - 3) - strlen($s);
 			$s = substr($s, 0, strrpos($s, ' ', $offset)) . '...';
@@ -1980,9 +1984,17 @@ class Format
 		return $buffer;
 	}
 
-	public static function get_snippet($str, $wordCount = 45): string
+	/**
+	 * Get a snippet from a string
+	 *
+	 * @param  string|null $str Input text
+	 * @param  int $wordCount Number of words to return. Default 45
+	 * @return string Snippet
+	 */
+	public static function get_snippet(string|null $str, int $wordCount = 45): string
 	{
-		$str = strip_tags($str);
+		if($str === null) return '';
+		$str = strip_tags($str ?? '');
 
 		$rtn = implode(
 			'',
