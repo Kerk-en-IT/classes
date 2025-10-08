@@ -265,19 +265,10 @@ class Format
 	 * @param	string|null $zipcode
 	 * @return	string|null
 	 */
+	#[\Deprecated(message: 'This function has been DEPRECATED', since: '1.2.0', replacement: 'GeoLocation::Zipcode()')]
 	public static function Zipcode(string|null $zipcode)
 	{
-		if( $zipcode === null || $zipcode === '' || empty($zipcode)) :
-			return null;
-		endif;
-		$zipcodeStrip = preg_replace('/[^0-9a-zA-Z]/', '', $zipcode);
-		if( strlen($zipcodeStrip) == 6 && !str_contains($zipcodeStrip, ' ')) :
-			if(\is_numeric(substr($zipcodeStrip, 0, 4)) && !\is_numeric(substr($zipcodeStrip, 4, 2))) :
-				// When the first 4 characters are numbers and the last 2 characters are numbers
-				$zipcode = substr($zipcodeStrip, 0, 4) . ' ' . strtoupper(substr($zipcodeStrip, 4, 2));
-			endif;
-		endif;
-		return $zipcode;
+		return GeoLocation::Zipcode($zipcode);
 	}
 
 	/**
@@ -407,7 +398,7 @@ class Format
 	 *
 	 * @return	string GUID with dashes
 	 */
-	#[\Deprecated(message: "use uuid() instead")]
+	#[\Deprecated(message: "use uuid() instead", since: '1.1.0', replacement: 'Format::uuid()')]
 	public static function GUID(): string
 	{
 		return self::uuid();
@@ -437,7 +428,7 @@ class Format
 	 * @param   string  $guid   The string to check
 	 * @return  boolean
 	 */
-	#[\Deprecated(message: "use is_uuid() instead")]
+	#[\Deprecated(message: "use is_uuid() instead", since: '1.1.0', replacement: 'Format::is_uuid()')]
 	public static function is_guid($uuid)
 	{
 		return self::is_uuid($uuid);
@@ -530,6 +521,7 @@ class Format
 	 * Encrypt a string
 	 * @deprecated @see Cryptography::encrypt()
 	 */
+	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0', replacement: 'Cryptography::Encrypting()')]
 	public static function encrypt($string)
 	{
 		return Cryptography::encrypt($string);
@@ -538,6 +530,7 @@ class Format
 	 * Decrypt a string
 	 * @deprecated @see Cryptography::decrypt()
 	 */
+	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0', replacement: 'Cryptography::Decrypting()')]
 	public static function decrypt($encrypted)
 	{
 		return Cryptography::decrypt($encrypted);
@@ -728,6 +721,7 @@ class Format
 	 * @param	string $hexColor
 	 * @return	string
 	 */
+	#[\Deprecated(message: 'This function has been DEPRECATED', since: '1.2.0', replacement: 'ColorPalette::get_contrast_color()')]
 	public static function GetContrastColor($hexColor)
 	{
 		$prefix = '';
@@ -2124,6 +2118,7 @@ class Format
 		return implode(', ', $items);
 	}
 
+	#[\Deprecated(message: 'This function has been DEPRECATED', since: '1.1.0', replacement: 'GeoLocation::latlon()')]
 	public static function latlon($value)
 	{
 		return str_replace(',', '.', (string)$value);

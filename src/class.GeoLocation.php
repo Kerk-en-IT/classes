@@ -170,6 +170,40 @@ class GeoLocation {
 		endif;
 	}
 
+
+	/**
+	 * Formats a latitude or longitude value to be used in a URL
+	 *
+	 * @param  float|double $value Latitude or Longitude value
+	 * @return string Formatted Latitude or Longitude value
+	 */
+	public static function latlon(float|double $value): string
+	{
+		return str_replace(',', '.', (string)$value);
+	}
+
+
+	/**
+	 * Format the zipcode to the correct format
+	 *
+	 * @param	string|null $zipcode
+	 * @return	string|null
+	 */
+	public static function Zipcode(string|null $zipcode)
+	{
+		if ($zipcode === null || $zipcode === '' || empty($zipcode)) :
+			return null;
+		endif;
+		$zipcodeStrip = preg_replace('/[^0-9a-zA-Z]/', '', $zipcode);
+		if (strlen($zipcodeStrip) == 6 && !str_contains($zipcodeStrip, ' ')) :
+			if (\is_numeric(substr($zipcodeStrip, 0, 4)) && !\is_numeric(substr($zipcodeStrip, 4, 2))) :
+				// When the first 4 characters are numbers and the last 2 characters are numbers
+				$zipcode = substr($zipcodeStrip, 0, 4) . ' ' . strtoupper(substr($zipcodeStrip, 4, 2));
+			endif;
+		endif;
+		return $zipcode;
+	}
+
 	/**
 	 * Gets the distance between a user and a church
 	 *

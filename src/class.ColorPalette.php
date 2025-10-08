@@ -140,6 +140,82 @@ class ColorPalette
 		endif;
 	}
 
+	/**
+	 * Get the average pixel color from the given file using Image Magick
+	 *
+	 * @param  mixed $filename
+	 * @param  mixed $as_hex_string	Set to true, the function will return the 6 character HEX value of the color.
+	 * 								If false, an array will be returned with r, g, b components.
+	 * @param  mixed $width
+	 * @param  mixed $height
+	 * @param  mixed $x
+	 * @param  mixed $y
+	 * @return	string|array
+	 */
+	public static function get_average_color(string $filename, bool $as_hex_string = true, int $width = 0, int $height = 0, int $x = 0, int $y = 0)
+	{
+		if (!empty($filename)) :
+			$crop = false;
+			if (($width + $height + $x + $y) !== 0) :
+				$crop = true;
+			endif;
+			$json = null;
+			try {
+				$filename = realpath($filename);
+				$extension = pathinfo($filename, PATHINFO_EXTENSION);
+				$json = str_replace('.' . $extension, ($crop ? '.crop' : '.color'), $filename);
+				if (file_exists($json)) :
+					// Return the HEX color
+					return json_decode(file_get_contents($json));
+				endif;
+			} catch (Exception $e) {
+				$json = null;
+			}
+			//if(DEBUG) :
+			//	return 'transparent';
+			//endif;
+			try {
+				// Read image file with Image Magick
+				$image = new \Imagick($filename);
+
+				if ($crop) :
+					$image->cropImage($width, $height, $x, $y);
+				endif;
+				// Scale down to 1x1 pixel to make \Imagick do the average
+				$image->scaleimage(1, 1);
+				/** @var \ImagickPixel $pixel */
+				if (!$pixels = $image->getimagehistogram()) :
+					// Return transparent if the function has not returned a value
+					return 'transparent';
+				endif;
+			} catch (\ImagickException $e) {
+				// Image Magick Error!
+				return 'transparent';
+			} catch (Exception $e) {
+				// Unknown Error!
+				return 'transparent';
+			}
+
+			$pixel = reset($pixels);
+			$rgb = $pixel->getcolor();
+
+			if ($as_hex_string) :
+				$hex = '#' . sprintf('%02X%02X%02X', $rgb['r'], $rgb['g'], $rgb['b']);
+				if ($json != null) :
+					file_put_contents($json, json_encode($hex));
+				endif;
+				// Return the HEX color
+				return $hex;
+			endif;
+			if ($json != null) :
+				file_put_contents($json, json_encode($rgb));
+			endif;
+			// Return the RGB array
+			return $rgb;
+		endif;
+		// Return transparent if the function has not returned a value
+		return 'transparant';
+	}
 
 	/**
 	 * Converts HEX color to RGB

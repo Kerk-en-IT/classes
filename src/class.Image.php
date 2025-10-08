@@ -16,6 +16,9 @@ namespace KerkEnIT;
  * @since      Class available since Release 1.0.0
  **/
 
+/**
+ * Supported Image Mime Types
+ */
 enum ImageMimeTypes: string
 {
 	case JPG = 'image/jpg';
@@ -77,11 +80,11 @@ class Image
 	 * @param	string $file
 	 * @param	int|float $w Destination width
 	 * @param	int|float $h Destination height
-	 * @param	bool $crop Crops the extra information of the image
+	 * @param	bool $crop Crops the extra information of the image. If false the image will be resized to fit within the dimensions. Default false.
 	 * @param	string $format Image Mimetype @see ```ImageMimeTypes``
-	 * @return resource|\GdImage|false
+	 * @return \resource|\GdImage|false
 	 */
-	public static function Resize($file, $w, $h, $crop = FALSE, $format = ImageMimeTypes::JPG)
+	public static function Resize(string $file, int|float $w, int|float $h, bool $crop = false, string $format = ImageMimeTypes::JPG): \resource|\GdImage|false
 	{
 		$image = NULL;
 		if (file_exists($file)) :
@@ -136,13 +139,21 @@ class Image
 		return FALSE;
 	}
 
-	public static function getimagesize($image): array|false
+	/**
+	 * Get the size of an image from a URL with caching
+	 *
+	 * @param	string $image URL to image or path to image
+	 * @return array|false Array with image size or false on error
+	 */
+	public static function getimagesize(string $image): array|false
 	{
 		try {
 			$mem_var = new \Memcached();
 			$mem_var->addServer("127.0.0.1", 11211);
 			$size = $mem_var->get("image_size_" . md5($image));
-			if ($size == false) :
+			if ($size == false && \file_exists($image)) :
+				$size = \getimagesize($image);
+			elseif ($size == false) :
 				$user_agents = array(
 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.81 Safari/537.36 Edge/16.16299",
@@ -209,7 +220,6 @@ class Image
 				);
 				$user_agent = $user_agents[array_rand($user_agents)];
 
-				//$size = getimagesize($image);
 				$ch = curl_init($image);
 				curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -235,6 +245,13 @@ class Image
 		}
 	}
 
+	/**
+	 * Calculate the ratio between two numbers and return in format X:Y
+	 *
+	 * @param	int|float $a
+	 * @param	int|float $b
+	 * @return string Ratio in format X:Y
+	 */
 	private static function ratio($a, $b): string
 	{
 		$_a = $a;
@@ -252,30 +269,25 @@ class Image
 		return round($a / $gcd)  . ':' . round($b / $gcd);
 	}
 
-	//private static function ratio(): string
-	//{
-	//	$input = func_get_args();
-	//	$c = func_num_args();
-	//	if ($c < 1)
-	//		return ''; //empty input
-	//	if ($c == 1)
-	//		return $input[0]; //only 1 input
-	//	$gcd = self::gcd($input[0], $input[1]); //find gcd of inputs
-	//	for ($i = 2; $i < $c; $i++)
-	//		$gcd = self::gcd($gcd, $input[$i]);
-	//	$var = $input[0] / $gcd; //init output
-	//	for ($i = 1; $i < $c; $i++)
-	//		$var .= ':' . round($input[$i] / $gcd); //calc ratio
-	//	return $var;
-	//}
+
+	/**
+	 * Get the image ratio in format X:Y
+	 *
+	 * @param	string $image Path to image
+	 * @return string Ratio in format X:Y or 0:0 on error
+	 */
 	public static function getImageRatio(string $image): string
 	{
-		$im = new \Imagick($image);
-		$size = $im->getImageGeometry();
-		if($size['width'] < $size['height']) :
-			return  self::ratio($size['width'], $size['height']);
+		if(!is_dir($image) && file_exists($image)) :
+			$im = new \Imagick($image);
+			$size = $im->getImageGeometry();
+			if($size['width'] < $size['height']) :
+				return self::ratio($size['width'], $size['height']);
+			else :
+				return self::ratio($size['height'], $size['width']);
+			endif;
 		else :
-			return  self::ratio($size['height'], $size['width']);
+			return '0:0';
 		endif;
 	}
 }
