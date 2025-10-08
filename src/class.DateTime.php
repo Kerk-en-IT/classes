@@ -36,6 +36,10 @@ class DateTime
 			endif;
 		endif;
 
+		if($datetime === 'current_timestamp()') :
+			$datetime = 'now';
+		endif;
+
 		if ($datetime !== null && is_object($datetime) && $datetime instanceof \DateTime) :
 			return $datetime;
 		elseif ($datetime !== null && is_object($datetime) && $datetime instanceof \DateTimeImmutable) :
