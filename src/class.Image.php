@@ -227,7 +227,6 @@ class Image
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($ch, CURLOPT_URL, $image);
 				curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-				curl_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
 				$raw = curl_exec($ch);
 				curl_close($ch);
 				$fp = tmpfile();
@@ -278,10 +277,10 @@ class Image
 	 */
 	public static function getImageRatio(string $image): string
 	{
-		if(!is_dir($image) && file_exists($image)) :
+		if (!is_dir($image) && file_exists($image)) :
 			$im = new \Imagick($image);
 			$size = $im->getImageGeometry();
-			if($size['width'] < $size['height']) :
+			if ($size['width'] < $size['height']) :
 				return self::ratio($size['width'], $size['height']);
 			else :
 				return self::ratio($size['height'], $size['width']);
