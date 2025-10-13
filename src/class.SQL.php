@@ -50,6 +50,11 @@ class SQL {
 	private $_memcache_obj = null;
 
 	/**
+	 * SQL Duplicate Entry constant
+	 */
+	const DuplicateEntry = 'DUPLICATE_ENTRY';
+
+	/**
 	 *
 	 * Constructor for the SQL class
 	 *
@@ -462,6 +467,184 @@ class SQL {
 			$rtn .= '</div>';
 		endif;
 		return $this->ignoreDuplicateMessages($rtn);
+	}
+
+
+	/**
+	 * Add multiple rows at once
+	 *
+	 * @param array $data Array of column => value pairs
+	 * @return void
+	 */
+	public function addRows(array|object $data)
+	{
+		foreach ((array)$data as $column => $value) {
+			$this->addRow($column, $value);
+		}
+	}
+
+	/**
+	 * CRUD operations (Create, Read, Update, Delete)
+	 *
+	 * @param string $type HTTP method (POST, GET, PUT, DELETE)
+	 * @param string $id Optional ID for specific operations
+	 * @param int $rowCount Number of rows to return (for GET)
+	 * @return object|bool Result object or false on failure
+	 */
+	public function CRUD(string $type, ?string $id = null, int $rowCount = 1)
+	{
+		switch (strtoupper($type)) {
+			case 'POST':
+				return $this->performInsert($id);
+			case 'GET':
+				return $this->performSelect($id, $rowCount);
+			case 'PUT':
+				return $this->performUpdate($id);
+			case 'DELETE':
+				return $this->performDelete($id);
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Perform INSERT operation
+	 */
+	private function performInsert($id)
+	{
+		if (empty($this->rows)) {
+			return (object)['result' => false];
+		}
+
+		$columns = array_keys($this->rows);
+		$values = array_values($this->rows);
+		$placeholders = array_fill(0, count($values), '?');
+
+		$sql = "INSERT INTO `{$this->table}` (`" . implode('`, `', $columns) . "`) VALUES (" . implode(', ', $placeholders) . ")";
+
+		$stmt = $this->mysqli->prepare($sql);
+		if (!$stmt) {
+			return (object)['result' => false];
+		}
+
+		$types = str_repeat('s', count($values)); // Assume all strings for simplicity
+		$stmt->bind_param($types, ...$values);
+
+		try {
+			if ($stmt->execute()) {
+				if ($this->mysqli->errno === 1062) { // Duplicate entry
+					return (object)['result' => self::DuplicateEntry];
+				}
+				return (object)['result' => $id ?? $this->mysqli->insert_id];
+			}
+		} catch (\Exception $e) {
+			if ($this->mysqli->errno === 1062) { // Duplicate entry
+				return (object)['result' => self::DuplicateEntry];
+			}
+			return (object)['result' => $id ?? $this->mysqli->insert_id];
+		}
+
+		return (object)['result' => false];
+	}
+
+	/**
+	 * Perform SELECT operation
+	 */
+	private function performSelect($id, $rowCount)
+	{
+		$sql = "SELECT * FROM `{$this->table}` WHERE 1=1";
+		$params = [];
+		$types = '';
+
+		if ($id !== null) {
+			$sql .= " AND `ID` = ?";
+			$params[] = $id;
+			$types .= 's';
+		}
+
+		if (isset($this->where) && is_array($this->where)) {
+			foreach ($this->where as $column => $value) {
+				$sql .= " AND `{$column}` = ?";
+				$params[] = $value;
+				$types .= 's';
+			}
+		}
+
+		$stmt = $this->mysqli->prepare($sql);
+		if (!$stmt) {
+			return false;
+		}
+
+		if (!empty($params)) {
+			$stmt->bind_param($types, ...$params);
+		}
+
+		$stmt->execute();
+		$result = $stmt->get_result();
+
+		if ($rowCount === 1) {
+			return $result->fetch_object() ?: false;
+		} else {
+			return $result->fetch_all(MYSQLI_ASSOC) ?: false;
+		}
+	}
+
+	/**
+	 * Perform UPDATE operation
+	 */
+	private function performUpdate($id)
+	{
+		if (empty($this->rows) || !$id) {
+			return false;
+		}
+
+		$setParts = [];
+		$params = [];
+		$types = '';
+
+		foreach ($this->rows as $column => $value) {
+			if ($value === null) {
+				$setParts[] = "`{$column}` = NULL";
+			} elseif ($value === 'NOW()') {
+				$setParts[] = "`{$column}` = NOW()";
+			} else {
+				$setParts[] = "`{$column}` = ?";
+				$params[] = $value;
+				$types .= 's';
+			}
+		}
+
+		$sql = "UPDATE `{$this->table}` SET " . implode(', ', $setParts) . " WHERE `ID` = ?";
+		$params[] = $id;
+		$types .= 's';
+
+		$stmt = $this->mysqli->prepare($sql);
+		if (!$stmt) {
+			return false;
+		}
+
+		$stmt->bind_param($types, ...$params);
+		return $stmt->execute();
+	}
+
+	/**
+	 * Perform DELETE operation
+	 */
+	private function performDelete($id)
+	{
+		if (!$id) {
+			return false;
+		}
+
+		$sql = "DELETE FROM `{$this->table}` WHERE `ID` = ?";
+		$stmt = $this->mysqli->prepare($sql);
+
+		if (!$stmt) {
+			return false;
+		}
+
+		$stmt->bind_param('s', $id);
+		return $stmt->execute();
 	}
 }
 ?>
