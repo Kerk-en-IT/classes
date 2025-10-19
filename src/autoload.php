@@ -43,13 +43,22 @@ if ((!isset($_ENV) || !is_array($_ENV) || count($_ENV) == 0)) :
 		foreach ($env as $line) :
 			$line = explode('=', $line);
 			if (count($line) == 2) :
-				putenv(trim($line[0], '"') . "=" . trim($line[1], '"'));
-				$_ENV[trim($line[0], '"')] = trim($line[1], '"');
+				$value = trim($line[1], '"');
+				putenv(trim($line[0], '"') . "=" . $value);
+				$_ENV[trim($line[0], '"')] = $value;
 			endif;
 		endforeach;
 	endif;
 endif;
+foreach ($_ENV as $key => $value) :
+	if ($value === 'true') :
+		$_ENV[$key] = true;
+	elseif ($value === 'false') :
+		$_ENV[$key] = false;
+	endif;
+endforeach;
 extract($_ENV);
+
 // Get debug hosts from the environment
 if(isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
 	if(!defined('DEBUG')) :
