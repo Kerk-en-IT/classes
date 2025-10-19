@@ -91,7 +91,7 @@ class Convert2
 			$x = (int)round($width - $watermark->getImageWidth());
 			$y = (int)round($height - $watermark->getImageHeight());
 
-			$avg_color = self::get_average_color($input_file, true, (int)$watermark->getImageWidth(), (int)$watermark->getImageHeight(), (int)$x, (int)$y);
+			$avg_color = ColorPalette::get_average_color($input_file, true, (int)$watermark->getImageWidth(), (int)$watermark->getImageHeight(), (int)$x, (int)$y);
 			$rgb = ColorPalette::hex_to_rgb($avg_color);
 
 			$composite = \Imagick::COMPOSITE_LIGHTEN;

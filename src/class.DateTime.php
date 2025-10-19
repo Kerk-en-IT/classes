@@ -625,7 +625,7 @@ class DateTime
 	 *
 	 * @param	object datetime
 	 * @param string period
-	 * @return	string maandag 20 december
+	 * @return	string maandagmorgen 20 december
 	 */
 	public static function DayDateMonthPeriod($datetime, $period = 'morgen'): string
 	{

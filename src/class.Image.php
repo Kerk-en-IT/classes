@@ -289,4 +289,46 @@ class Image
 			return '0:0';
 		endif;
 	}
+
+	public static function max_upload_size(): int
+	{
+		static $max_size = -1;
+
+		if ($max_size < 0) {
+			// Start with post_max_size.
+			$max_size = self::return_bytes(ini_get('post_max_size'));
+
+			// If upload_max_size is less, then reduce. Except if upload_max_size is
+			// zero, which indicates no limit.
+			$upload_max = self::return_bytes(ini_get('upload_max_filesize'));
+			if ($upload_max > 0 && $upload_max < $max_size) {
+				$max_size = $upload_max;
+			}
+		}
+		return $max_size;
+	}
+
+	/**
+	 * Convert a PHP ini size string to bytes
+	 *
+	 * @param	string $val Size string from php.ini
+	 * @return int Size in bytes
+	 */
+	private static function return_bytes($val): int
+	{
+		preg_match('/(?<value>\d+)(?<option>.?)/i', trim($val), $matches);
+		$inc = array(
+			'g' => 1073741824, // (1024 * 1024 * 1024)
+			'm' => 1048576, // (1024 * 1024)
+			'k' => 1024
+		);
+
+		$value = (int) $matches['value'];
+		$key = strtolower(trim($matches['option']));
+		if (isset($inc[$key])) {
+			$value *= $inc[$key];
+		}
+
+		return $value;
+	}
 }

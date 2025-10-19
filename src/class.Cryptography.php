@@ -177,7 +177,7 @@ class Cryptography
 				$rtn = self::$hashesFiles[$filePath];
 			endif;
 			if ((empty($rtn)) && \defined('VERSION')) :
-				$rtn = VERSION;
+				$rtn = \VERSION;
 			endif;
 
 			if (empty($rtn)) :

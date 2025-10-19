@@ -96,7 +96,7 @@ class Video
 	 * @param	string|null $destinationPath The requested destination path
 	 * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
 	 */
-	public function watermark(string $watermark, ?string $destinationPath): string
+	public function watermark(string $watermark, ?string $destinationPath = null): string
 	{
 		if ($destinationPath !== null && !is_file($destinationPath)) :
 			$filter = null;

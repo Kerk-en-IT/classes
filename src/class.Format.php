@@ -1896,7 +1896,9 @@ class Format
 			if ($toRemove) {
 				foreach ($toRemove as $attr) {
 					if (gettype($image) == 'object' && $image !== null) :
-						$image->removeAttribute($attr->name);
+						if(method_exists($image, 'removeAttribute')) :
+							$image->removeAttribute($attr->name);
+						endif;
 					endif;
 				}
 			}
@@ -2247,5 +2249,19 @@ class Format
 			endif;
 		endif;
 		return $youtube_id;
+	}
+
+	/**
+	 * Convert bytes to human readable format
+	 *
+	 * @param int $bytes Size in bytes
+	 * @param int $decimals Number of decimals
+	 * @return	string Human readable size
+	 */
+	public static function bytesToHuman(int $bytes, int $decimals = 0): string
+	{
+		$size = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+		$factor = floor((strlen($bytes) - 1) / 3);
+		return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . '' . $size[$factor];
 	}
 }
