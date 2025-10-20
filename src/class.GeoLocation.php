@@ -174,10 +174,10 @@ class GeoLocation {
 	/**
 	 * Formats a latitude or longitude value to be used in a URL
 	 *
-	 * @param  float|double $value Latitude or Longitude value
+	 * @param  float $value Latitude or Longitude value
 	 * @return string Formatted Latitude or Longitude value
 	 */
-	public static function latlon(float|double $value): string
+	public static function latlon(float $value): string
 	{
 		return str_replace(',', '.', (string)$value);
 	}
