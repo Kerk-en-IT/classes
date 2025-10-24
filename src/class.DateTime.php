@@ -621,7 +621,7 @@ class DateTime
 	}
 
 	/**
-	 * maandag 20 december
+	 * maandagmorgen 20 december
 	 *
 	 * @param	object datetime
 	 * @param string period
