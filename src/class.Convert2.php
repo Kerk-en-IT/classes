@@ -676,7 +676,7 @@ class Convert2
 					return $output_file;
 				else :
 					$quality--;
-					if(unlink($output_file)) :
+					if((\file_exists($output_file) && unlink($output_file)) || \true) :
 						return self::social($input_file, $output_file, $width, $height, $max_bytes, $quality);
 					else :
 						return $output_file;
