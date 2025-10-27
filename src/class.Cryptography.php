@@ -25,7 +25,7 @@ class Cryptography
 	 * @param	string $string The data to be encrypted.
 	 * @return	string Encrypted string
 	 */
-	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0', replacement: 'Cryptography::Encrypting()')]
+	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0')]
 	public static function encrypt($string)
 	{
 		if (function_exists('mcrypt_create_iv') && function_exists('mcrypt_get_iv_size') && function_exists('mcrypt_encrypt')) :
@@ -59,7 +59,7 @@ class Cryptography
 	 * @param	encrypted $string The data to be decrypted.
 	 * @return	string Decrypted string
 	 */
-	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0', replacement: 'Cryptography::Decrypting()')]
+	#[\Deprecated(message: 'This function has been DEPRECATED as of PHP 7.1.0 and REMOVED as of PHP 7.2.0. Relying on this function is highly discouraged.', since: '1.1.0')]
 	public static function decrypt($encrypted)
 	{
 		$data = base64_decode($encrypted);

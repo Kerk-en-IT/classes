@@ -785,7 +785,7 @@ class Convert2
 	 * @param  mixed $y
 	 * @return	string|array
 	 */
-	#[\Deprecated(message: 'Use ColorPalette::get_average_color() instead', since: '1.3.0', replacement: 'ColorPalette::get_average_color()')]
+	#[\Deprecated(message: 'See ColorPalette::get_average_color() instead', since: '1.3.0')]
 	public static function get_average_color(string $filename, bool $as_hex_string = true, int $width = 0, int $height = 0, int $x = 0, int $y = 0)
 	{
 		return ColorPalette::get_average_color($filename, $as_hex_string, $width, $height, $x, $y);
