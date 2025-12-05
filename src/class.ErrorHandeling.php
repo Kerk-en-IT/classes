@@ -41,6 +41,9 @@ class ErrorHandeling
 	 */
 	public static function register(): void
 	{
+		if(str_contains(__DIR__, 'wp-content')) {
+			return;
+		}
 		$that = new self();
 		self::env();
 		set_error_handler(array($that, 'log_error'));

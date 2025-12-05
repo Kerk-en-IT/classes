@@ -621,7 +621,7 @@ class DateTime
 	}
 
 	/**
-	 * maandagmorgen 20 december
+	 * maandag 20 december
 	 *
 	 * @param	object datetime
 	 * @param string period
@@ -695,7 +695,7 @@ class DateTime
 	public static function ShortDateAndTime($datetime): string
 	{
 		$datetime = self::GetDate($datetime);
-		return str_replace(' 0:00', '', self::days_short()[$datetime->format('w')] . ' ' . $datetime->format('d') . ' ' . self::months_short()[$datetime->format('m') - 1] . ' ' . $datetime->format('Y G:i'));
+		return str_replace(' 0:00', '', self::days_short()[$datetime->format('w')] . ' ' . $datetime->format('j') . ' ' . self::months_short()[$datetime->format('m') - 1] . ' ' . $datetime->format('Y G:i'));
 	}
 
 	/**
@@ -707,7 +707,7 @@ class DateTime
 	public static function ShortDateAndMonth($datetime): string
 	{
 		$datetime = self::GetDate($datetime);
-		return $datetime->format('d') . ' ' . self::months_short()[$datetime->format('m') - 1];
+		return $datetime->format('j') . ' ' . self::months_short()[$datetime->format('m') - 1];
 	}
 
 	/**
@@ -719,7 +719,7 @@ class DateTime
 	public static function ShortDateAndFullMonth($datetime): string
 	{
 		$datetime = self::GetDate($datetime);
-		return $datetime->format('d') . ' ' . self::months_full()[$datetime->format('m') - 1];
+		return $datetime->format('j') . ' ' . self::months_full()[$datetime->format('m') - 1];
 	}
 
 	/**
@@ -1414,5 +1414,118 @@ class DateTime
 		$start = self::GetDate($start);
 		$end = self::GetDate($end);
 		return $end->getTimestamp() - $start->getTimestamp();
+	}
+	public static function parseDateFromNote(string $note, ?int $maxTime = 31536000, ?int $now = null, ?int $i = null): ?int
+	{
+		$note = str_replace(', ', ' ', $note);
+		if ($now === null) :
+			$now = strtotime('today');
+		endif;
+		$date = null;
+		$hourMinute = null;
+		if($maxTime === null) :
+			$maxTime = 31536000;
+		endif;
+		for ($time = $now; $time < ($now + $maxTime); $time += 86400) :
+			$hourMinute = null;
+			for ($h = 0; $h < 24; $h++) :
+				foreach (array('00', '15', '30', '45') as $m) :
+					if (strpos($note, $h . "." . $m) !== false) :
+						$hourMinute = ($h * 60) + (int)$m;
+						break;
+					elseif (strpos($note, $h . ":" . $m) !== false) :
+						$hourMinute = ($h * 60) + (int)$m;
+						break;
+					endif;
+				endforeach;
+			endfor;
+			if (strpos($note, DateTime::DayDateMonth($time)) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos(strtolower($note), DateTime::DayDateMonth($time)) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::DayDateMonthPeriod($time, 'morgen')) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::DayDateMonthPeriod($time, 'ochtend')) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::DayDateMonthPeriod($time, 'middag')) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::DayDateMonthPeriod($time, 'avond')) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::DayDateMonthPeriod($time, 'nacht')) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, ucfirst(DateTime::DayDateMonthPeriod($time, 'morgen'))) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, ucfirst(DateTime::DayDateMonthPeriod($time, 'ochtend'))) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, ucfirst(DateTime::DayDateMonthPeriod($time, 'middag'))) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, ucfirst(DateTime::DayDateMonthPeriod($time, 'avond'))) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, ucfirst(DateTime::DayDateMonthPeriod($time, 'nacht'))) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::LongDate($time)) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::ShortDate($time)) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::FullDateAt($time)) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, ucfirst(DateTime::DayDateMonth($time))) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, strtolower(DateTime::DayDateMonth($time))) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::ShortDateAndFullMonth($time)) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			elseif (strpos($note, DateTime::ShortDateAndMonth($time)) !== false) :
+				$date = $time + $i + ($hourMinute ?? 77777);
+				break;
+			endif;
+		endfor;
+		if ($date != null && (strpos($note, 'doop') || strpos($note, 'huwelijk'))) :
+			$date += ($hourMinute ?? 800);
+		endif;
+		if($date == null) :
+			foreach(array(
+				2147483647 => 'koffie',
+				1000 => 'na afloop',
+				2000 => 'aansluitend',
+				3000 => 'zo meteen',
+				4000 => 'zometeen',
+				5000 => 'iedere zondag',
+				strtotime(date('Y') . '-12-25') => 'Eerste Kerstdag',
+				strtotime(date('Y') . '-12-26') => 'Tweede Kerstdag',
+				strtotime(date('Y')+1 . '-01-01') => 'Nieuwjaarsdag',
+				strtotime(date('Y') . '-04-27') => 'Koningsdag',
+				strtotime(date('Y') . '-05-05') => 'Bevrijdingsdag',
+				strtotime(date('Y') . '-12-31') => 'Oudejaarsavond',
+			) as $timeDateStamp => $needle) :
+				if (str_contains(strtolower($note), strtolower($needle))) :
+
+					if ($date == null) :
+						$date = $timeDateStamp;
+					endif;
+					$date += ($hourMinute ?? 800);
+					break;
+				endif;
+			endforeach;
+		endif;
+		return $date;
 	}
 }

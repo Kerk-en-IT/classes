@@ -66,10 +66,12 @@ if(isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && 
 	endif;
 endif;
 
-$filename = realpath(dirname(__FILE__) . '/class.Log.php');
-if (realpath($filename) !== FALSE) :
-	if (substr(PHP_VERSION, 0, 3) === '8.4') :
-		require_once($filename);
+if (!str_contains(__DIR__, 'wp-content')) :
+	$filename = realpath(dirname(__FILE__) . '/class.Log.php');
+	if (realpath($filename) !== FALSE) :
+		if (substr(PHP_VERSION, 0, 3) === '8.4') :
+			require_once($filename);
+		endif;
 	endif;
 endif;
 /**

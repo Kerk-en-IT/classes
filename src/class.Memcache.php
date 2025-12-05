@@ -9,17 +9,17 @@ if (!class_exists('\Memcache')) :
 	class Memcache
 	{
 		// Properties
-		private static $host;
-		private static $port;
-		private static $data = array();
+		private static string $host;
+		private static int $port;
+		private static array $data = array();
 
 		/**
 		 * connect
 		 *
 		 * @param	string $host
 		 * @param	int $port
-		 * @param  mixed $timeout
-		 * @return bool
+		 * @param 	mixed $timeout
+		 * @return	bool
 		 */
 		public static function connect(string $host, ?int $port = null, ?int $timeout = null): bool
 		{
@@ -32,13 +32,13 @@ if (!class_exists('\Memcache')) :
 		/**
 		 * Add data to the data array
 		 *
-		 * @param	string $key
-		 * @param  mixed $var
-		 * @param  mixed $flag
-		 * @param  mixed $expire
-		 * @return bool
+		 * @param	string $key The key that will be associated with the item.
+		 * @param	mixed $var The variable to store. Strings and integers are stored as is, other types are stored serialized.
+		 * @param	int $flag Use MEMCACHE_COMPRESSED to store the item compressed (uses zlib).
+		 * @param	int $expire Expiration time of the item. If it's equal to zero, the item will never expire. You can also use Unix timestamp or a number of seconds starting from current time, but in the latter case the number of seconds may not exceed 2592000 (30 days).
+		 * @return	bool
 		 */
-		public static function set($key, $var, $flag = null, $expire = null): bool
+		public static function set(string $key, $var, ?int $flag = null, ?int $expire = null): bool
 		{
 			self::$data[$key] = $var;
 			return true;

@@ -81,7 +81,7 @@ class SQL {
 	public function addRow($column, $value, bool $nullify = false)
 	{
 		if($nullify) :
-			if(!isset($value) || empty($value)) :
+			if(!isset($value) || (empty($value) && $value !== 0)) :
 				$value = NULL;
 			endif;
 		endif;
@@ -215,27 +215,42 @@ class SQL {
 		}
 		$sql = substr($sql, 0, -1);
 		$sql .= $close . ';';
-
-		if (!$this->mysqli->query($sql)) :
-			if($this->mysqli->errno == 1062) :
-				return 'DuplicateEntry';
+		try
+		{
+			if (!$this->mysqli->query($sql)) :
+				if ($this->mysqli->errno == 1062) :
+					return 'DuplicateEntry';
+				else :
+					echo $this->message("danger", "Toevoegen item NIET gelukt. ERROR: " . $this->mysqli->error);
+					if (DEBUG) :
+						echo $this->message("info", $sql);
+					endif;
+				endif;
+				return false;
 			else :
-				echo $this->message("danger", "Toevoegen item NIET gelukt. ERROR: " . $this->mysqli->error);
-				if(DEBUG) :
+				if (!$header) :
+					echo $this->messageLink("success", "Toevoegen item gelukt.", $redirect);
+				else :
+					if (!empty($redirect)) :
+						header('Location: ' . $redirect);
+					endif;
+				endif;
+				return true;
+			endif;
+		}
+		catch (\mysqli_sql_exception $e)
+		{
+			if ($e->getCode() == 1062) :
+				$result = 'DuplicateEntry';
+			else :
+				echo $this->message("danger", "Toevoegen item NIET gelukt. ERROR: " . $e->getMessage());
+				if (DEBUG) :
 					echo $this->message("info", $sql);
 				endif;
 			endif;
 			return false;
-		else :
-			if (!$header) :
-				echo $this->messageLink("success", "Toevoegen item gelukt.", $redirect);
-			else :
-				if(!empty($redirect)) :
-					header('Location: ' . $redirect);
-				endif;
-			endif;
-			return true;
-		endif;
+		}
+
 	}
 
 	/**
@@ -313,6 +328,8 @@ class SQL {
 	 */
 	public function DELETE($id)
 	{
+		//var_dump("DELETE FROM `" . $this->table . "` WHERE ID='" . $id . "'");
+		//die();
 		return $this->mysqli->query("DELETE FROM `".$this->table."` WHERE ID='" . $id."'");
 	}
 
