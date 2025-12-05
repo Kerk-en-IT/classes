@@ -419,10 +419,21 @@ class DateTime
 	 */
 	public static function Age($datetime): int
 	{
+		return self::AgeInterval($datetime)->y;
+	}
+
+	/**
+	 * Get the age as DateInterval
+	 *
+	 * @param mixed $datetime
+	 * @return	\DateInterval
+	 */
+	public static function AgeInterval($datetime): \DateInterval
+	{
 		$datetime = self::GetDate($datetime);
 		$now = new \DateTime();
 		$interval = $datetime->diff($now);
-		return $interval->y;
+		return $interval;
 	}
 
 	/**
@@ -621,7 +632,7 @@ class DateTime
 	}
 
 	/**
-	 * maandag 20 december
+	 * maandagmorgen 20 december
 	 *
 	 * @param	object datetime
 	 * @param string period
@@ -707,6 +718,19 @@ class DateTime
 	public static function ShortDateAndMonth($datetime): string
 	{
 		$datetime = self::GetDate($datetime);
+		return $datetime->format('j') . ' ' . self::months_short()[$datetime->format('m') - 1];
+	}
+
+	/**
+	 * 20 dec 2010
+	 *
+	 * @param	object datetime
+	 * @return	string 20 dec 2010
+	 */
+	public static function ShortDateAndMonthAndYear($datetime): string
+	{
+		$datetime = self::GetDate($datetime);
+		return $datetime->format('d') . ' ' . self::months_short()[$datetime->format('m') - 1] . ' ' . $datetime->format('Y');
 		return $datetime->format('j') . ' ' . self::months_short()[$datetime->format('m') - 1];
 	}
 
@@ -1284,8 +1308,6 @@ class DateTime
 		return FALSE;
 	}
 
-
-
 	/**
 	 * Check if given date is within between the in ```$begin``` and` ``$end``` datetime
 	 *
@@ -1305,6 +1327,87 @@ class DateTime
 		endif;
 
 		return FALSE;
+	}
+
+
+	public static function Birthdate(mixed $datetime): \DateTime|null
+	{
+		$birthdate = null;
+		if ($datetime instanceof \DateTime) :
+			return $datetime;
+		endif;
+		if (empty($datetime)) :
+			return null;
+		else:
+			$datetime = trim($datetime);
+			$datetime = str_replace(' ', '', $datetime);
+			$datetime = str_replace('_', '-', $datetime);
+			$datetime = str_replace('.', '-', $datetime);
+			$datetime = str_replace('januari', '-01-', $datetime);
+			$datetime = str_replace('februari', '-02-', $datetime);
+			$datetime = str_replace('maart', '-03-', $datetime);
+			$datetime = str_replace('april', '-04-', $datetime);
+			$datetime = str_replace('mei', '-05-', $datetime);
+			$datetime = str_replace('juni', '-06-', $datetime);
+			$datetime = str_replace('juli', '-07-', $datetime);
+			$datetime = str_replace('augustus', '-08-', $datetime);
+			$datetime = str_replace('september', '-09-', $datetime);
+			$datetime = str_replace('oktober', '-10-', $datetime);
+			$datetime = str_replace('november', '-11-', $datetime);
+			$datetime = str_replace('december', '-12-', $datetime);
+			$datetime = str_replace('jan', '-01-', $datetime);
+			$datetime = str_replace('feb', '-02-', $datetime);
+			$datetime = str_replace('mar', '-03-', $datetime);
+			$datetime = str_replace('mrt', '-03-', $datetime);
+			$datetime = str_replace('apr', '-04-', $datetime);
+			$datetime = str_replace('jun', '-06-', $datetime);
+			$datetime = str_replace('jul', '-07-', $datetime);
+			$datetime = str_replace('aug', '-08-', $datetime);
+			$datetime = str_replace('sep', '-09-', $datetime);
+			$datetime = str_replace('oct', '-10-', $datetime);
+			$datetime = str_replace('nov', '-11-', $datetime);
+			$datetime = str_replace('dec', '-12-', $datetime);
+			$datetime = str_replace('--', '-', $datetime);
+		endif;
+
+
+		// Handle date formats
+		if (strlen($datetime) == 4 && is_numeric($datetime)) :
+			$birthdate = $datetime . "-00-00";
+		elseif (preg_match('/^\d{4}-\d{2}-\d{2}$/', $datetime)) :
+			$birthdate = $datetime;
+		elseif (preg_match('/^\d{1,2}-\d{1,2}-\d{4}$/', $datetime)) :
+			// Convert to YYYY-MM-DD format
+			$dateParts = explode('-', $datetime);
+			if (count($dateParts) == 3) :
+				$birthdate = $dateParts[2] . '-' . str_pad($dateParts[1], 2, "0", STR_PAD_LEFT) . '-' . str_pad($dateParts[0], 2, "0", STR_PAD_LEFT);
+			endif;
+		elseif (preg_match('/^\d{1,2}\/\d{1,2}\/\d{4}$/', $datetime)) :
+			// Convert to YYYY-MM-DD format
+			$dateParts = explode('/', $datetime);
+			if (count($dateParts) == 3) :
+				$birthdate = $dateParts[2] . '-' . str_pad($dateParts[1], 2, "0", STR_PAD_LEFT) . '-' . str_pad($dateParts[0], 2, "0", STR_PAD_LEFT);
+			endif;
+
+		elseif (preg_match('/^\d{1,2}-\d{1,2}-\d{2}$/', $datetime)) :
+			// Convert to YYYY-MM-DD format
+			$dateParts = explode('-', $datetime);
+			if (count($dateParts) == 3) :
+				$birthdate = '19' . $dateParts[2] . '-' . str_pad($dateParts[1], 2, "0", STR_PAD_LEFT) . '-' . str_pad($dateParts[0], 2, "0", STR_PAD_LEFT);
+			endif;
+		elseif (preg_match('/^\d{1,2}-\d{1,2}-\d{4}$/', $datetime)) :
+			// Convert to YYYY-MM-DD format
+			$dateParts = explode('-', $datetime);
+			if (count($dateParts) == 3) :
+				$birthdate = $dateParts[2] . '-' . str_pad($dateParts[1], 2, "0", STR_PAD_LEFT) . '-' . str_pad($dateParts[0], 2, "0", STR_PAD_LEFT);
+			endif;
+
+		endif;
+		if ($birthdate !== null) :
+			return self::GetDate($birthdate);
+		else :
+			return null;
+		endif;
 	}
 
 	/**
