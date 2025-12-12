@@ -1,7 +1,9 @@
 <?php
 
 namespace KerkEnIT;
+
 use KerkEnIT\Format;
+
 /**
  * DateTime Class File for Kerk en IT Framework
  *
@@ -36,7 +38,7 @@ class DateTime
 			endif;
 		endif;
 
-		if($datetime === 'current_timestamp()') :
+		if ($datetime === 'current_timestamp()') :
 			$datetime = 'now';
 		endif;
 
@@ -89,18 +91,18 @@ class DateTime
 					endif;
 					try {
 						if (is_string($datetime)) :
-							$datetime = str_replace(array(' jan ', ' jan.'), ' jan ', $datetime);
-							$datetime = str_replace(array(' feb ', ' feb. ', ' febr ', ' febr. '), ' feb ', $datetime);
-							$datetime = str_replace(array(' mrt ', ' mrt. '), ' mar ', $datetime);
-							$datetime = str_replace(array(' apr ', ' apr. '), ' apr ', $datetime);
-							$datetime = str_replace(array(' mei ', ' mei. '), ' may ', $datetime);
+							$datetime = str_replace(array(' jan ', ' jan.', ' januari '), ' jan ', $datetime);
+							$datetime = str_replace(array(' feb ', ' feb. ', ' febr ', ' febr. ', ' februari '), ' feb ', $datetime);
+							$datetime = str_replace(array(' mrt ', ' mrt. ', ' maart '), ' mar ', $datetime);
+							$datetime = str_replace(array(' apr ', ' apr. ', ' april '), ' apr ', $datetime);
+							$datetime = str_replace(array(' mei ', ' mei. ', ' mei '), ' may ', $datetime);
 							$datetime = str_replace(array(' jun ', ' jun. ', ' juni '), ' jun ', $datetime);
 							$datetime = str_replace(array(' jul ', ' jul. ', ' juli '), ' jul ', $datetime);
-							$datetime = str_replace(array(' aug ', ' aug. '), ' aug ', $datetime);
-							$datetime = str_replace(array(' sep ', ' sep. ', ' sept ', ' sept. '), ' sep ', $datetime);
-							$datetime = str_replace(array(' okt ', ' okt. '), ' oct ', $datetime);
-							$datetime = str_replace(array(' nov ', ' nov. '), ' nov ', $datetime);
-							$datetime = str_replace(array(' dec ', ' dec. '), ' dec ', $datetime);
+							$datetime = str_replace(array(' aug ', ' aug. ', ' augustus '), ' aug ', $datetime);
+							$datetime = str_replace(array(' sep ', ' sep. ', ' sept ', ' sept. ', ' september '), ' sep ', $datetime);
+							$datetime = str_replace(array(' okt ', ' okt. ', ' oktober '), ' oct ', $datetime);
+							$datetime = str_replace(array(' nov ', ' nov. ', ' november '), ' nov ', $datetime);
+							$datetime = str_replace(array(' dec ', ' dec. ', ' december '), ' dec ', $datetime);
 							if (\str_contains($datetime, ' en ')) :
 								$datetime = explode(' en ', $datetime)[0];
 							endif;
@@ -151,7 +153,7 @@ class DateTime
 			}
 
 		endif;
-		if($date === null) :
+		if ($date === null) :
 			$date = new \DateTime();
 		endif;
 		if ($timezone !== false && ($timezone instanceof \DateTimeZone)) :
@@ -1440,7 +1442,7 @@ class DateTime
 	 * @param	object datetime
 	 * @return int 1450600974
 	 */
-	public static function TimeStamp($datetime) :int
+	public static function TimeStamp($datetime): int
 	{
 		return self::GetDate($datetime)->getTimeStamp();
 	}
@@ -1526,7 +1528,7 @@ class DateTime
 		endif;
 		$date = null;
 		$hourMinute = null;
-		if($maxTime === null) :
+		if ($maxTime === null) :
 			$maxTime = 31536000;
 		endif;
 		for ($time = $now; $time < ($now + $maxTime); $time += 86400) :
@@ -1604,21 +1606,23 @@ class DateTime
 		if ($date != null && (strpos($note, 'doop') || strpos($note, 'huwelijk'))) :
 			$date += ($hourMinute ?? 800);
 		endif;
-		if($date == null) :
-			foreach(array(
-				2147483647 => 'koffie',
-				1000 => 'na afloop',
-				2000 => 'aansluitend',
-				3000 => 'zo meteen',
-				4000 => 'zometeen',
-				5000 => 'iedere zondag',
-				strtotime(date('Y') . '-12-25') => 'Eerste Kerstdag',
-				strtotime(date('Y') . '-12-26') => 'Tweede Kerstdag',
-				strtotime(date('Y')+1 . '-01-01') => 'Nieuwjaarsdag',
-				strtotime(date('Y') . '-04-27') => 'Koningsdag',
-				strtotime(date('Y') . '-05-05') => 'Bevrijdingsdag',
-				strtotime(date('Y') . '-12-31') => 'Oudejaarsavond',
-			) as $timeDateStamp => $needle) :
+		if ($date == null) :
+			foreach (
+				array(
+					2147483647 => 'koffie',
+					1000 => 'na afloop',
+					2000 => 'aansluitend',
+					3000 => 'zo meteen',
+					4000 => 'zometeen',
+					5000 => 'iedere zondag',
+					strtotime(date('Y') . '-12-25') => 'Eerste Kerstdag',
+					strtotime(date('Y') . '-12-26') => 'Tweede Kerstdag',
+					strtotime(date('Y') + 1 . '-01-01') => 'Nieuwjaarsdag',
+					strtotime(date('Y') . '-04-27') => 'Koningsdag',
+					strtotime(date('Y') . '-05-05') => 'Bevrijdingsdag',
+					strtotime(date('Y') . '-12-31') => 'Oudejaarsavond',
+				) as $timeDateStamp => $needle
+			) :
 				if (str_contains(strtolower($note), strtolower($needle))) :
 
 					if ($date == null) :
