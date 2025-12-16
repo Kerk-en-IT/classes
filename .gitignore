@@ -15,3 +15,4 @@ yarn-debug.log*
 yarn-error.log*
 *.sh
 src/class.Mailer.php
+src/class.KerkEnIT.php
