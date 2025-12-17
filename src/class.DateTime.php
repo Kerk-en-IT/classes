@@ -944,10 +944,10 @@ class DateTime
 		$firstdig1 = array(21, 24, 25, 27, 28, 29, 30, 31, 32, 34, 35, 38);
 		$firstdig2 = array(33, 36, 37, 39, 40);
 
-		$firstdig = \KerkEnIT\Math::idiv($y, 100);
+		$firstdig = KerkEnIT\Math::idiv($y, 100);
 		$remain19 = $y % 19;
 
-		$temp = \KerkEnIT\Math::idiv($firstdig - 15, 2) + 202 - 11 * $remain19;
+		$temp = KerkEnIT\Math::idiv($firstdig - 15, 2) + 202 - 11 * $remain19;
 
 		if (in_array($firstdig, $firstdig1)) {
 			$temp = $temp - 1;
@@ -977,7 +977,7 @@ class DateTime
 		}
 
 		$temp = $y % 100;
-		$td = ($temp + \KerkEnIT\Math::idiv($temp, 4)) % 7;
+		$td = ($temp + KerkEnIT\Math::idiv($temp, 4)) % 7;
 
 		$te = ((20 - $tb - $tc - $td) % 7) + 1;
 		$d = $ta + $te;
@@ -1414,7 +1414,7 @@ class DateTime
 
 	/**
 	 * jsDateTime
-	 * @deprecated in 1.3.107 @see \KerkEnIT\DateTime::ISO8601()
+	 * @deprecated in 1.3.107 @see KerkEnIT\DateTime::ISO8601()
 	 *
 	 * @param  mixed $datetime
 	 * @return	string
