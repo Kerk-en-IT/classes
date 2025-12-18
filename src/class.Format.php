@@ -296,6 +296,32 @@ class Format
 	}
 
 	/**
+	 * Format Money to Euro using NumberFormatter
+	 *
+	 * @param  string|float|int|null $money
+	 * @return	string € 9,99 or € 9,-
+	 */
+	public static function Euro(string|float|int|null $money): string
+	{
+		if (is_string($money)) :
+			$money = str_replace(',', '.', $money);
+			$money = (float)$money;
+		elseif (is_int($money)) :
+			$money = (float)$money;
+		elseif (!is_float($money)) :
+			$money = (float)($money ?? 0);
+		endif;
+		$currency = 'EUR';
+		$fmt = new \NumberFormatter('nl_NL', \NumberFormatter::CURRENCY);
+		$rtn = $fmt->formatCurrency(($money ?? 0), $currency);
+
+		if (str_ends_with($rtn, ",00")) :
+			$rtn = rtrim($rtn, '0') . '-';
+		endif;
+		return $rtn ?? '';
+	}
+
+	/**
 	 * Convert variable to bool
 	 *
 	 * @param int|bool|string $object
@@ -385,9 +411,6 @@ class Format
 		if($content !== null) :
 			return self::md5_to_uuid(md5($content));
 		endif;
-		if (function_exists('com_create_guid') === true) {
-			return trim(com_create_guid(), '{}');
-		}
 
 		return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
 	}

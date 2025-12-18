@@ -250,8 +250,8 @@ class DateTime
 	 * @param string $date input date
 	 * @param string $timezone destination TimeZone
 	 * @return	string formatted date in RSS standard
-	 * E.g. Thu, 07 Dec 2023 14:19:00 +0100
-	 * When TimeZone = UTC it will return Thu, 07 Dec 2023 13:19:00 +0000
+	 * E.g. Mon, 20 Dec 2010 09:42:46 +0100
+	 * When TimeZone = UTC it will return Mon, 20 Dec 2010 10:42:46 +0000
 	 */
 	public static function RSS($date, $timezone = 'Europe/Amsterdam'): string
 	{
@@ -734,6 +734,30 @@ class DateTime
 		$datetime = self::GetDate($datetime);
 		return $datetime->format('d') . ' ' . self::months_short()[$datetime->format('m') - 1] . ' ' . $datetime->format('Y');
 		return $datetime->format('j') . ' ' . self::months_short()[$datetime->format('m') - 1];
+	}
+
+	/**
+	 * ma 20 dec '10
+	 *
+	 * @param	mixed datetime
+	 * @return	string ma 20 dec '10
+	 */
+	public static function ShortDateMonth(mixed $datetime): string
+	{
+		$datetime = \KerkEnIT\DateTime::GetDate($datetime);
+		return self::days_short()[$datetime->format('w')] . ' ' . $datetime->format('j') . ' ' . self::months_short()[$datetime->format('m') - 1] . ' \'' . $datetime->format('y');
+	}
+
+	/**
+	 * 20 dec '10
+	 *
+	 * @param	mixed datetime
+	 * @return	string 20 dec '10
+	 */
+	public static function ShortDayMonth(mixed $datetime): string
+	{
+		$datetime = \KerkEnIT\DateTime::GetDate($datetime);
+		return $datetime->format('j') . ' ' . self::months_short()[$datetime->format('m') - 1] . ' \'' . $datetime->format('y');
 	}
 
 	/**
@@ -1243,7 +1267,7 @@ class DateTime
 	 * @param  object $logic Logical Date object
 	 * @return \DateTime
 	 */
-	public static function AddDateTimeLogic($datetime, $logic)
+	public static function AddDateTimeLogic($datetime, $logic): \DateTime
 	{
 		$datetime = self::GetDate($datetime);
 		if ($logic->type == 'week') :
@@ -1257,7 +1281,7 @@ class DateTime
 	 * @param  mixed $datetime
 	 * @return int 20161220094200
 	 */
-	public static function DateSort($datetime)
+	public static function DateSort($datetime): int
 	{
 		return (int)self::GetDate($datetime)->format('YmdHis');
 	}
@@ -1268,9 +1292,30 @@ class DateTime
 	 * @param  mixed $datetime
 	 * @return bool
 	 */
-	public static function isToday($datetime)
+	public static function isToday(mixed $datetime): bool
 	{
 		return self::GetDate($datetime)->format('Y-m-d') == (new \DateTime('now'))->format('Y-m-d');
+	}
+
+
+	public static function isPast(mixed $datetime): bool
+	{
+		$datetimeObj1 = new \DateTime();
+		$datetimeObj2 = self::GetDate($datetime);
+		$interval = $datetimeObj1->diff($datetimeObj2);
+		$dateDiff = $interval->format('%R%a');
+
+		return $dateDiff > 0;
+	}
+
+	public static function isFuture(mixed $datetime): bool
+	{
+		$datetimeObj1 = self::GetDate($datetime);
+		$datetimeObj2 = new \DateTime();
+		$interval = $datetimeObj1->diff($datetimeObj2);
+		$dateDiff = $interval->format('%R%a');
+
+		return $dateDiff > 0;
 	}
 
 	/**
@@ -1279,7 +1324,7 @@ class DateTime
 	 * @param  mixed $datetime
 	 * @return bool
 	 */
-	public static function isWithinNextWeek($datetime)
+	public static function isWithinNextWeek(mixed $datetime): bool
 	{
 		return self::isWithinXDays($datetime, 6);
 	}
@@ -1291,7 +1336,7 @@ class DateTime
 	 * @param	int|float $x Add days to datetime. When negative it subtract the amount of days.
 	 * @return bool
 	 */
-	public static function isWithinXDays($datetime, $x)
+	public static function isWithinXDays(mixed $datetime, int|float $x)	: bool
 	{
 		$currentDate = self::GetDate($datetime);
 		$today = self::GetDate('today');
@@ -1471,6 +1516,7 @@ class DateTime
 	 * @param  mixed $date
 	 * @return bool
 	 */
+	#[\Deprecated('Use isFuture method instead', '1.3.107')]
 	public static function dateInFuture_YN($date)
 	{
 		$datetimeObj1 = new \DateTime($date);
