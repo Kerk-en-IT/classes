@@ -968,10 +968,10 @@ class DateTime
 		$firstdig1 = array(21, 24, 25, 27, 28, 29, 30, 31, 32, 34, 35, 38);
 		$firstdig2 = array(33, 36, 37, 39, 40);
 
-		$firstdig = KerkEnIT\Math::idiv($y, 100);
+		$firstdig = \KerkEnIT\Math::idiv($y, 100);
 		$remain19 = $y % 19;
 
-		$temp = KerkEnIT\Math::idiv($firstdig - 15, 2) + 202 - 11 * $remain19;
+		$temp = \KerkEnIT\Math::idiv($firstdig - 15, 2) + 202 - 11 * $remain19;
 
 		if (in_array($firstdig, $firstdig1)) {
 			$temp = $temp - 1;
@@ -1001,7 +1001,7 @@ class DateTime
 		}
 
 		$temp = $y % 100;
-		$td = ($temp + KerkEnIT\Math::idiv($temp, 4)) % 7;
+		$td = ($temp + \KerkEnIT\Math::idiv($temp, 4)) % 7;
 
 		$te = ((20 - $tb - $tc - $td) % 7) + 1;
 		$d = $ta + $te;
@@ -1298,6 +1298,12 @@ class DateTime
 	}
 
 
+	/**
+	 * Check if given date is in the past
+	 *
+	 * @param  mixed $datetime
+	 * @return bool
+	 */
 	public static function isPast(mixed $datetime): bool
 	{
 		$datetimeObj1 = new \DateTime();
@@ -1308,6 +1314,12 @@ class DateTime
 		return $dateDiff > 0;
 	}
 
+	/**
+	 * Check if given date is in the future
+	 *
+	 * @param  mixed $datetime
+	 * @return bool
+	 */
 	public static function isFuture(mixed $datetime): bool
 	{
 		$datetimeObj1 = self::GetDate($datetime);
@@ -1336,7 +1348,7 @@ class DateTime
 	 * @param	int|float $x Add days to datetime. When negative it subtract the amount of days.
 	 * @return bool
 	 */
-	public static function isWithinXDays(mixed $datetime, int|float $x)	: bool
+	public static function isWithinXDays(mixed $datetime, int|float $x): bool
 	{
 		$currentDate = self::GetDate($datetime);
 		$today = self::GetDate('today');
@@ -1459,7 +1471,7 @@ class DateTime
 
 	/**
 	 * jsDateTime
-	 * @deprecated in 1.3.107 @see KerkEnIT\DateTime::ISO8601()
+	 * @deprecated in 1.3.107 @see \KerkEnIT\DateTime::ISO8601()
 	 *
 	 * @param  mixed $datetime
 	 * @return	string
