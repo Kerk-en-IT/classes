@@ -3,7 +3,7 @@ namespace KerkEnIT;
 /**
  * Autoloader for the Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4
+ * PHP versions 8.3, 8.4, 8.5
  *
  * @version    1.2.0
  * @package    KerkEnIT
@@ -57,6 +57,7 @@ foreach ($_ENV as $key => $value) :
 		$_ENV[$key] = false;
 	endif;
 endforeach;
+
 extract($_ENV);
 
 // Get debug hosts from the environment

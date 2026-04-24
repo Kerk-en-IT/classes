@@ -47,7 +47,7 @@ endif;
  *
  * Formatting various objects into the expected output.
  *
- * PHP versions 8.3, 8.4
+ * PHP versions 8.3, 8.4, 8.5
  *
  * @package    KerkEnIT
  * @subpackage Convert2

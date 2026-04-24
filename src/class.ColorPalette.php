@@ -5,7 +5,7 @@ namespace KerkEnIT;
 /**
  * ColorPalette Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4
+ * PHP versions 8.3, 8.4, 8.5
  *
  * @package    KerkEnIT
  * @subpackage ColorPalette
