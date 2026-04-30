@@ -7,6 +7,9 @@ endif;
 if(!defined('WEBP_QUALITY')) :
 	define('WEBP_QUALITY', 90);
 endif;
+if (!defined('JXL_QUALITY')) :
+	define('JXL_QUALITY', 80);
+endif;
 if(!defined('AVIF_QUALITY')) :
 	define('AVIF_QUALITY', 95);
 endif;
@@ -207,6 +210,42 @@ class Convert2
 		endif;
 		// Return false if the function has not returned a value
 		return false;
+	}
+
+	/**
+	 *
+	 * Convert image to JPG-XL
+	 * Requires the JpegXlEncode library from NPX (https://github.com/joppuyo/jpeg-xl-encode)
+	 * ```composer require joppuyo/jpeg-xl-encode```
+	 *
+	 * @param string $input_file Source image
+	 * @return mixed when succeed the file path; otherwise FALSE
+	 */
+	public static function jxl($input_file)
+	{
+		// check if file exists
+		if (!file_exists($input_file)) :
+			return false;
+		endif;
+		$output_file =  self::replace_extension($input_file, 'jxl');
+		if (!REGENERATE && file_exists($output_file)) :
+			return $output_file;
+		endif;
+
+		$options = [
+			'encoding' => 'lossy',
+			'quality' => JXL_QUALITY,
+		];
+		try {
+			\NPX\JpegXlEncode\Encoder::encode($input_file, $output_file, $options);
+		} catch (Exception $exception) {
+			error_log('Whoops, something went wrong.');
+		}
+		if (file_exists($output_file)) :
+			return $output_file;
+		else :
+			return false;
+		endif;
 	}
 
 	/**
