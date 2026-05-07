@@ -203,9 +203,11 @@ class Video
 			$command[] = "'{$destinationPath}'";
 			if ($this->multicore) :
 				$command[] = ' </dev/null >/dev/null 2>&1 &';
-			endif;
-			if (shell_exec(implode(' ', $command)) === FALSE) :
-				throw new \Exception('Failed to create poster. ' . implode(' ', $command));
+				exec(implode(' ', $command));
+			else:
+				if (shell_exec(implode(' ', $command)) === FALSE) :
+					throw new \Exception('Failed to create poster. ' . implode(' ', $command));
+				endif;
 			endif;
 		endif;
 		if (!$this->multicore && !file_exists($destinationPath)) :
@@ -246,10 +248,11 @@ class Video
 			$command[] = "'$destinationPath'";
 			if ($this->multicore) :
 				$command[] = ' </dev/null >/dev/null 2>&1 &';
-			endif;
-
-			if (shell_exec(implode(' ', $command)) === FALSE) :
-				throw new \Exception('Failed to create ogv. ' . implode(' ', $command));
+				exec(implode(' ', $command));
+			else :
+				if (shell_exec(implode(' ', $command)) === FALSE) :
+					throw new \Exception('Failed to create ogv. ' . implode(' ', $command));
+				endif;
 			endif;
 		endif;
 
@@ -312,10 +315,11 @@ class Video
 			$command[] = "-y '$destinationPath'";
 			if ($this->multicore) :
 				$command[] = ' </dev/null >/dev/null 2>&1 &';
-			endif;
-
-			if (shell_exec(implode(' ', $command)) === FALSE) :
-				throw new \Exception('Failed to create mp4. ' . implode(' ', $command));
+				exec(implode(' ', $command));
+			else :
+				if (shell_exec(implode(' ', $command)) === FALSE) :
+					throw new \Exception('Failed to create mp4. ' . implode(' ', $command));
+				endif;
 			endif;
 		endif;
 		if (!$this->multicore && !file_exists($destinationPath)) :
@@ -367,10 +371,11 @@ class Video
 			$command[] = "'$destinationPath'";
 			if ($this->multicore) :
 				$command[] = ' </dev/null >/dev/null 2>&1 &';
-			endif;
-
-			if (shell_exec(implode(' ', $command)) === FALSE) :
-				throw new \Exception('Failed to create h265. ' . implode(' ', $command));
+				exec(implode(' ', $command));
+			else :
+				if (shell_exec(implode(' ', $command)) === FALSE) :
+					throw new \Exception('Failed to create h265. ' . implode(' ', $command));
+				endif;
 			endif;
 		endif;
 		if (!$this->multicore && !file_exists($destinationPath)) :
@@ -458,10 +463,11 @@ class Video
 			$command[] = "'$destinationPath'";
 			if ($this->multicore) :
 				$command[] = ' </dev/null >/dev/null 2>&1 &';
-			endif;
-
-			if (shell_exec(implode(' ', $command)) === FALSE) :
-				throw new \Exception('Failed to create webm. ' . implode(' ', $command));
+				exec(implode(' ', $command));
+			else :
+				if (shell_exec(implode(' ', $command)) === FALSE) :
+					throw new \Exception('Failed to create webm. ' . implode(' ', $command));
+				endif;
 			endif;
 		endif;
 		if (!$this->multicore && !file_exists($destinationPath)) :
@@ -559,10 +565,11 @@ class Video
 			$command[] = "'{$destinationPath}'";
 			if ($this->multicore) :
 				$command[] = ' </dev/null >/dev/null 2>&1 &';
-			endif;
-
-			if (shell_exec(implode(' ', $command)) === FALSE) :
-				throw new \Exception('Failed to create vp8. ' . implode(' ', $command));
+				exec(implode(' ', $command));
+			else:
+				if (shell_exec(implode(' ', $command)) === FALSE) :
+					throw new \Exception('Failed to create vp8. ' . implode(' ', $command));
+				endif;
 			endif;
 		endif;
 		if (!$this->multicore && !file_exists($destinationPath)) :
