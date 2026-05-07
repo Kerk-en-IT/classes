@@ -70,7 +70,7 @@ endif;
 if (!str_contains(__DIR__, 'wp-content')) :
 	$filename = realpath(dirname(__FILE__) . '/class.Log.php');
 	if (realpath($filename) !== FALSE) :
-		if (substr(PHP_VERSION, 0, 3) === '8.4') :
+		if (in_array(substr(PHP_VERSION, 0, 3), ['8.4', '8.5'])) :
 			require_once($filename);
 		endif;
 	endif;
@@ -88,14 +88,14 @@ spl_autoload_register(function ($class) {
 		$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
 	endif;
 	if ($filename !== FALSE) :
-		if (substr(PHP_VERSION, 0, 3) === '8.4') :
+		if (in_array(substr(PHP_VERSION, 0, 3), ['8.4', '8.5'])) :
 			require_once($filename);
 		elseif (substr(PHP_VERSION, 0, 3) === '8.3') :
 			if (!str_contains(file_get_contents($filename), 'PHP versions 8.4')) :
 				require_once($filename);
 			elseif (!str_contains(file_get_contents($filename), 'PHP versions')) :
 				require_once($filename);
-			endif;;
+			endif;
 		else :
 			require_once($filename);
 		endif;
