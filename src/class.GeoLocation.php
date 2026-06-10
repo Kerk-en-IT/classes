@@ -124,7 +124,6 @@ class GeoLocation {
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
 				$data = curl_exec($ch);
-				curl_close($ch);
 				ini_set('safe_mode', true);
 				$geo_json = json_decode($data, true);
 
@@ -145,7 +144,6 @@ class GeoLocation {
 				curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 
 				$data = curl_exec($ch);
-				curl_close($ch);
 				ini_set('safe_mode', true);
 				$geo_json = json_decode($data, true);
 				$this->latitude = $geo_json[0]['lat'];
@@ -228,7 +226,6 @@ class GeoLocation {
 			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 
 			$data = curl_exec($ch);
-			curl_close($ch);
 			ini_set('safe_mode', true);
 			$geo_json = json_decode($data, true);
 			#todo: Finish GPS distance

@@ -228,7 +228,6 @@ class Image
 				curl_setopt($ch, CURLOPT_URL, $image);
 				curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 				$raw = curl_exec($ch);
-				curl_close($ch);
 				$fp = tmpfile();
 				fwrite($fp, $raw);
 				$size = getimagesize(stream_get_meta_data($fp)['uri']);
