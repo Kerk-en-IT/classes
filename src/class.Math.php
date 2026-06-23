@@ -26,7 +26,7 @@ class Math
 	public static function calculateMedian(array $array): float
 	{
 		if (!$array) {
-			throw new LengthException('Cannot calculate median because Argument #1 ($array) is empty');
+			throw new \LengthException('Cannot calculate median because Argument #1 ($array) is empty');
 		}
 		sort($array);
 		$middleIndex = count($array) / 2;
@@ -46,7 +46,7 @@ class Math
 	public static function calculateAverage(array $array): float
 	{
 		if (!$array) {
-			throw new LengthException('Cannot calculate median because Argument #1 ($array) is empty');
+			throw new \LengthException('Cannot calculate average because Argument #1 ($array) is empty');
 		}
 		return array_sum($array) / count($array);
 	}
