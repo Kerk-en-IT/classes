@@ -1,4 +1,5 @@
 <?php
+
 namespace KerkEnIT;
 
 /**
@@ -14,7 +15,8 @@ namespace KerkEnIT;
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.0.0
  **/
-class GeoLocation {
+class GeoLocation
+{
 
 	/**
 	 * Formatted Address
@@ -84,7 +86,7 @@ class GeoLocation {
 	 * @var string
 	 */
 	public $country = NULL;
-/*
+	/*
 	public $street = NULL;
 	public $zipcode = NULL;
 	public $city = NULL;
@@ -109,16 +111,16 @@ class GeoLocation {
 	public function search(?string $address, ?string $zipcode = null, ?string $city = null, ?string $country = null): bool
 	{
 		$this->_address = trim(trim(trim(trim(($address ?? '') . ', ' . ($zipcode  !== null ? ($zipcode ?? '') . ', ' : '') . ($city ?? ''), ',')), ',')) . ($country  !== null ? ', ' . ($country ?? '') : '');
-		if(!empty(($address ?? '') . ($zipcode ?? '') . ($city ?? ''))) :
+		if (!empty(($address ?? '') . ($zipcode ?? '') . ($city ?? ''))) :
 			$address = urlencode($this->_address);
-			if(!empty($this->GOOGLE_MAPS_API_KEY)) :
+			if (!empty($this->GOOGLE_MAPS_API_KEY)) :
 
-				$url = "https://maps.google.com/maps/api/geocode/json?address=".$address ."&key=".$this->GOOGLE_MAPS_API_KEY;
+				$url = "https://maps.google.com/maps/api/geocode/json?address=" . $address . "&key=" . $this->GOOGLE_MAPS_API_KEY;
 				ini_set('safe_mode', false);
 				$ch = curl_init();
 
 				curl_setopt($ch, CURLOPT_URL, $url);
-				curl_setopt($ch, CURLOPT_HEADER,0);
+				curl_setopt($ch, CURLOPT_HEADER, 0);
 				curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
 				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -133,7 +135,7 @@ class GeoLocation {
 				return true;
 			else :
 				ini_set('safe_mode', false);
-				$url = "https://nominatim.openstreetmap.org/search?q=".$address."&format=json&polygon=1&addressdetails=1";
+				$url = "https://nominatim.openstreetmap.org/search?q=" . $address . "&format=json&polygon=1&addressdetails=1";
 				$ch = curl_init();
 
 				curl_setopt($ch, CURLOPT_URL, $url);
@@ -149,13 +151,13 @@ class GeoLocation {
 				$this->latitude = $geo_json[0]['lat'];
 				$this->longitude = $geo_json[0]['lon'];
 				$this->road = $geo_json[0]['address']['road'] ?? null;
-				if($this->road !== null):
+				if ($this->road !== null):
 					$this->address = $this->road . ' ' . ($geo_json[0]['address']['house_number'] ?? '1');
 				endif;
 				$this->street = $this->address;
 				$this->postalCode = $geo_json[0]['address']['postcode'] ?? null;
 				$this->city = $geo_json[0]['address']['city'] ?? null;
-				if($this->city === null) :
+				if ($this->city === null) :
 					//var_dump($geo_json[0]['address']);
 					//die();
 					$this->city = $geo_json[0]['address']["village"] ?? null;
@@ -211,15 +213,15 @@ class GeoLocation {
 	 * @param  float $lng_destinations Destination longitude
 	 * @return	array|bool
 	 */
-	public function matrix($lat_origins, $lng_origins, $lat_destinations, $lng_destinations) :array|bool
+	public function matrix($lat_origins, $lng_origins, $lat_destinations, $lng_destinations): array|bool
 	{
-		if(!empty($this->GOOGLE_MAPS_API_KEY)) :
+		if (!empty($this->GOOGLE_MAPS_API_KEY)) :
 			$url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=' . $lat_origins . ',' . $lng_origins . '&destinations=' . $lat_destinations . ',' . $lng_destinations . '&key=' . $this->GOOGLE_MAPS_API_KEY;
 			ini_set('safe_mode', false);
 			$ch = curl_init();
 
 			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_HEADER,0);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
 			curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
 			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -337,5 +339,3 @@ class GeoLocation {
 		endif;
 	}
 }
-
-?>

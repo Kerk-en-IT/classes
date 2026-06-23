@@ -1,4 +1,5 @@
 <?php
+
 namespace KerkEnIT;
 
 if (!defined('EOL_SPLIT')) :
@@ -229,18 +230,18 @@ class Format
 	public static function PhoneNumber(string|null $phone, string|null $country = null)
 	{
 		$lang = \Locale::getDefault();
-		if(strlen($lang) >= 5) :
+		if (strlen($lang) >= 5) :
 			$lang = substr($lang, 3, 2);
 		endif;
-		if($country === null) :
+		if ($country === null) :
 			$country = substr(\Locale::getDefault(), 3, 2);
 		endif;
-		if($phone !== null) :
+		if ($phone !== null) :
 			$phoneNumberUtil = \libphonenumber\PhoneNumberUtil::getInstance();
 			try {
 				$phoneNumberObject = $phoneNumberUtil->parse($phone, $country);
-				if($phoneNumberUtil->isValidNumber($phoneNumberObject)) :
-					if($country == $lang) :
+				if ($phoneNumberUtil->isValidNumber($phoneNumberObject)) :
+					if ($country == $lang) :
 						//var_dump(($country === null ? $lang : null));
 						$phone = $phoneNumberUtil->format($phoneNumberObject, \libphonenumber\PhoneNumberFormat::NATIONAL);
 					else :
@@ -408,7 +409,7 @@ class Format
 	 */
 	public static function uuid(?string $content = null): string
 	{
-		if($content !== null) :
+		if ($content !== null) :
 			return self::md5_to_uuid(md5($content));
 		endif;
 
@@ -1933,7 +1934,7 @@ class Format
 			if ($toRemove) {
 				foreach ($toRemove as $attr) {
 					if (gettype($image) == 'object' && $image !== null) :
-						if(method_exists($image, 'removeAttribute')) :
+						if (method_exists($image, 'removeAttribute')) :
 							$image->removeAttribute($attr->name);
 						endif;
 					endif;
@@ -2026,7 +2027,7 @@ class Format
 	 */
 	public static function get_snippet(string|null $str, int $wordCount = 45): string
 	{
-		if($str === null) return '';
+		if ($str === null) return '';
 		$str = strip_tags($str ?? '');
 
 		$rtn = implode(
@@ -2080,7 +2081,7 @@ class Format
 		foreach ($images as $image) :
 			if (file_exists($image) || realpath($dist_path . '/' . $image) !== false) :
 				$image_size = getimagesize($dist_path . '/' . $image);
-				if($image_size !== false) :
+				if ($image_size !== false) :
 					$image_width = $image_size[0];
 				endif;
 				$rtn[] = ltrim($image, '/') . '?v=' . Cryptography::get_hash($dist_path . '/' . $image) . ' ' . $image_width . 'w';

@@ -41,7 +41,7 @@ class ErrorHandeling
 	 */
 	public static function register(): void
 	{
-		if(str_contains(__DIR__, 'wp-content')) {
+		if (str_contains(__DIR__, 'wp-content')) {
 			return;
 		}
 		$that = new self();

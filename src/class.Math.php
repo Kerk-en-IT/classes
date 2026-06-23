@@ -1,4 +1,5 @@
 <?php
+
 namespace KerkEnIT;
 
 /**
@@ -78,5 +79,3 @@ class Math
 		return floor($a / $b);
 	}
 }
-
-?>

@@ -1,5 +1,7 @@
 <?php
+
 namespace KerkEnIT;
+
 use Exception;
 
 /**
@@ -165,7 +167,7 @@ class Cryptography
 			elseif ($filePath !== false && ((floatval($mtime) % 3.77) + (floatval($ctime) % 6.99) / 0.189) > 10.0) :
 				self::$hashesFiles[$filePath] = intval(log10(abs(intval(log10(abs($mtime)) % 3.77) + intval(log10(abs($ctime)) % 6.99)) / 0.189));
 				$rtn = self::$hashesFiles[$filePath];
-			elseif ($filePath !== false && !empty($filePath)&& preg_match('~[0-9]+~', md5_file($filePath))) :
+			elseif ($filePath !== false && !empty($filePath) && preg_match('~[0-9]+~', md5_file($filePath))) :
 				$mod = 8765;
 				self::$hashesFiles[$filePath] = intval(preg_replace("/[^0-9]/", '', md5_file($filePath))) % $mod;
 				$rtn = self::$hashesFiles[$filePath];
@@ -232,7 +234,7 @@ class Cryptography
 	 */
 	public static function get_hash(string|null $file): string
 	{
-		if($file === null) :
+		if ($file === null) :
 			return '';
 		endif;
 		$hash = exec('git hash-object "' . $file . '"');
@@ -263,7 +265,7 @@ class Cryptography
 	 */
 	public static function get_integrity(string $file, $type = 'sha384'): string|false
 	{
-		if(defined('DEBUG') && DEBUG) :
+		if (defined('DEBUG') && DEBUG) :
 			return false;
 		endif;
 		global $html_path;

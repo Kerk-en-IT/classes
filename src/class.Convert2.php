@@ -1,25 +1,26 @@
 <?php
+
 namespace KerkEnIT;
 
-if(!defined('JPG_QUALITY')) :
+if (!defined('JPG_QUALITY')) :
 	define('JPG_QUALITY', 85);
 endif;
-if(!defined('WEBP_QUALITY')) :
+if (!defined('WEBP_QUALITY')) :
 	define('WEBP_QUALITY', 90);
 endif;
 if (!defined('JXL_QUALITY')) :
 	define('JXL_QUALITY', 80);
 endif;
-if(!defined('AVIF_QUALITY')) :
+if (!defined('AVIF_QUALITY')) :
 	define('AVIF_QUALITY', 95);
 endif;
-if(!defined('MAX_WIDTH')) :
+if (!defined('MAX_WIDTH')) :
 	define('MAX_WIDTH', 0);
 endif;
-if(!defined('MAX_HEIGHT')) :
+if (!defined('MAX_HEIGHT')) :
 	define('MAX_HEIGHT', 3840);
 endif;
-if(!defined('MY_MAGICK_MEMORY_LIMIT')) :
+if (!defined('MY_MAGICK_MEMORY_LIMIT')) :
 	define('MY_MAGICK_MEMORY_LIMIT', 2147483648);
 endif;
 if (!defined('DEBUG')) :
@@ -29,7 +30,7 @@ if (!defined('DEBUG')) :
 	endif;
 endif;
 if (!defined('REGENERATE')) :
-	if(DEBUG) :
+	if (DEBUG) :
 		define('REGENERATE', false);
 	else :
 		define('REGENERATE', false);
@@ -65,7 +66,7 @@ class Convert2
 
 	public static function watermarks(&$img, $input_file)
 	{
-		if(realpath(\get_include_path() . "/watermark.png") !== false) :
+		if (realpath(\get_include_path() . "/watermark.png") !== false) :
 			$watermark = new \Imagick();
 			$watermark->readImage(realpath(\get_include_path() . "/watermark.png"));
 
@@ -100,18 +101,18 @@ class Convert2
 			$composite = \Imagick::COMPOSITE_LIGHTEN;
 
 			$watermark = new \Imagick();
-			if($rgb->avg < 96 && $rgb->g > 64 && $rgb->b < 64 && $rgb->r < 64) :
+			if ($rgb->avg < 96 && $rgb->g > 64 && $rgb->b < 64 && $rgb->r < 64) :
 				$png = \get_include_path() . "/watermark_dark.png";
 			elseif ($rgb->avg > 96 && $rgb->g > 64 && $rgb->b < 64 && $rgb->r < 64) :
 				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
-			elseif ($rgb->avg < 128 && $rgb->g > 64 && $rgb->b < 128 && $rgb->b > 64 && $rgb->r >128 && $rgb->r < 144) :
+			elseif ($rgb->avg < 128 && $rgb->g > 64 && $rgb->b < 128 && $rgb->b > 64 && $rgb->r > 128 && $rgb->r < 144) :
 				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
 			elseif ($rgb->avg < 128 && $rgb->g > 128 && $rgb->b < 128 && $rgb->r > 96) :
 				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
-			elseif ($rgb->avg > 128 && $rgb->avg < 196 && $rgb->g >128 && $rgb->g < 196 && $rgb->b < 128 && $rgb->b > 96 && $rgb->r >128 && $rgb->r < 144) :
+			elseif ($rgb->avg > 128 && $rgb->avg < 196 && $rgb->g > 128 && $rgb->g < 196 && $rgb->b < 128 && $rgb->b > 96 && $rgb->r > 128 && $rgb->r < 144) :
 				$png = \get_include_path() . "/watermark_light.png";
 				$composite = \Imagick::COMPOSITE_DARKEN;
 			elseif ($rgb->avg < 20 && $rgb->g < 25 && $rgb->b < 25 && $rgb->r < 25) :
@@ -166,7 +167,7 @@ class Convert2
 		if (!REGENERATE && file_exists($output_file)) :
 			return $output_file;
 		endif;
-		if((strpos($input_file, 'cover') !== false || strpos($output_file, 'images/201') !== false)) :
+		if ((strpos($input_file, 'cover') !== false || strpos($output_file, 'images/201') !== false)) :
 			if (file_exists($output_file)) :
 				return $output_file;
 			endif;
@@ -193,14 +194,14 @@ class Convert2
 			$img->setImageResolution(72, 72);
 			$img->setFormat("jpg");
 			//$img->stripImage();
-			if($img->writeImage($output_file)) :
+			if ($img->writeImage($output_file)) :
 				$img->clear();
 				return $output_file;
 			endif;
 		else :
-			if(copy($input_file, $output_file)) :
+			if (copy($input_file, $output_file)) :
 				// Return the output file
-				if(file_exists($output_file)) :
+				if (file_exists($output_file)) :
 					return $output_file;
 				else :
 					// Return false if the file does not exist
@@ -403,7 +404,7 @@ class Convert2
 			if ((strpos($input_file, 'cover') === false && strpos($output_file, 'images/199') === false && strpos($output_file, 'images/200') === false && strpos($output_file, 'images/201') === false)) :
 				self::watermarks($img, $input_file);
 			endif;
-			try{
+			try {
 				if ($file_type === IMAGETYPE_JPEG || $file_type === IMAGETYPE_PNG) {
 					$img->setImageFormat('avif');
 					$img->setImageCompressionQuality(AVIF_QUALITY);
@@ -411,12 +412,12 @@ class Convert2
 				if ($img->writeImage($output_file)) :
 					$img->clear();
 				endif;
-			} catch(Exception $e) {
+			} catch (Exception $e) {
 				return false;
 			} finally {
-				if(file_exists($output_file)) :
+				if (file_exists($output_file)) :
 					return $output_file;
-				else  :
+				else :
 					return false;
 				endif;
 			}
@@ -539,8 +540,8 @@ class Convert2
 					$img->setImageCompressionQuality(AVIF_QUALITY);
 					break;
 			endswitch;
-			if($height != 0) :
-				if(round($width) > 0 && round($height) > 0) :
+			if ($height != 0) :
+				if (round($width) > 0 && round($height) > 0) :
 					$img->cropThumbnailImage($width, $height);
 				endif;
 			endif;
@@ -554,7 +555,7 @@ class Convert2
 			endif;
 		else :
 			if (copy($input_file, $output_file)) :
-				if(file_exists($output_file)) :
+				if (file_exists($output_file)) :
 					// Return the output file
 					return $output_file;
 				else :
@@ -587,7 +588,7 @@ class Convert2
 		if (file_exists($output_file) && filesize($output_file) > 0) :
 			$size = getimagesize($output_file);
 
-			if(true || ($size == NULL) || ($size[0]+ $size[1] == 0) || ($size[0] === $width && $size[1] === $height)) :
+			if (true || ($size == NULL) || ($size[0] + $size[1] == 0) || ($size[0] === $width && $size[1] === $height)) :
 				return $output_file;
 			endif;
 		endif;
@@ -605,7 +606,7 @@ class Convert2
 
 		//crop and resize the image
 		$img->cropThumbnailImage($width, $height);
-		switch(strtolower(pathinfo($output_file, PATHINFO_EXTENSION))) :
+		switch (strtolower(pathinfo($output_file, PATHINFO_EXTENSION))):
 			case 'webp':
 				$img->setImageFormat('webp');
 				$img->setImageCompressionQuality(WEBP_QUALITY);
@@ -627,12 +628,12 @@ class Convert2
 				} catch (Exception $e) {
 				}
 				break;
-			break;
+				break;
 		endswitch;
 
-		if($img->writeImage($output_file)) :
+		if ($img->writeImage($output_file)) :
 			$img->clear();
-			if(file_exists($output_file)) :
+			if (file_exists($output_file)) :
 				// Return the output file
 				return $output_file;
 			else :
@@ -708,14 +709,14 @@ class Convert2
 
 		if ($img->writeImage($output_file)) :
 			$img->clear();
-			if($max_bytes == NULL) :
+			if ($max_bytes == NULL) :
 				return $output_file;
 			else :
-				if(filesize($output_file) <= ($max_bytes ?? 307200)) :
+				if (filesize($output_file) <= ($max_bytes ?? 307200)) :
 					return $output_file;
 				else :
 					$quality--;
-					if((\file_exists($output_file) && unlink($output_file)) || \true) :
+					if ((\file_exists($output_file) && unlink($output_file)) || \true) :
 						return self::social($input_file, $output_file, $width, $height, $max_bytes, $quality);
 					else :
 						return $output_file;
@@ -795,14 +796,14 @@ class Convert2
 			//$img->stripImage();
 			if ($img->writeImage($output_file)) :
 				$img->clear();
-				if(file_exists($output_file)) :
+				if (file_exists($output_file)) :
 					// Return the output file
 					return $output_file;
 				endif;
 			endif;
 		else :
 			if (copy($input_file, $output_file)) :
-				if(file_exists($output_file)) :
+				if (file_exists($output_file)) :
 					// Return the output file
 					return $output_file;
 				endif;
@@ -836,7 +837,7 @@ class Convert2
 	 * @param	string $filename
 	 * @return object $size The dimension object.
 	 */
-	public static function get_dimension(string $filename) :object
+	public static function get_dimension(string $filename): object
 	{
 		$url = null;
 		if (!empty($filename) && !file_exists($filename) && filter_var($filename, FILTER_VALIDATE_URL) && str_starts_with($filename, 'http')) :
@@ -846,10 +847,10 @@ class Convert2
 
 		$width = (\defined('MAX_WIDTH') ? \MAX_WIDTH : 1);
 		$height = (\defined('MAX_HEIGHT') ? \MAX_HEIGHT : 1);
-		if($width == 0) :
+		if ($width == 0) :
 			$width = $height;
 		endif;
-		if($height == 0) :
+		if ($height == 0) :
 			$height = $width;
 		endif;
 		$size = array(
@@ -880,7 +881,7 @@ class Convert2
 			$json = null;
 		}
 		try {
-			if(file_exists($filename)) :
+			if (file_exists($filename)) :
 				// Read image file with Image Magick
 				$img = new \Imagick($filename);
 
@@ -898,7 +899,7 @@ class Convert2
 			// Unknown Error!
 			return (object)$size;
 		}
-		if($size != null) :
+		if ($size != null) :
 			if ($json != null) :
 				// Save the dimension
 				file_put_contents($json, json_encode($size));
@@ -928,4 +929,3 @@ class Convert2
 			. $new_extension;
 	}
 }
-?>

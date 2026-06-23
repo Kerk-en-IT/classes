@@ -1,5 +1,7 @@
 <?php
+
 namespace KerkEnIT;
+
 /**
  * Autoloader for the Kerk en IT Framework
  *
@@ -29,7 +31,7 @@ if (!function_exists('getEnvPath')) :
 	}
 endif;
 // Load the environment variables
-if(!isset($_ENV) || !is_array($_ENV) || count($_ENV) == 0) :
+if (!isset($_ENV) || !is_array($_ENV) || count($_ENV) == 0) :
 	$file = realpath(getEnvPath(dirname(__FILE__)) . '/.env');
 	if ($file !== FALSE) :
 		$_ENV = parse_ini_file($file, true, INI_SCANNER_RAW);
@@ -61,8 +63,8 @@ endforeach;
 extract($_ENV);
 
 // Get debug hosts from the environment
-if(isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
-	if(!defined('DEBUG')) :
+if (isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
+	if (!defined('DEBUG')) :
 		define('DEBUG', true);
 	endif;
 endif;
@@ -101,4 +103,3 @@ spl_autoload_register(function ($class) {
 		endif;
 	endif;
 });
-?>

@@ -1,4 +1,5 @@
 <?php
+
 namespace KerkEnIT;
 
 /**
@@ -14,7 +15,8 @@ namespace KerkEnIT;
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.0.0
  **/
-class SQL {
+class SQL
+{
 	/**
 	 * rows
 	 *
@@ -80,8 +82,8 @@ class SQL {
 	 */
 	public function addRow($column, $value, bool $nullify = false)
 	{
-		if($nullify) :
-			if(!isset($value) || (empty($value) && $value !== 0)) :
+		if ($nullify) :
+			if (!isset($value) || (empty($value) && $value !== 0)) :
 				$value = NULL;
 			endif;
 		endif;
@@ -115,21 +117,18 @@ class SQL {
 		$sql = 'SELECT * FROM `' . $this->table . '` WHERE (0=0)';
 
 		if (isset($this->where) && is_array($this->where) && count($this->where) > 0) :
-			foreach ($this->where as $key => $value)
-			{
-				if(is_array($key)) :
+			foreach ($this->where as $key => $value) {
+				if (is_array($key)) :
 
 					$tmp = array();
-					foreach($key as $col)
-					{
+					foreach ($key as $col) {
 						$tmp[] = $col . '=' . $this->varType($value);
 					}
 					$sql .= ' AND (' . implode(' OR ', $tmp) . ')';
-				elseif(is_array($value)) :
+				elseif (is_array($value)) :
 					$sql .= ' AND (';
 					$tmp = array();
-					foreach($value as $val)
-					{
+					foreach ($value as $val) {
 						$tmp[] = $key . '=' . $this->varType($val);
 					}
 					$sql .= ' AND (' . implode(' OR ', $tmp) . ')';
@@ -139,18 +138,18 @@ class SQL {
 			}
 		endif;
 
-		if($order !== NULL) :
+		if ($order !== NULL) :
 			$sql .= " ORDER BY `$order` " . ($asc ? 'ASC' : 'DESC');
 		endif;
 		//die($sql);
-		if($rowCount === 1) :
+		if ($rowCount === 1) :
 			if ($result = $this->mysqli->query($sql)) :
 				if ($result->num_rows > 0) :
 					return $result->fetch_object();
 				endif;
 			endif;
 			return false;
-		elseif($rowCount > 1) :
+		elseif ($rowCount > 1) :
 			if ($result = $this->mysqli->query($sql)) :
 				return $result->fetch_all(MYSQLI_ASSOC);
 			endif;
@@ -168,8 +167,7 @@ class SQL {
 	{
 		if (is_array($array)) :
 			$out = array();
-			foreach ($array as $key => $value)
-			{
+			foreach ($array as $key => $value) {
 				$out[$key] = stripslashes($value);
 			}
 			return $out;
@@ -191,10 +189,9 @@ class SQL {
 		$sql = 'INSERT INTO `' . $this->table . '` (';
 		$values = ') VALUES (';
 		$close = ')';
-		foreach($this->rows as $column => $value)
-		{
+		foreach ($this->rows as $column => $value) {
 			$sql .= $column . ',';
-			if($column == 'sortOrder' && $value == NULL) :
+			if ($column == 'sortOrder' && $value == NULL) :
 				$values = ') SELECT ';
 				$close = ' FROM `' . $this->table . '`';
 			endif;
@@ -202,8 +199,7 @@ class SQL {
 		$sql = substr($sql, 0, -1);
 
 		$sql .= $values;
-		foreach ($this->rows as $column => $value)
-		{
+		foreach ($this->rows as $column => $value) {
 			if ($column == 'id') :
 				$sql .= '0,';
 			elseif ($column == 'sortOrder' && $value == NULL) :
@@ -211,12 +207,10 @@ class SQL {
 			else :
 				$sql .= $this->varType($value) . ',';
 			endif;
-
 		}
 		$sql = substr($sql, 0, -1);
 		$sql .= $close . ';';
-		try
-		{
+		try {
 			if (!$this->mysqli->query($sql)) :
 				if ($this->mysqli->errno == 1062) :
 					return 'DuplicateEntry';
@@ -237,9 +231,7 @@ class SQL {
 				endif;
 				return true;
 			endif;
-		}
-		catch (\mysqli_sql_exception $e)
-		{
+		} catch (\mysqli_sql_exception $e) {
 			if ($e->getCode() == 1062) :
 				$result = 'DuplicateEntry';
 			else :
@@ -250,7 +242,6 @@ class SQL {
 			endif;
 			return false;
 		}
-
 	}
 
 	/**
@@ -264,16 +255,14 @@ class SQL {
 	public function UPDATE($redirect, $header = false)
 	{
 		$sql = 'UPDATE `' . $this->table . '` SET ';
-		foreach($this->rows as $key => $value)
-		{
+		foreach ($this->rows as $key => $value) {
 			$sql .= $key . '=' . $this->varType($value) .  ',';
 		}
 		$sql = substr($sql, 0, -1);
-		$sql .=' WHERE (0=0)';
+		$sql .= ' WHERE (0=0)';
 
 		if (count($this->where) > 0) :
-			foreach($this->where as $key => $value)
-			{
+			foreach ($this->where as $key => $value) {
 				$sql .= ' AND ' . $key . '=' . $this->varType($value);
 			}
 		endif;
@@ -289,7 +278,7 @@ class SQL {
 			if (!$header) :
 				echo $this->messageLink("success", "Bijwerken item gelukt.", $redirect);
 			else :
-				if(!empty($redirect)) :
+				if (!empty($redirect)) :
 					header('Location: ' . $redirect);
 				endif;
 			endif;
@@ -307,8 +296,8 @@ class SQL {
 	 */
 	public function EXISTS($column, $value)
 	{
-		if ($result = $this->mysqli->query("SELECT COUNT(1) AS cnt FROM `".$this->table."` WHERE `" . $column . "`=" . $this->varType($value))) :
-			if($result->fetch_object()->cnt > 0) :
+		if ($result = $this->mysqli->query("SELECT COUNT(1) AS cnt FROM `" . $this->table . "` WHERE `" . $column . "`=" . $this->varType($value))) :
+			if ($result->fetch_object()->cnt > 0) :
 				$result->close();
 				return TRUE;
 			else :
@@ -330,7 +319,7 @@ class SQL {
 	{
 		//var_dump("DELETE FROM `" . $this->table . "` WHERE ID='" . $id . "'");
 		//die();
-		return $this->mysqli->query("DELETE FROM `".$this->table."` WHERE ID='" . $id."'");
+		return $this->mysqli->query("DELETE FROM `" . $this->table . "` WHERE ID='" . $id . "'");
 	}
 
 	/**
@@ -341,11 +330,10 @@ class SQL {
 	 */
 	public function DELETE_WHERE()
 	{
-		$sql = "DELETE FROM `".$this->table."` WHERE (0=0)";
+		$sql = "DELETE FROM `" . $this->table . "` WHERE (0=0)";
 
 		if (count($this->where) > 0) :
-			foreach ($this->where as $key => $value)
-			{
+			foreach ($this->where as $key => $value) {
 				$sql .= ' AND ' . $key . '=' . $this->varType($value);
 			}
 			return $this->mysqli->query($sql);
@@ -355,12 +343,12 @@ class SQL {
 
 	public function DELETEFOREIGNKEY($redirect, $id, $message, $sqlSelect, $url)
 	{
-		if(!$this->mysqli->query("DELETE FROM `".$this->table."` WHERE ID=" . $id)) :
+		if (!$this->mysqli->query("DELETE FROM `" . $this->table . "` WHERE ID=" . $id)) :
 			echo $this->message("danger", "Verwijderen item niet gelukt.");
-		elseif(!$this->mysqli->query($sql = "ALTER TABLE `".$this->table."` auto_increment = 1")) :
+		elseif (!$this->mysqli->query($sql = "ALTER TABLE `" . $this->table . "` auto_increment = 1")) :
 			echo $this->message("warning", "Opruimen database niet gelukt.");
 		else :
-			header('Location: '.$redirect);
+			header('Location: ' . $redirect);
 		endif;
 	}
 
@@ -379,33 +367,33 @@ class SQL {
 		if (strtolower($var) == 'null') :
 			return 'NULL';
 		elseif (is_string($var)) :
-			return '"'.$var.'"';
+			return '"' . $var . '"';
 		elseif (is_int($var)) :
-			return ''.$var.'';
+			return '' . $var . '';
 		elseif (is_float($var)) :
-			return ''.$var.'';
+			return '' . $var . '';
 		elseif (is_bool($var)) :
-			return ''.$var.'';
+			return '' . $var . '';
 		elseif (is_numeric($var)) :
-			return ''.$var.'';
+			return '' . $var . '';
 		else :
-			return '"'.$var.'"';
+			return '"' . $var . '"';
 		endif;
 	}
 
 	public function setSortOrder($table, $OldIndex, $Index, $ID)
 	{
-		if($result = $this->mysqli->query(sprintf('SELECT COUNT(1) AS cnt FROM `%s` WHERE account_ID = "%s"', $table, $_SESSION['account_ID']))) :
+		if ($result = $this->mysqli->query(sprintf('SELECT COUNT(1) AS cnt FROM `%s` WHERE account_ID = "%s"', $table, $_SESSION['account_ID']))) :
 			$max = (int)$result->fetch_object()->cnt;
 		endif;
-		if($Index > 0):
+		if ($Index > 0):
 			if ($Index < $OldIndex && $Index < $max) :
-				if($result = $this->mysqli->query(sprintf("UPDATE `%s` SET sortOrder = (sortOrder + 1) WHERE sortOrder < %d AND sortOrder >= %d AND account_ID = '%s'", $table, $OldIndex, $Index, $_SESSION['account_ID']))) :
-					if(!$result) :
+				if ($result = $this->mysqli->query(sprintf("UPDATE `%s` SET sortOrder = (sortOrder + 1) WHERE sortOrder < %d AND sortOrder >= %d AND account_ID = '%s'", $table, $OldIndex, $Index, $_SESSION['account_ID']))) :
+					if (!$result) :
 						return $result->error();
 					else :
-						if($result = $this->mysqli->query(sprintf('UPDATE `%s` SET sortOrder = %d WHERE `ID` = "%s" AND account_ID = "%s"', $table, $Index, $ID, $_SESSION['account_ID']))) :
-							if(! empty( $this->mysqli->error)) :
+						if ($result = $this->mysqli->query(sprintf('UPDATE `%s` SET sortOrder = %d WHERE `ID` = "%s" AND account_ID = "%s"', $table, $Index, $ID, $_SESSION['account_ID']))) :
+							if (! empty($this->mysqli->error)) :
 								return $this->mysqli->error;
 							else :
 								return true;
@@ -414,12 +402,12 @@ class SQL {
 					endif;
 				endif;
 			elseif ($Index > $OldIndex && $Index <= $max) :
-				if($result = $this->mysqli->query(sprintf("UPDATE `%s` SET sortOrder = (sortOrder - 1) WHERE sortOrder > %d AND sortOrder <= %d AND account_ID = '%s'", $table, $OldIndex, $Index, $_SESSION['account_ID']))) :
-					if(!$result) :
+				if ($result = $this->mysqli->query(sprintf("UPDATE `%s` SET sortOrder = (sortOrder - 1) WHERE sortOrder > %d AND sortOrder <= %d AND account_ID = '%s'", $table, $OldIndex, $Index, $_SESSION['account_ID']))) :
+					if (!$result) :
 						return $result->error();
 					else :
-						if($result = $this->mysqli->query(sprintf('UPDATE `%s` SET sortOrder = %d WHERE `ID` = "%s" AND account_ID = "%s"', $table, $Index, $ID, $_SESSION['account_ID']))) :
-							if(! empty( $this->mysqli->error ) ) :
+						if ($result = $this->mysqli->query(sprintf('UPDATE `%s` SET sortOrder = %d WHERE `ID` = "%s" AND account_ID = "%s"', $table, $Index, $ID, $_SESSION['account_ID']))) :
+							if (! empty($this->mysqli->error)) :
 								return $this->mysqli->error;
 							else:
 								return true;
@@ -441,7 +429,7 @@ class SQL {
 		endif;
 
 		$messages = $this->_memcache_obj->get('SQL_Messages');
-		if($messages == false) :
+		if ($messages == false) :
 			$messages = array();
 		else :
 			$messages = json_decode($messages);
@@ -469,16 +457,16 @@ class SQL {
 		return $this->ignoreDuplicateMessages($rtn);
 	}
 
-	public function messageLink($color, $message, $url='')
+	public function messageLink($color, $message, $url = '')
 	{
 		$rtn = '';
 		if (php_sapi_name() != "cli") :
 			$rtn = '<div class="alert alert-' . ($color ?? 'danger') . '">';
-			if(strlen($url) > 0) {
+			if (strlen($url) > 0) {
 				$rtn .= '<a href="' . $url . '" class="alert-link">';
 			}
 			$rtn .= $message;
-			if(strlen($url) > 0) {
+			if (strlen($url) > 0) {
 				$rtn .= '</a>';
 			}
 			$rtn .= '</div>';
@@ -664,4 +652,3 @@ class SQL {
 		return $stmt->execute();
 	}
 }
-?>

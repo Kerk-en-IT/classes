@@ -1,4 +1,5 @@
 <?php
+
 namespace KerkEnIT;
 
 /**
@@ -106,7 +107,7 @@ class Cache
 			$key[] = $_SERVER['SERVER_NAME'];
 		endif;
 
-		if(count($value) > 0) :
+		if (count($value) > 0) :
 			$key = array_merge($key, $value);
 		endif;
 		return implode(\DIRECTORY_SEPARATOR, $key);
@@ -124,5 +125,4 @@ class Cache
 			endif;
 		endif;
 	}
-
 }

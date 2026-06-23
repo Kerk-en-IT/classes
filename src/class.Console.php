@@ -94,7 +94,7 @@ class Console
 	 */
 	public static function error(...$params)
 	{
-		if($params instanceof Exception) :
+		if ($params instanceof Exception) :
 			$params = array($params->getMessage(), $params->getFile() . ' (' . $params->getLine() . ')', $params->getTraceAsString());
 		endif;
 		if (!is_array($params)) :

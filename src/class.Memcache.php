@@ -1,6 +1,6 @@
 <?php
 if (!class_exists('\Memcache')) :
-	if(!defined('MEMCACHE_COMPRESSED')) :
+	if (!defined('MEMCACHE_COMPRESSED')) :
 		define('MEMCACHE_COMPRESSED', 2);
 	endif;
 	/**
@@ -78,4 +78,3 @@ if (!class_exists('\Memcache')) :
 	}
 
 endif;
-?>
