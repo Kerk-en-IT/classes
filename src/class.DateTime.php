@@ -699,6 +699,26 @@ class DateTime
 		return $datetime->format('d-m-Y');
 	}
 
+	/**
+	 * ma 20 dec om 9:42 tot 10:42
+	 *
+	 * @param	object datetime
+	 * @param	object datetime
+	 * @return	string ma 20 dec om 9:42 tot 10:42
+	 */
+	public static function DutchShortDateWithoutYearFromTill($from, $to = null): string
+	{
+		$from = self::GetDate($from);
+		$to = self::GetDate($to);
+		if ($to !== null && $from->format('Y-m-d') == $to->format('Y-m-d')) :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1];
+		elseif ($to !== null && $from->format('Y-m-d') != $to->format('Y-m-d')) :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::till() . ' ' . self::days_short()[$to->format('w')] . ' ' . $to->format('j') . ' ' . self::months_short()[$to->format('m') - 1];
+		else :
+			return self::days_short()[$from->format('w')] . ' ' . $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::from();
+		endif;
+	}
+
 
 	/**
 	 * maandag 20 december 2010 9:42
