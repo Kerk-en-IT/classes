@@ -688,6 +688,19 @@ class DateTime
 	}
 
 	/**
+	 * 20-12-2015
+	 *
+	 * @param	object datetime
+	 * @return	string 20-12-2015
+	 */
+	public static function ShortDateDutch($datetime): string
+	{
+		$datetime = self::GetDate($datetime);
+		return $datetime->format('d-m-Y');
+	}
+
+
+	/**
 	 * maandag 20 december 2010 9:42
 	 *
 	 * @param	object datetime
@@ -1311,7 +1324,7 @@ class DateTime
 		$interval = $datetimeObj1->diff($datetimeObj2);
 		$dateDiff = $interval->format('%R%a');
 
-		return $dateDiff > 0;
+		return $dateDiff < 0;
 	}
 
 	/**
@@ -1327,7 +1340,7 @@ class DateTime
 		$interval = $datetimeObj1->diff($datetimeObj2);
 		$dateDiff = $interval->format('%R%a');
 
-		return $dateDiff > 0;
+		return $dateDiff < 0;
 	}
 
 	/**
