@@ -779,7 +779,7 @@ class Convert2
 			endif;
 		endif;
 
-		if (class_exists('\Imagick')) :
+		if (class_exists('\Imagick') && file_exists($input_file)) :
 			$img = new \Imagick();
 			$img->setResourceLimit(\Imagick::RESOURCETYPE_MEMORY, MY_MAGICK_MEMORY_LIMIT);
 			$img->setResourceLimit(\Imagick::RESOURCETYPE_MAP, MY_MAGICK_MEMORY_LIMIT);
@@ -794,6 +794,12 @@ class Convert2
 			endif;
 			$img->setFormat("jpg");
 			//$img->stripImage();
+			if(is_dir(dirname($output_file)) === false) :
+				mkdir(dirname($output_file), 0755, true);
+			endif;
+			if(is_dir(dirname($output_file)) === false) :
+				return false;
+			endif;
 			if ($img->writeImage($output_file)) :
 				$img->clear();
 				if (file_exists($output_file)) :
