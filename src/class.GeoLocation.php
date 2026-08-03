@@ -23,28 +23,21 @@ class GeoLocation
 	 *
 	 * @var string
 	 */
-	private $_address = NULL;
-
-	/**
-	 * Google Maps API Key
-	 *
-	 * @var string
-	 */
-	private $GOOGLE_MAPS_API_KEY = NULL;
+	private ?string $_address = NULL;
 
 	/**
 	 * Latitude
 	 *
 	 * @var float
 	 */
-	public $latitude = 0.000000;
+	public float $latitude = 0.000000;
 
 	/**
 	 * Longitude
 	 *
 	 * @var float
 	 */
-	public $longitude = 0.000000;
+	public float $longitude = 0.000000;
 
 	/**
 	 * Street
@@ -52,51 +45,46 @@ class GeoLocation
 	 * @var string
 	 * @deprecated please use `address` or `road` instead
 	 */
-	public $street = NULL;
+	public ?string $street = NULL;
 
 	/**
 	 * Road
 	 *
 	 * @var string
 	 */
-	public $road = NULL;
+	public ?string $road = NULL;
 
 	/**
 	 * Address
 	 *
 	 * @var string
 	 */
-	public $address = NULL;
+	public ?string $address = NULL;
 
 	/**
 	 * Zipcode
 	 *
 	 * @var string
 	 */
-	public $postalCode = NULL;
+	public ?string $postalCode = NULL;
 	/**
 	 * City
 	 *
 	 * @var string
 	 */
-	public $city = NULL;
+	public ?string $city = NULL;
 	/**
 	 * Country
 	 *
 	 * @var string
 	 */
-	public $country = NULL;
-	/*
-	public $street = NULL;
-	public $zipcode = NULL;
-	public $city = NULL;
-	public $state = NULL;
-	public $country = NULL;
-*/
+	public ?string $country = NULL;
 
-	function __construct()
+	/**
+	 * Constructor
+	 */
+	public function __construct()
 	{
-		$this->GOOGLE_MAPS_API_KEY = getenv('GOOGLE_MAPS_API_KEY');
 	}
 
 	/**
@@ -113,58 +101,38 @@ class GeoLocation
 		$this->_address = trim(trim(trim(trim(($address ?? '') . ', ' . ($zipcode  !== null ? ($zipcode ?? '') . ', ' : '') . ($city ?? ''), ',')), ',')) . ($country  !== null ? ', ' . ($country ?? '') : '');
 		if (!empty(($address ?? '') . ($zipcode ?? '') . ($city ?? ''))) :
 			$address = urlencode($this->_address);
-			if (!empty($this->GOOGLE_MAPS_API_KEY)) :
+			ini_set('safe_mode', false);
+			$url = "https://nominatim.openstreetmap.org/search?q=" . $address . "&format=json&polygon=1&addressdetails=1";
+			$ch = curl_init();
 
-				$url = "https://maps.google.com/maps/api/geocode/json?address=" . $address . "&key=" . $this->GOOGLE_MAPS_API_KEY;
-				ini_set('safe_mode', false);
-				$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_HEADER, 0);
+			curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 
-				curl_setopt($ch, CURLOPT_URL, $url);
-				curl_setopt($ch, CURLOPT_HEADER, 0);
-				curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
-				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-				$data = curl_exec($ch);
-				ini_set('safe_mode', true);
-				$geo_json = json_decode($data, true);
-
-				$this->latitude = $geo_json['results'][0]['geometry']['location']["lat"];
-				$this->longitude = $geo_json['results'][0]['geometry']['location']["lng"];
-
-				return true;
-			else :
-				ini_set('safe_mode', false);
-				$url = "https://nominatim.openstreetmap.org/search?q=" . $address . "&format=json&polygon=1&addressdetails=1";
-				$ch = curl_init();
-
-				curl_setopt($ch, CURLOPT_URL, $url);
-				curl_setopt($ch, CURLOPT_HEADER, 0);
-				curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
-				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-
-				$data = curl_exec($ch);
-				ini_set('safe_mode', true);
-				$geo_json = json_decode($data, true);
-				$this->latitude = $geo_json[0]['lat'];
-				$this->longitude = $geo_json[0]['lon'];
-				$this->road = $geo_json[0]['address']['road'] ?? null;
-				if ($this->road !== null):
-					$this->address = $this->road . ' ' . ($geo_json[0]['address']['house_number'] ?? '1');
-				endif;
-				$this->street = $this->address;
-				$this->postalCode = $geo_json[0]['address']['postcode'] ?? null;
-				$this->city = $geo_json[0]['address']['city'] ?? null;
-				if ($this->city === null) :
-					//var_dump($geo_json[0]['address']);
-					//die();
-					$this->city = $geo_json[0]['address']["village"] ?? null;
-				endif;
-				$this->country = $geo_json[0]['address']['country'] ?? null;
-				return true;
+			$data = curl_exec($ch);
+			ini_set('safe_mode', true);
+			$geo_json = json_decode($data, true);
+			if (!is_array($geo_json) || !isset($geo_json[0])) :
+				return false;
 			endif;
+
+			$this->latitude = (float)($geo_json[0]['lat'] ?? 0.0);
+			$this->longitude = (float)($geo_json[0]['lon'] ?? 0.0);
+			$this->road = $geo_json[0]['address']['road'] ?? null;
+			if ($this->road !== null):
+				$this->address = $this->road . ' ' . ($geo_json[0]['address']['house_number'] ?? '1');
+			endif;
+			$this->street = $this->address;
+			$this->postalCode = $geo_json[0]['address']['postcode'] ?? null;
+			$this->city = $geo_json[0]['address']['city'] ?? null;
+			if ($this->city === null) :
+				$this->city = $geo_json[0]['address']["village"] ?? null;
+			endif;
+			$this->country = $geo_json[0]['address']['country'] ?? null;
+			return true;
 		else :
 			return false;
 		endif;
@@ -189,7 +157,7 @@ class GeoLocation
 	 * @param	string|null $zipcode
 	 * @return	string|null
 	 */
-	public static function Zipcode(string|null $zipcode)
+	public static function Zipcode(string|null $zipcode): ?string
 	{
 		if ($zipcode === null || $zipcode === '' || empty($zipcode)) :
 			return null;
@@ -213,28 +181,42 @@ class GeoLocation
 	 * @param  float $lng_destinations Destination longitude
 	 * @return	array|bool
 	 */
-	public function matrix($lat_origins, $lng_origins, $lat_destinations, $lng_destinations): array|bool
+	public function matrix(float $lat_origins, float $lng_origins, float $lat_destinations, float $lng_destinations): array|bool
 	{
-		if (!empty($this->GOOGLE_MAPS_API_KEY)) :
-			$url = 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=' . $lat_origins . ',' . $lng_origins . '&destinations=' . $lat_destinations . ',' . $lng_destinations . '&key=' . $this->GOOGLE_MAPS_API_KEY;
-			ini_set('safe_mode', false);
-			$ch = curl_init();
-
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_HEADER, 0);
-			curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-
-			$data = curl_exec($ch);
-			ini_set('safe_mode', true);
-			$geo_json = json_decode($data, true);
-			#todo: Finish GPS distance
-			return $geo_json;
-		else :
+		if (!is_numeric($lat_origins) || !is_numeric($lng_origins) || !is_numeric($lat_destinations) || !is_numeric($lng_destinations)) :
 			return false;
 		endif;
+
+		$distanceMeters = (int)round(self::haversineGreatCircleDistance(
+			latitudeFrom:(float)$lat_origins,
+			longitudeFrom:(float)$lng_origins,
+			latitudeTo:(float)$lat_destinations,
+			longitudeTo:(float)$lng_destinations
+		));
+		$durationSeconds = (int)round((($distanceMeters / 1000) / 50) * 3600);
+		$durationMinutes = max(1, (int)round($durationSeconds / 60));
+		$distanceText = $distanceMeters >= 1000
+			? number_format($distanceMeters / 1000, 1, ',', '.') . ' km'
+			: $distanceMeters . ' m';
+
+		return [
+			'destination_addresses' => [self::latlon((float)$lat_destinations) . ',' . self::latlon((float)$lng_destinations)],
+			'origin_addresses' => [self::latlon((float)$lat_origins) . ',' . self::latlon((float)$lng_origins)],
+			'rows' => [[
+				'elements' => [[
+					'distance' => [
+						'text' => $distanceText,
+						'value' => $distanceMeters,
+					],
+					'duration' => [
+						'text' => $durationMinutes . ' mins',
+						'value' => $durationSeconds,
+					],
+					'status' => 'OK',
+				]],
+			]],
+			'status' => 'OK',
+		];
 	}
 
 
@@ -250,12 +232,12 @@ class GeoLocation
 	 * @return float Distance between points in [m] (same as earthRadius)
 	 */
 	public static function vincentyGreatCircleDistance(
-		$latitudeFrom,
-		$longitudeFrom,
-		$latitudeTo,
-		$longitudeTo,
-		$earthRadius = 6371000
-	) {
+		float $latitudeFrom,
+		float $longitudeFrom,
+		float $latitudeTo,
+		float $longitudeTo,
+		float $earthRadius = 6371000
+	): float {
 		// convert from degrees to radians
 		$latFrom = deg2rad($latitudeFrom);
 		$lonFrom = deg2rad($longitudeFrom);
@@ -279,15 +261,14 @@ class GeoLocation
 	 * @param float $longitudeFrom Longitude of start point in [deg decimal]
 	 * @param float $latitudeTo Latitude of target point in [deg decimal]
 	 * @param float $longitudeTo Longitude of target point in [deg decimal]
-	 * @param float $earthRadius Mean earth radius in [m]
 	 * @return float Distance between points in [m] (same as earthRadius)
 	 */
 	public static function haversineGreatCircleDistance(
-		$latitudeFrom,
-		$longitudeFrom,
-		$latitudeTo,
-		$longitudeTo
-	) {
+		float $latitudeFrom,
+		float $longitudeFrom,
+		float $latitudeTo,
+		float $longitudeTo
+	): float {
 		$theta = $longitudeFrom - $longitudeTo;
 		$distance = (sin(deg2rad($latitudeFrom)) * sin(deg2rad($latitudeTo))) + (cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * cos(deg2rad($theta)));
 		$distance = acos($distance);
@@ -305,16 +286,16 @@ class GeoLocation
 	 * @param array $coordinates Array of objects with latitude and longitude properties.
 	 * @return array|null Array with center latitude and longitude or null if no coordinates are provided.
 	 */
-	public static function getCenterLatLng($coordinates)
+	public static function getCenterLatLng(array $coordinates): ?array
 	{
-		$latitudes = array_map(function ($coordinate) {
+		$latitudes = array_map(function ($coordinate): mixed {
 			return $coordinate->latitude;
 		}, $coordinates);
 		if (count($latitudes) > 0) :
 			$min_latitude = min($latitudes);
 			$max_latitude = max($latitudes);
 
-			$longitudes = array_map(function ($coordinate) {
+			$longitudes = array_map(function ($coordinate): mixed {
 				return $coordinate->longitude;
 			}, $coordinates);
 
