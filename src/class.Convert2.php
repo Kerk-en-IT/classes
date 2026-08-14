@@ -237,11 +237,19 @@ class Convert2
 			'encoding' => 'lossy',
 			'quality' => JXL_QUALITY,
 		];
-		try {
-			\NPX\JpegXlEncode\Encoder::encode($input_file, $output_file, $options);
-		} catch (Exception $exception) {
-			error_log('Whoops, something went wrong.');
-		}
+		if (intval(PHP_MAJOR_VERSION . '' . PHP_MINOR_VERSION) >= 85 && class_exists('\NPX\JpegXlEncode\Encoder')) :
+			$formats = \Imagick::queryformats();
+			if (!in_array('JXL', $formats)) :
+				//error_log('JXL format is not supported by Imagick. Please ensure that the JpegXlEncode library is installed and configured correctly.');
+				return false;
+			endif;
+
+			try {
+				\NPX\JpegXlEncode\Encoder::encode($input_file, $output_file, $options);
+			} catch (Exception $exception) {
+				error_log('Whoops, something went wrong.');
+			}
+		endif;
 		if (file_exists($output_file)) :
 			return $output_file;
 		else :
