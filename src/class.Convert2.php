@@ -802,10 +802,10 @@ class Convert2
 			endif;
 			$img->setFormat("jpg");
 			//$img->stripImage();
-			if(is_dir(dirname($output_file)) === false) :
+			if (is_dir(dirname($output_file)) === false) :
 				mkdir(dirname($output_file), 0755, true);
 			endif;
-			if(is_dir(dirname($output_file)) === false) :
+			if (is_dir(dirname($output_file)) === false) :
 				return false;
 			endif;
 			if ($img->writeImage($output_file)) :
