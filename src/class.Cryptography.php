@@ -229,6 +229,13 @@ class Cryptography
 	/**
 	 * Get GitHub Hash
 	 *
+	 * {
+	 *     "require": {
+	 *         "aza/math": "^1.0"
+	 *     }
+	 * }
+	 * composer require aza/math
+	 *
 	 * @param	string|null $file
 	 * @return	string hash
 	 */
