@@ -460,12 +460,20 @@ class Format
 	 * Convert a MD5 hash to a UUID
 	 *
 	 * @param	string $md5 MD5 hash
-	 * @return	string UUID
+	 * @return	string UUID or false if not valid MD5 hash
 	 */
-	public static function md5_to_uuid($md5): string
+	public static function md5_to_uuid(string $md5, bool $explicit = true): string|false
 	{
+		if(is_string($md5) && strlen($md5) == 36 && self::is_uuid($md5)) {
+			return $md5;
+		}
+
 		if (!is_string($md5) || strlen($md5) !== 32) {
-			throw new \InvalidArgumentException('Input must be a 32-character hexadecimal string.');
+			if($explicit) :
+				throw new \InvalidArgumentException('Input must be a 32-character hexadecimal string.');
+			else :
+				return false;
+			endif;
 		}
 		$md5 = substr($md5, 0, 8) . '-' .
 			substr($md5, 8, 4) . '-' .
