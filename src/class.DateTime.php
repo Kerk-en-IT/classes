@@ -1068,6 +1068,29 @@ class DateTime
 		return false;
 	}
 
+	/**
+	 * Round the duration between two dates to the nearest 15-minute interval and return it in decimal hours.
+	 *
+	 * @param \DateTime $startDate The start date and time.
+	 * @param \DateTime $endDate The end date and time.
+	 * @param int $roundTo The number of minutes to round to (default is 15).
+	 * @return float The rounded duration in decimal hours.
+	 */
+	public static function RoundDuration(\DateTime $startDate, \DateTime $endDate, int $roundTo = 15): float
+	{
+		// Calculate the duration in minutes from the dates
+		$durationInMs = ($endDate->getTimestamp() - $startDate->getTimestamp()) * 1000;
+		$durationInMinutes = round($durationInMs / 60000);
+
+		// Round to the nearest 15-minute interval
+		$roundedDuration = round($durationInMinutes / $roundTo) * $roundTo;
+
+		// Convert rounded minutes to decimal hours (e.g. 90 -> 1.50, 75 -> 1.25)
+		$decimalHours = number_format($roundedDuration / 60, 2, '.', '');
+
+		// Return the rounded duration in decimal hours
+		return (float)$decimalHours;
+	}
 
 
 	/**
