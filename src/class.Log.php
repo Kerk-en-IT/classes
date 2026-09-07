@@ -107,6 +107,9 @@ class Log
 			endif;
 		endif;
 		if (PHP_OS != 'Darwin' && getenv('ZSH') !== true):
+			if(\KerkEnIT\KerkEnIT::is_dev()) :
+				print($message);
+			endif;
 			error_log($message);
 		endif;
 	}
@@ -202,6 +205,8 @@ if (!function_exists('varDie')) :
 	{
 		Log::error($params);
 		if (defined('DEBUG') && DEBUG) :
+			die();
+		elseif(\KerkEnIT\KerkEnIT::is_dev()) :
 			die();
 		endif;
 	}
