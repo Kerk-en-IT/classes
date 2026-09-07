@@ -65,6 +65,7 @@ class ColorPalette
 	{
 		$newColor = '';
 		$colorPalette = array();
+		$colorVariation = 0;
 		for ($i = 1; $i <= $colorCount; $i++) {
 			if ($i == 1) {
 				$color = $this->color;
