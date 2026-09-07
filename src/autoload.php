@@ -61,6 +61,7 @@ foreach ($_ENV as $key => $value) :
 endforeach;
 
 extract($_ENV);
+define('PHP_MAJOR_MINOR_VERSION', (int)str_replace(".", "", substr(PHP_VERSION, 0, 3)));
 
 // Get debug hosts from the environment
 if (isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) && in_array($_SERVER['REMOTE_ADDR'], array_map('getHostByName', explode(',', $_ENV['debug_hosts'])))) :
@@ -69,12 +70,14 @@ if (isset($_ENV['debug_hosts']) && \array_key_exists('REMOTE_ADDR', $_SERVER) &&
 	endif;
 endif;
 
-if (!str_contains(__DIR__, 'wp-content')) :
-	$filename = realpath(dirname(__FILE__) . '/class.Log.php');
-	if (realpath($filename) !== FALSE) :
-		if (in_array(substr(PHP_VERSION, 0, 3), ['8.4', '8.5'])) :
-			require_once($filename);
-		endif;
+if (!defined('ABSPATH')) :
+	if (PHP_MAJOR_MINOR_VERSION >= 83) :
+		foreach(array('class.Log.php', 'global.php') as $file) :
+			$filename = realpath(dirname(__FILE__) . '/' . $file);
+			if ($filename !== FALSE) :
+				require_once($filename);
+			endif;
+		endforeach;
 	endif;
 endif;
 /**
@@ -90,9 +93,9 @@ spl_autoload_register(function ($class) {
 		$filename = realpath(dirname(__FILE__) . '/class.' . strtolower($class) . '.php');
 	endif;
 	if ($filename !== FALSE) :
-		if (in_array(substr(PHP_VERSION, 0, 3), ['8.4', '8.5'])) :
+		if (PHP_MAJOR_MINOR_VERSION >= 84) :
 			require_once($filename);
-		elseif (substr(PHP_VERSION, 0, 3) === '8.3') :
+		elseif (PHP_MAJOR_MINOR_VERSION === 83) :
 			if (!str_contains(file_get_contents($filename), 'PHP versions 8.4')) :
 				require_once($filename);
 			elseif (!str_contains(file_get_contents($filename), 'PHP versions')) :
