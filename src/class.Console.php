@@ -174,7 +174,7 @@ class Console
 	 * @param  mixed|null $second
 	 * @return	string
 	 */
-	private static function WriteLine($first, $second = null)
+	private static function WriteLine(mixed $first, mixed $second = null)
 	{
 		$time_end = floatval(microtime(true));
 		$execution_time = ($time_end - self::$time_start);
@@ -191,9 +191,9 @@ class Console
 	 * GetLine
 	 *
 	 * @param  mixed $param
-	 * @return void
+	 * @return mixed|string
 	 */
-	private static function GetLine($param)
+	private static function GetLine(mixed $param)
 	{
 		if (is_array($param)) :
 			return (json_encode($param));
