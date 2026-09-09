@@ -7,7 +7,7 @@ use KerkEnIT\Format;
 /**
  * DateTime Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.4, 8.5
  *
  * @package		KerkEnIT
  * @subpackage	DateTime
@@ -19,6 +19,46 @@ use KerkEnIT\Format;
  **/
 class DateTime
 {
+	/**
+	 * @var string|null $timezone The default timezone to use for date and time operations.
+	 */
+	public static ?string $timezone  = null;
+
+	/**
+	 * @var \DateTimeZone|null $tz The default timezone object to use for date and time operations.
+	 */
+	public static ?\DateTimeZone $tz = null;
+
+	/**
+	 * Set the default timezone for date and time operations.
+	 *
+	 * @param string|null $timezone The timezone to set. If null, the default timezone from PHP configuration will be used.
+	 */
+	public static function default_timezone(?string $timezone = null): string
+	{
+		// If the timezone is not set, use the default timezone from PHP configuration
+		if ($timezone === null) :
+			self::$timezone = date_default_timezone_get();
+		else :
+			self::$timezone = $timezone;
+		endif;
+		return self::$timezone;
+	}
+
+	/**
+	 * Get the default timezone object for date and time operations.
+	 *
+	 * @return \DateTimeZone The default timezone object.
+	 */
+	public static function tz(): \DateTimeZone
+	{
+		// If the timezone object is not set, create a new DateTimeZone object with the default timezone
+		if (self::$tz === null) :
+			self::$tz = new \DateTimeZone(self::default_timezone());
+		endif;
+		return self::$tz;
+	}
+
 	/**
 	 * Get Date from various types
 	 *
@@ -170,12 +210,12 @@ class DateTime
 	public static function GetTimezoneDate($time): \DateTime
 	{
 		$datetime = self::GetDate($time);
-		$timezone = 'Europe/Amsterdam';
+		$timezone = self::default_timezone();
 		if ($datetime > new \DateTime('2024-01-10') && $datetime < new \DateTime('2024-03-12')) :
 			$timezone = 'America/Panama';
 		endif;
 		$schedule_date = new \DateTime($datetime->format('Y-m-d H:i:s'), new \DateTimeZone($timezone));
-		$schedule_date->setTimeZone(new \DateTimeZone(date_default_timezone_get()));
+		$schedule_date->setTimeZone(self::tz());
 
 		return $schedule_date;
 	}
@@ -253,13 +293,14 @@ class DateTime
 	 * E.g. Mon, 20 Dec 2010 09:42:46 +0100
 	 * When TimeZone = UTC it will return Mon, 20 Dec 2010 10:42:46 +0000
 	 */
-	public static function RSS($date, $timezone = 'Europe/Amsterdam'): string
+	public static function RSS($date, $timezone = ''): string
 	{
-		$datetime = new \DateTime('now', new \DateTimeZone('Europe/Amsterdam'));
+		$timezone = ($timezone == '' ? self::default_timezone() : $timezone);
+		$datetime = new \DateTime('now', self::tz());
 		if (is_numeric($date)) :
 			$datetime->setTimestamp($date);
 		else :
-			$datetime = self::GetDate($date, new \DateTimeZone('Europe/Amsterdam'));
+			$datetime = self::GetDate($date, self::tz());
 		endif;
 		if ($timezone == 'UTC') :
 			if ((int)$datetime->format('His') === 0) :
@@ -300,8 +341,9 @@ class DateTime
 	 * E.g. 2022-12-01T13:47:24+01:00
 	 * When TimeZone = UTC it will return 2009-02-28T18:56:23Z
 	 */
-	public static function ISO8601($datetime = 'now', $timezone = 'Europe/Amsterdam'): string
+	public static function ISO8601($datetime = 'now', $timezone = ''): string
 	{
+		$timezone = ($timezone == '' ? self::default_timezone() : $timezone);
 		$date = self::GetDate($datetime, $timezone);
 		if ($timezone !== false) :
 			$date->setTimezone(new \DateTimeZone($timezone));
@@ -325,8 +367,9 @@ class DateTime
 	 * @return	string formatted date in ISO 8601 standard
 	 * E.g. 2022-12-01T13:47:24+01:00
 	 */
-	public static function ATOM($datetime = 'now', $timezone = 'Europe/Amsterdam'): string
+	public static function ATOM($datetime = 'now', $timezone = ''): string
 	{
+		$timezone = ($timezone == '' ? self::default_timezone() : $timezone);
 		$date = self::GetDate($datetime);
 		if ($timezone !== false) :
 			$date->setTimezone(new \DateTimeZone($timezone));
@@ -342,7 +385,7 @@ class DateTime
 	 * Best for iCal (.ics) files
 	 *
 	 * @param mixed $datetime input date
-	 * @param string|DateTimeZone|bool $timezone destination TimeZone
+	 * @param string|\DateTimeZone|bool $timezone destination TimeZone
 	 * @return	string formatted date in ISO 8601 standard
 	 * E.g. 20221201T134724
 	 */
@@ -405,11 +448,11 @@ class DateTime
 		$datetime = self::GetDate($datetime);
 		$interval = date_create('now')->diff($datetime);
 		$suffix = ($interval->invert ? ' geleden' : '');
-		if ($v = $interval->y >= 1) return KerkEnIT\Format::pluralize($interval->y, ' jaar', ' jaren') . $suffix;
-		if ($v = $interval->m >= 1) return KerkEnIT\Format::pluralize($interval->m, ' maand', ' maanden') . $suffix;
-		if ($v = $interval->d >= 1) return KerkEnIT\Format::pluralize($interval->d, ' dag', ' dagen') . $suffix;
-		if ($v = $interval->h >= 1) return KerkEnIT\Format::pluralize($interval->h, ' uur', ' uren') . $suffix;
-		if ($v = $interval->i >= 1) return KerkEnIT\Format::pluralize($interval->i, ' minuut', ' minuten') . $suffix;
+		if ($v = $interval->y >= 1) return Format::pluralize($interval->y, ' jaar', ' jaren') . $suffix;
+		if ($v = $interval->m >= 1) return Format::pluralize($interval->m, ' maand', ' maanden') . $suffix;
+		if ($v = $interval->d >= 1) return Format::pluralize($interval->d, ' dag', ' dagen') . $suffix;
+		if ($v = $interval->h >= 1) return Format::pluralize($interval->h, ' uur', ' uren') . $suffix;
+		if ($v = $interval->i >= 1) return Format::pluralize($interval->i, ' minuut', ' minuten') . $suffix;
 		return ($interval->s < 5 ? 'zojuist' : ' seconden geleden');
 	}
 
@@ -1045,7 +1088,7 @@ class DateTime
 		} else {
 			$m = 3;
 		}
-		return new \DateTime("$y-$m-$d", new \DateTimeZone('Europe/Amsterdam'));
+		return new \DateTime("$y-$m-$d", self::tz());
 	}
 
 	public static function FeastDate_YN($date)
@@ -1096,26 +1139,34 @@ class DateTime
 	/**
 	 * Get Duration text
 	 *
-	 * @param int $minutes Minutes to add or subtract from the time of now
+	 * @param null|int|float $minutes Minutes to add or subtract from the time of now
+	 * @param null|int|float $seconds Seconds to add or subtract from the time of now
 	 * @return	string
 	 */
-	public static function Duration($minutes)
+	public static function Duration(null|int|float $minutes = null, null|int|float $seconds = null)
 	{
 		$datetime = date_create('today');
-		if ($minutes >= 0) :
-
-			$datetime->add(new \DateInterval('PT' . ((int) $minutes) . 'M'));
-		else :
-			$datetime->sub(new \DateInterval('PT' . (abs((int) $minutes)) . 'M'));
+		if ($minutes !== null) :
+			if ($minutes >= 0) :
+				$datetime->add(new \DateInterval('PT' . ((int) $minutes) . 'M'));
+			else :
+				$datetime->sub(new \DateInterval('PT' . (abs((int) $minutes)) . 'M'));
+			endif;
+		elseif ($seconds !== null) :
+			if ($seconds >= 0) :
+				$datetime->add(new \DateInterval('PT' . ((int) $seconds) . 'S'));
+			else :
+				$datetime->sub(new \DateInterval('PT' . (abs((int) $seconds)) . 'S'));
+			endif;
 		endif;
-		$interval = date_create('today')->diff($datetime);
+		$interval = (new \DateTime('today', new \DateTimeZone(date_default_timezone_get())))->diff($datetime);
 
 		$text = '';
 		if ($v = $interval->y >= 1) :
-			$text .= KerkEnIT\Format::pluralize($interval->y, ' jaar ', ' jaren ');
+			$text .= Format::pluralize($interval->y, ' jaar ', ' jaren ');
 		endif;
 		if ($v = $interval->m >= 1) :
-			$text .= KerkEnIT\Format::pluralize($interval->m, ' maand ', ' maanden ');
+			$text .= Format::pluralize($interval->m, ' maand ', ' maanden ');
 		endif;
 
 		if ($v = $interval->d >= 1) :
@@ -1131,7 +1182,7 @@ class DateTime
 		endif;
 
 		if ($v = $interval->s >= 1) :
-			$text .= Format::pluralize($interval->i, ' seconde ', ' seconden ');
+			$text .= Format::pluralize($interval->s, ' seconde ', ' seconden ');
 		endif;
 
 		if (empty($text)) :
