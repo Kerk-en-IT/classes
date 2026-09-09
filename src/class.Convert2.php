@@ -150,6 +150,38 @@ class Convert2
 			return $img;
 		endif;
 	}
+
+	public static function getImageOrientation($filename): int
+	{
+		$deg = 0;
+		if (function_exists('exif_read_data')) {
+			$exif = exif_read_data($filename);
+			if ($exif && isset($exif['Orientation'])) {
+				$orientation = $exif['Orientation'];
+				if ($orientation != 1) {
+
+					switch ($orientation) {
+						case 3:
+							$deg = 180;
+							//return \Imagick::ORIENTATION_BOTTOMRIGHT;
+							break;
+						case 6:
+							$deg = 270;
+							//return \Imagick::ORIENTATION_RIGHTTOP;
+							break;
+						case 8:
+							$deg = 90;
+							//return \Imagick::ORIENTATION_LEFTBOTTOM;
+							break;
+					}
+					if ($deg) {
+						return $deg;
+					}
+				} // if there is some rotation necessary
+			} // if have the exif orientation info
+		} // if function exists
+		return $deg;
+	}
 	/**
 	 *
 	 * Convert image to JPG
@@ -173,6 +205,13 @@ class Convert2
 			endif;
 		endif;
 
+		$deg = self::getImageOrientation($input_file);
+		if($deg !== 0) :
+			$img = imagecreatefromjpeg($input_file);
+			$img = imagerotate($img, $deg, 0);
+			imagejpeg($img, $input_file, 100);
+		endif;
+
 		if (class_exists('\Imagick')) :
 			$img = new \Imagick();
 			$img->setResourceLimit(\Imagick::RESOURCETYPE_MEMORY, MY_MAGICK_MEMORY_LIMIT);
@@ -193,9 +232,14 @@ class Convert2
 			//$img->resampleImage(72, 72, \Imagick::FILTER_SINC, 1);
 			$img->setImageResolution(72, 72);
 			$img->setFormat("jpg");
+
 			//$img->stripImage();
 			if ($img->writeImage($output_file)) :
 				$img->clear();
+				//unset($img);
+				//$img = imagecreatefromjpeg($output_file);
+				//$img = imagerotate($img, self::getImageOrientation($output_file), 0);
+				//imagejpeg($img, $output_file, JPG_QUALITY);
 				return $output_file;
 			endif;
 		else :
@@ -311,8 +355,13 @@ class Convert2
 				$img->setImageCompressionQuality(WEBP_QUALITY);
 				$img->setOption('webp:lossless', 'false');
 			}
+
 			if ($img->writeImage($output_file)) :
 				$img->clear();
+				//unset($img);
+				//$img = imagecreatefromwebp($output_file);
+				//$img = imagerotate($img, self::getImageOrientation($output_file), 0);
+				//imagewebp($img, $output_file, WEBP_QUALITY);
 				return $output_file;
 			endif;
 		elseif (function_exists('imagewebp')) :
@@ -419,6 +468,10 @@ class Convert2
 				}
 				if ($img->writeImage($output_file)) :
 					$img->clear();
+					//unset($img);
+					//$img = imagecreatefromavif($output_file);
+					//$img = imagerotate($img, self::getImageOrientation($output_file), 0);
+					//imageavif($img, $output_file, AVIF_QUALITY);
 				endif;
 			} catch (Exception $e) {
 				return false;
@@ -452,6 +505,9 @@ class Convert2
 						break;
 					case IMAGETYPE_XBM:
 						$image = imagecreatefromxbm($input_file);
+						break;
+					case IMAGETYPE_AVIF:
+						$image = imagecreatefromavif($input_file);
 						break;
 					default:
 						return false;
