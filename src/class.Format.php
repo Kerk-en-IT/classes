@@ -464,19 +464,19 @@ class Format
 	 */
 	public static function md5_to_uuid(string|null $md5, bool $explicit = true): string|false
 	{
-		if($md5 === null) {
-			if($explicit) :
+		if ($md5 === null) {
+			if ($explicit) :
 				throw new \InvalidArgumentException('Input must be a 32-character hexadecimal string.');
 			else :
 				return false;
 			endif;
 		}
-		if(is_string($md5) && strlen($md5) == 36 && self::is_uuid($md5)) {
+		if (is_string($md5) && strlen($md5) == 36 && self::is_uuid($md5)) {
 			return $md5;
 		}
 
 		if (!is_string($md5) || strlen($md5) !== 32) {
-			if($explicit) :
+			if ($explicit) :
 				throw new \InvalidArgumentException('Input must be a 32-character hexadecimal string.');
 			else :
 				return false;
