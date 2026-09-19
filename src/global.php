@@ -1,7 +1,4 @@
 <?php
-use \KerkEnIT;
-
-
 if (!function_exists('varDump')) :
 	/**
 	 * var_dump all content
