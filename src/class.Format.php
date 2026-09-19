@@ -2317,4 +2317,55 @@ class Format
 		$factor = floor((strlen($bytes) - 1) / 3);
 		return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . '' . $size[$factor];
 	}
+
+	/**
+	 * Strip MS Word HTML cruft from rich-text content
+	 *
+	 * Removes the inline styles, MS Office conditional comments and other
+	 * artifacts that get pasted into a rich-text editor (e.g. Summernote)
+	 * when content is copied from Microsoft Word. Based on the widely used
+	 * "strip_word_html" snippet (https://gist.github.com/dave1010/674071),
+	 * adapted to modern PHP (no deprecated mb_eregi_replace / mb_regex_encoding).
+	 *
+	 * @param string $text The raw HTML to clean
+	 * @param string $allowed_tags Tags that are allowed to survive the cleanup
+	 * @return string The cleaned HTML
+	 */
+	public static function stripWordHTML(string $text, string $allowed_tags = '<b><i><sup><sub><em><strong><u><br><p><ul><ol><li><a><img><blockquote><h1><h2><h3><h4><h5><h6>'): string
+	{
+		mb_regex_encoding('UTF-8');
+		//replace MS special characters first
+		$search = array('/&lsquo;/u', '/&rsquo;/u', '/&ldquo;/u', '/&rdquo;/u', '/&mdash;/u');
+		$replace = array('\'', '\'', '"', '"', '-');
+		$text = preg_replace($search, $replace, $text);
+		//make sure _all_ html entities are converted to the plain ascii equivalents - it appears
+		//in some MS headers, some html entities are encoded and some aren't
+		$text = html_entity_decode($text, ENT_QUOTES, 'UTF-8');
+		//try to strip out any C style comments first, since these, embedded in html comments, seem to
+		//prevent strip_tags from removing html comments (MS Word introduced combination)
+		if (mb_stripos($text, '/*') !== FALSE) {
+			$text = mb_eregi_replace('#/\*.*?\*/#s', '', $text, 'm');
+		}
+		//introduce a space into any arithmetic expressions that could be caught by strip_tags so that they won't be
+		//'<1' becomes '< 1'(note: somewhat application specific)
+		$text = preg_replace(array('/<([0-9]+)/'), array('< $1'), $text);
+		$text = strip_tags($text, $allowed_tags);
+		//eliminate extraneous whitespace from start and end of line, or anywhere there are two or more spaces, convert it to one
+		$text = preg_replace(array('/^\s\s+/', '/\s\s+$/', '/\s\s+/u'), array('', '', ' '), $text);
+		//strip out inline css and simplify style tags
+		$search = array('#<(strong|b)[^>]*>(.*?)</(strong|b)>#isu', '#<(em|i)[^>]*>(.*?)</(em|i)>#isu', '#<u[^>]*>(.*?)</u>#isu');
+		$replace = array('<b>$2</b>', '<i>$2</i>', '<u>$1</u>');
+		$text = preg_replace($search, $replace, $text);
+		//on some of the ?newer MS Word exports, where you get conditionals of the form 'if gte mso 9', etc., it appears
+		//that whatever is in one of the html comments prevents strip_tags from eradicating the html comment that contains
+		//some MS Style Definitions - this last bit gets rid of any leftover comments */
+		$num_matches = preg_match_all("/\<!--/u", $text, $matches);
+		if ($num_matches) {
+			$text = preg_replace('/\<!--(.)*--\>/isu', '', $text);
+		}
+		$text = str_replace(' class="MsoNormal"', '', $text);
+		$text = str_replace(' name="_MailOriginal"', '', $text);
+
+		return $text;
+	}
 }
