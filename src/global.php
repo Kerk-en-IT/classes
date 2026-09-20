@@ -6,14 +6,14 @@ if (!function_exists('varDump')) :
 	 * @param  mixed $params
 	 * @return void
 	 */
-	function varDump(...$params)
+	function varDump(mixed ...$params)
 	{
 		\KerkEnIT\varDump($params);
 	}
 endif;
 
 if (!function_exists('varDie')) :
-	function varDie(...$params)
+	function varDie(mixed ...$params)
 	{
 		\KerkEnIT\varDie($params);
 	}
@@ -26,14 +26,20 @@ if (!function_exists('log')) :
 	 * @param  mixed $params
 	 * @return void
 	 */
-	function log(...$params)
+	function log(mixed ...$params)
 	{
 		\KerkEnIT\log($params);
 	}
 endif;
 
 if (!function_exists('error')) :
-	function error(...$params)
+	/**
+	 * var_dump all content
+	 *
+	 * @param  mixed $params
+	 * @return void
+	 */
+	function error(mixed ...$params)
 	{
 		\KerkEnIT\error($params);
 	}
