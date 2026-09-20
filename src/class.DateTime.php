@@ -1134,6 +1134,52 @@ class DateTime
 		endif;
 	}
 
+	/**
+	 * Check if the date is a sunday
+	 *
+	 * @param  DateTime|int|string $sender
+	 * @return bool
+	 */
+	public static function Sunday_YN($sender): bool
+	{
+		$sunday = false;
+		$datetime = self::GetDate($sender);
+		if ($datetime !== null) :
+			if ($datetime->format('w') == 0) :
+				$sunday = true;
+
+			else :
+				$dateofyear = $datetime->format('m-d');
+				switch ($dateofyear):
+					case '12-25': // Eerste kerstdag
+					case '12-26': // Tweede kerstdag
+						$sunday = true;
+						$sunday = true;
+						break;
+					case '08-15':
+						if ($datetime->format('w') < 6) :
+							$sunday = true;
+						endif;
+						break;
+				endswitch;
+				if (!$sunday) :
+					if (self::is_easter_date_offset($datetime, 1)) :
+						//Tweede Paasdag
+						$sunday = true;
+					elseif (self::is_easter_date_offset($datetime, 39)) :
+						//Hemelvaartsdag
+						$sunday = true;
+					elseif (self::is_easter_date_offset($datetime, 50)) :
+						//Tweede Pinksterdag
+						$sunday = true;
+					endif;
+				endif;
+			endif;
+		endif;
+		return $sunday;
+	}
+
+
 	public static function FeastDate_YN($date)
 	{
 		$datetime = self::GetDate($date);
