@@ -1091,6 +1091,49 @@ class DateTime
 		return new \DateTime("$y-$m-$d", self::tz());
 	}
 
+	/**
+	 * Get the offset of the Easter date
+	 *
+	 * @param  DateTime $sender
+	 * @param  int $offset
+	 * @return DateTime
+	 */
+	public static function get_easter_date_offset($sender, $offset)
+	{
+		$datetime = self::GetDate($sender);
+		if ($datetime !== null) :
+			$easter = \KerkEnIT\DateTime::easter_date((int)$datetime->format('Y'));
+
+			if ($offset < 0) :
+				$easter->modify('-' . abs($offset) . ' day');
+			else :
+				$easter->modify('+' . abs($offset) . ' day');
+			endif;
+			return $easter;
+		else :
+			return NULL;
+		endif;
+	}
+
+
+
+	/**
+	 * Check if the offset of the Easter date is equal to the date
+	 *
+	 * @param  DateTime|int|string $sender
+	 * @param  int $offset
+	 * @return bool
+	 */
+	public static function is_easter_date_offset($sender, $offset): bool
+	{
+		$datetime = self::GetDate($sender);
+		if ($datetime !== null) :
+			return $datetime->format('Y-m-d') === self::get_easter_date_offset($datetime, $offset)->format('Y-m-d');
+		else :
+			return false;
+		endif;
+	}
+
 	public static function FeastDate_YN($date)
 	{
 		$datetime = self::GetDate($date);
