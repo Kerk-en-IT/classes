@@ -1485,8 +1485,13 @@ class Format
 		return $name;
 	}
 
-
-	public static function removeEmoji($string)
+	/**
+	 * Remove emoji characters from a string
+	 *
+	 * @param string $string Input string
+	 * @return string String without emoji characters
+	 */
+	public static function removeEmoji(string $string): string
 	{
 		// Match Enclosed Alphanumeric Supplement
 		$regex_alphanumeric = '/[\x{1F100}-\x{1F1FF}]/u';
@@ -1559,7 +1564,13 @@ class Format
 		return Format::remove_accents($text);
 	}
 
-	public static function remove_accents($string)
+	/**
+	 * Remove accents from a string
+	 *
+	 * @param string $string Input string
+	 * @return string String without accents
+	 */
+	public static function remove_accents(string $string): string
 	{
 		if (!preg_match('/[\x80-\xff]/', $string))
 			return $string;
@@ -1756,6 +1767,7 @@ class Format
 
 		return $string;
 	}
+
 
 	/**
 	 *
