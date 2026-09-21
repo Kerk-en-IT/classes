@@ -231,7 +231,7 @@ class DateTime
 	{
 		$time = self::GetDate($date);
 		global $culture;
-		$formatter = new \IntlDateFormatter(str_replace('-', '_', $culture), $style, \IntlDateFormatter::NONE);
+		$formatter = new \IntlDateFormatter(str_replace('-', '_', ($culture ?? 'nl_NL')), $style, \IntlDateFormatter::NONE);
 		return $formatter->format($time);
 	}
 
@@ -254,7 +254,7 @@ class DateTime
 			$time = strtotime($date);
 		endif;
 		global $culture;
-		$formatter = new \IntlDateFormatter(str_replace('-', '_', $culture), \IntlDateFormatter::NONE, $style);
+		$formatter = new \IntlDateFormatter(str_replace('-', '_', ($culture ?? 'nl_NL')), \IntlDateFormatter::NONE, $style);
 		return $formatter->format($time);
 	}
 
@@ -267,7 +267,11 @@ class DateTime
 	 */
 	public static function culture_datetime($date): string
 	{
-		return self::culture_date($date) . ' ' . __('at') . ' ' . self::culture_time($date);
+		$at = 'om';
+		if (function_exists('__')) :
+			$at = __('at');
+		endif;
+		return self::culture_date($date) . ' ' . $at . ' ' . self::culture_time($date);
 	}
 
 	/**
@@ -279,7 +283,11 @@ class DateTime
 	 */
 	public static function culture_full_datetime($date): string
 	{
-		return self::culture_date($date, \IntlDateFormatter::FULL) . ' ' . __('at') . ' ' . self::culture_time($date);
+		$at = 'om';
+		if (function_exists('__')) :
+			$at = __('at');
+		endif;
+		return self::culture_date($date, \IntlDateFormatter::FULL) . ' ' . $at . ' ' . self::culture_time($date);
 	}
 
 	/**
