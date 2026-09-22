@@ -17,17 +17,23 @@ namespace KerkEnIT;
  **/
 
 if (!function_exists('getEnvPath')) :
-	function getEnvPath(string $dir)
+	function getEnvPath(string $dir, int $depth = 0)
 	{
 		$file = realpath($dir . '/.env');
 		if ($file !== FALSE) :
 			return $dir;
 		else :
-			$dir = realpath($dir . '/../');
-			if ($dir !== FALSE) :
-				return getEnvPath($dir);
+			$parent = realpath($dir . '/../');
+			if(trim(basename($dir), '/') === 'home' || trim(basename($dir), '/') === '') :
+				return FALSE;
+			endif;
+			// Stop at the filesystem root: realpath('/..') returns '/' (not FALSE),
+			// which would otherwise cause infinite recursion.
+			if ($parent !== FALSE && $parent !== $dir && $depth < 10) :
+				return getEnvPath($parent, $depth + 1);
 			endif;
 		endif;
+		return FALSE;
 	}
 endif;
 // Load the environment variables
