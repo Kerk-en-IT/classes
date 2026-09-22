@@ -1,5 +1,4 @@
 <?php
-
 namespace KerkEnIT;
 
 use KerkEnIT\Format;
@@ -1396,10 +1395,13 @@ class DateTime
 	 * @param  mixed $datetime
 	 * @return int
 	 */
-	public static function DayOfWeek($datetime = 'now')
+	public static function DayOfWeek(mixed $datetime = 'now', ?int $day = null):int|bool
 	{
 		$datetime = self::GetDate($datetime);
-		return (int)$datetime->format('N');
+		if($day === null) :
+			return (int)$datetime->format('N');
+		endif;
+		return (int)$datetime->format('N') === $day;
 	}
 
 	/**
