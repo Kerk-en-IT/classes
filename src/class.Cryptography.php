@@ -7,7 +7,7 @@ use Exception;
 /**
  * Cryptography Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.3 or higher (#[\Deprecated] attribute, a PHP 8.3 class)
  *
  * @package		KerkEnIT
  * @subpackage	Cryptography
@@ -16,6 +16,9 @@ use Exception;
  * @license		https://www.gnu.org/licenses/gpl-3.0.html	GNU General Public License v3.0
  * @link		https://www.kerkenit.nl
  * @since		Class available since Release 1.1.0
+ *
+ * @requires   PHP extension "openssl" (ext-openssl) Encrypting()/Decrypting() — AES-256-CBC
+ * @note       encrypt()/decrypt() use ext-mcrypt (removed in PHP 7.2); they no-op when mcrypt is absent
  **/
 class Cryptography
 {

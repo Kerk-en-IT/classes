@@ -6,7 +6,7 @@ use KerkEnIT\Format;
 /**
  * DateTime Class File for Kerk en IT Framework
  *
- * PHP versions 8.4, 8.5
+ * PHP versions 8.0 or higher (mixed + union types, ?? null coalescing, str_contains)
  *
  * @package		KerkEnIT
  * @subpackage	DateTime
@@ -15,6 +15,9 @@ use KerkEnIT\Format;
  * @license		https://www.gnu.org/licenses/gpl-3.0.html	GNU General Public License v3.0
  * @link		https://www.kerkenit.nl
  * @since		Class available since Release 1.1.0
+ *
+ * @requires   PHP extension "intl" (ext-intl)  culture_*() — \IntlDateFormatter
+ * @depends     \KerkEnIT\Format            use KerkEnIT\Format
  **/
 class DateTime
 {

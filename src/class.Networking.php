@@ -5,6 +5,8 @@ namespace KerkEnIT;
 /**
  * Private class for Kerk en IT Business Logic like hour price calculation and other internal stuff
  *
+ * PHP versions 8.0 or higher (union types `string|bool`, `int|float`)
+ *
  * @package    Classes
  * @subpackage KerkEnIT
  * @author     Marco van 't Klooster <info@kerkenit.nl>
@@ -12,6 +14,8 @@ namespace KerkEnIT;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkennit.nl
  * @since      Class available since Release 1.2.1
+ *
+ * @requires   PHP extension "filter" (ext-filter) gethostbyname*() — filter_var()/FILTER_VALIDATE_IP
  */
 
 class Networking
@@ -167,5 +171,41 @@ class Networking
 		} else {
 			return $ip6;
 		}
+	}
+
+	/**
+	 * Get a random user agent string.
+	 *
+	 * @return string
+	 */
+	public static function getRandomUserAgent(): string
+	{
+		$userAgents = [
+			// Chrome (desktop)
+			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+			'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+			// Firefox (desktop)
+			'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0',
+			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:127.0) Gecko/20100101 Firefox/127.0',
+			'Mozilla/5.0 (X11; Linux x86_64; rv:127.0) Gecko/20100101 Firefox/127.0',
+			// Safari (desktop)
+			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
+			// Edge (desktop)
+			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
+			// Chrome (mobile)
+			'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+			'Mozilla/5.0 (Linux; Android 13; SM-S911B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+			// Firefox (mobile)
+			'Mozilla/5.0 (Android 14; Mobile; rv:127.0) Gecko/127.0 Firefox/127.0',
+			'Mozilla/5.0 (Android 13; Mobile; rv:127.0) Gecko/127.0 Firefox/127.0',
+			// Safari (iPhone)
+			'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/605.1.15',
+			'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/20G85 Safari/605.1.15',
+			// Safari (iPad)
+			'Mozilla/5.0 (iPad; CPU OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/605.1.15',
+			'Mozilla/5.0 (iPad; CPU OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/20G85 Safari/605.1.15',
+		];
+		return $userAgents[array_rand($userAgents)];
 	}
 }

@@ -51,7 +51,7 @@ endif;
  *
  * Formatting various objects into the expected output.
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.3 or higher (#[\Deprecated] attribute, a PHP 8.3 class)
  *
  * @package    KerkEnIT
  * @subpackage Convert2
@@ -60,6 +60,9 @@ endif;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.0.0
+ *
+ * @requires   PHP extension "imagick" (ext-imagick) jpg/webp/jxl/avif/shrink/thumbnail — guarded by class_exists('\Imagick')
+ * @requires   PHP extension "gd" (ext-gd)         get_dimension()/getImageOrientation() via getimagesize()
  **/
 class Convert2
 {

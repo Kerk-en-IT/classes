@@ -8,7 +8,7 @@ use ErrorException;
 /**
  * ErrorHandeling Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.0 or higher (union types, str_contains)
  *
  * @package    KerkEnIT
  * @subpackage ErrorHandeling
@@ -17,6 +17,9 @@ use ErrorException;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.2.0
+ *
+ * @requires   PHP extension "mysqli" (ext-mysqli) optional — log_error() reads global $mysqli->error if present
+ * @note       mail_error() currently has the ext-mail send call commented out; no active ext-mail dependency
  */
 
 // Set the error reporting level

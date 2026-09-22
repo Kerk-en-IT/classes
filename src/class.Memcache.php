@@ -4,8 +4,9 @@ if (!class_exists('\Memcache')) :
 		define('MEMCACHE_COMPRESSED', 2);
 	endif;
 	/**
-	 * MemcacheDummy clone of \Memcache
-	 */
+	 * MemcacheDummy clone of \Memcache	  *
+	  * PHP versions 7.4 or higher (typed static properties)
+	  * Fallback used when ext-memcache is not installed.	 */
 	class Memcache
 	{
 		// Properties

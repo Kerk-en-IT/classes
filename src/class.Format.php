@@ -28,6 +28,12 @@ endif;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkennit.nl
  * @since      Class available since Release 1.0.57
+ *
+ * PHP versions 8.0 or higher (mixed + union types, str_starts_with/str_ends_with)
+ *
+ * @requires   PHP extension "intl"     (ext-intl)     Euro() — \NumberFormatter
+ * @requires   PHP extension "mbstring" (ext-mbstring)  CleanFileName/removeEmoji/slugify — mb_*()
+ * @requires   PHP extension "iconv"    (ext-iconv)     removeEmoji()/slugify() — iconv()
  */
 
 class Format

@@ -8,7 +8,7 @@ use ErrorException;
 /**
  * Log Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.0 or higher (mixed type hints, str_contains)
  *
  * @package    KerkEnIT
  * @subpackage Log
@@ -17,6 +17,9 @@ use ErrorException;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.0.0
+ *
+ * @depends     \KerkEnIT\KerkEnIT    error_handler()/varDie() — KerkEnIT::is_dev()
+ * @note       log_error()/varDie() read global $mysqli->error when present (ext-mysqli, optional)
  **/
 class Log
 {

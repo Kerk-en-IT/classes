@@ -5,7 +5,7 @@ namespace KerkEnIT;
 /**
  * ColorPalette Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 7.0 or higher (no PHP 8.x-only syntax used)
  *
  * @package    KerkEnIT
  * @subpackage ColorPalette
@@ -14,6 +14,9 @@ namespace KerkEnIT;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.1.0
+ *
+ * @requires   PHP extension "imagick" (ext-imagick) get_average_color() — new \Imagick()/getimagehistogram()
+ * @requires   PHP extension "json" (ext-json)     json_decode() of cached .color/.crop JSON
  **/
 class ColorPalette
 {

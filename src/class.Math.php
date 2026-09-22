@@ -5,7 +5,7 @@ namespace KerkEnIT;
 /**
  * Math Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 7.0 or higher (no PHP 8.x-only syntax used)
  *
  * @package    KerkEnIT
  * @subpackage Math

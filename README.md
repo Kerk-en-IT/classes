@@ -41,8 +41,9 @@
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+         <li><a href="#prerequisites">Prerequisites</a></li>
+         <li><a href="#php-version-requirements">PHP Version Requirements</a></li>
+         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
     <li><a href="#roadmap">Roadmap</a></li>
@@ -70,6 +71,47 @@ To get a local copy up and running follow these simple example steps.
 ### Prerequisites
 
 You need to be familiar to the commandline in in UNIX environment
+
+### PHP Version Requirements
+
+> **Best / recommended version: PHP 8.4 or higher.**
+> **Global minimum for the whole project: PHP 8.4** — because `class.Video.php` uses
+> PHP 8.4 *typed property accessors* (`public bool $x { get / set }`).
+> Most classes run on **PHP 8.0+**; only `class.Video.php` truly requires 8.4.
+
+Each class file documents its own minimum in the header docblock
+(`PHP versions X or higher …`). The autoloader in `src/autoload.php` enforces this:
+on **PHP 8.4+** every file is loaded; on **PHP 8.3** any file whose docblock contains
+`PHP versions 8.4` is skipped (only `class.Video.php` matches); on **PHP < 8.3** all
+files are loaded unconditionally.
+
+| Class | Min. PHP | Reason (newest feature used) | Key extension / dependency |
+|-------|:--------:|------------------------------|----------------------------|
+| `class.ColorPalette` | **7.0** | no 8.x-only syntax | ext-imagick, ext-json |
+| `class.Math` | **7.0** | no 8.x-only syntax | — |
+| `class.Memcache` (dummy `\Memcache`) | **7.4** | typed static properties | ext-memcache (optional fallback) |
+| `class.Cache` | **8.0** | `mixed` + `?int` type hints | global `\Memcache` |
+| `class.Meta` | **8.0** | union types (`string\|false`) | ext-curl, ext-dom, ext-gd, ext-filter |
+| `class.Console` | **8.0** | `mixed`, `float\|null` property | ext-intl (optional) |
+| `class.DateTime` | **8.0** | `mixed`, union types, `??` | ext-intl |
+| `class.ErrorHandeling` | **8.0** | union types, `str_contains` | ext-mysqli (optional) |
+| `class.Format` | **8.0** | `mixed`, `str_starts_with` | ext-intl, ext-mbstring, ext-iconv |
+| `class.GeoLocation` | **8.0** | `mixed` in closures, `str_contains` | ext-curl |
+| `class.KerkEnIT` | **8.0** | union types, `str_starts_with` | ext-filter; extends `Networking` |
+| `class.Log` | **8.0** | `mixed` type hints, `str_contains` | ext-mysqli (optional) |
+| `class.Mailer` | **8.0** | `string\|bool`, `str_contains` | PHPMailer (composer), ext-openssl |
+| `class.Networking` | **8.0** | union types `string\|bool` | ext-filter |
+| `class.SQL` | **8.0** | union type `array\|object` | ext-mysqli |
+| `class.Image` | **8.1** | backed enum `ImageMimeTypes` | ext-gd |
+| `class.Convert2` | **8.3** | `#[\Deprecated]` attribute | ext-imagick, ext-gd |
+| `class.Cryptography` | **8.3** | `#[\Deprecated]` attribute | ext-openssl |
+| `class.Video` | **8.4** | typed property accessors | ffmpeg / ffprobe binaries |
+
+**Recommended extensions (install all to use every class):**
+`ext-curl`, `ext-dom`, `ext-gd`, `ext-imagick`, `ext-intl`, `ext-mbstring`,
+`ext-iconv`, `ext-filter`, `ext-mysqli`, `ext-openssl`, `ext-json`, and
+the `phpmailer/phpmailer` Composer package (for `class.Mailer`).
+`ext-memcache` is optional — `class.Memcache.php` provides a no-op dummy fallback.
 
 ### Installation
 
@@ -101,7 +143,7 @@ You need to be familiar to the commandline in in UNIX environment
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Import all other projects and merge the into one big class
+- [x] Import all other projects and merge the into one big class
 - [ ] Complete all classes, functions and properties with correct documentation
 
 See the [open issues](https://github.com/kerkenit/classes/issues) for a full list of proposed features (and known issues).

@@ -7,15 +7,18 @@ namespace KerkEnIT;
  *
  * Convert video files with ffmpeg in various formats which are perfect for the web.
  *
- * PHP versions 8.4
+ * PHP versions 8.4 or higher (typed property accessors: `public bool $x { get/set }`)
  *
  * @package		KerkEnIT
  * @subpackage	Video
  * @author		Marco van 't Klooster <info@kerkenit.nl>
  * @copyright	2025-2025 © Kerk en IT
- * @license		https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
+ * @license		https://www.gnu.org/licenses/gpl-3.0.html	GNU General Public License v3.0
  * @link		https://www.kerkenit.nl
  * @since		Class available since Release 1.2.0
+ *
+ * @requires   System binary "ffmpeg"  shell_exec() to transcode/convert video files
+ * @requires   System binary "ffprobe" shell_exec() to read stream/color metadata
  */
 class Video
 {
@@ -497,16 +500,8 @@ class Video
 			$command[] = "-c:v libvpx";
 			$command[] = "-b:v 5M";
 			if ($this->hlg) :
-				if ($this->hlg) :
-					$command[] = "-vf 'zscale=t=linear:npl=250,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p'";
-					$command[] = "-pix_fmt yuv420p";
-				else :
-					$command[] = "-pix_fmt yuv420p10le";
-					$command[] = "-color_primaries 9";
-					$command[] = "-color_trc 18";
-					$command[] = "-colorspace 9";
-					$command[] = "-color_range 1";
-				endif;
+				$command[] = "-vf 'zscale=t=linear:npl=250,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p'";
+				$command[] = "-pix_fmt yuv420p";
 			endif;
 			$command[] = "-threads 1";
 			$command[] = "-speed 4";
@@ -533,16 +528,8 @@ class Video
 			$command[] = "-c:v libvpx";
 			$command[] = "-b:v 5M";
 			if ($this->hlg) :
-				if ($this->hlg) :
-					$command[] = "-vf 'zscale=t=linear:npl=250,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p'";
-					$command[] = "-pix_fmt yuv420p";
-				else :
-					$command[] = "-pix_fmt yuv420p10le";
-					$command[] = "-color_primaries 9";
-					$command[] = "-color_trc 18";
-					$command[] = "-colorspace 9";
-					$command[] = "-color_range 1";
-				endif;
+				$command[] = "-vf 'zscale=t=linear:npl=250,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p'";
+				$command[] = "-pix_fmt yuv420p";
 			endif;
 			$command[] = "-threads 1";
 			$command[] = "-speed 4";
@@ -574,6 +561,98 @@ class Video
 		endif;
 		if (!$this->multicore && !file_exists($destinationPath)) :
 			throw new \Exception('Failed to create vp8. File not found');
+		endif;
+		return $destinationPath;
+	}
+
+	/**
+	  * Create a vp9 video of the source video file
+	  * The video is converted to the vp9 codec
+	  * The audio is converted to the aac codec
+	  * VP9 supports 10-bit, so HLG content is passed through as yuv420p10le
+	  *
+	  * @param	string|null $destinationPath The requested destination path
+	  * @return	string $destinationPath or throw an \Exception if the file is not found or the command failed
+	  */
+	public function vp9(?string $destinationPath): string
+	{
+		if ($destinationPath !== null && !is_file($destinationPath)) :
+			$command = array();
+			if ($this->multicore) :
+				$command[] = 'nohup ';
+			endif;
+			$command[] = "ffmpeg";
+			$command[] = "-y -i '$this->source' -pass 1";
+
+			$command[] = "-c:v libvpx-vp9";
+			$command[] = "-b:v 12M";
+			if ($this->hlg) :
+				$command[] = "-pix_fmt yuv420p10le";
+				$command[] = "-color_primaries 9";
+				$command[] = "-color_trc 18";
+				$command[] = "-colorspace 9";
+				$command[] = "-color_range 1";
+			else :
+				$command[] = "-pix_fmt yuv420p";
+				$command[] = "-tile-columns 0";
+				$command[] = "-frame-parallel 0";
+				$command[] = "-auto-alt-ref 1";
+				$command[] = "-lag-in-frames 25";
+				$command[] = "-g 9999";
+				$command[] = "-aq-mode 0";
+			endif;
+
+			$command[] = "-minrate 6M";
+			$command[] = "-maxrate 18M";
+			$command[] = "-bufsize 24M";
+
+			$command[] = "-c:a aac";
+			$command[] = "-b:a 128K";
+
+			$command[] = "-f mp4";
+			$command[] = "/dev/null";
+
+			$command[] = "&&";
+			$command[] = "ffmpeg";
+			$command[] = "-y -i '$this->source' -pass 2";
+
+			$command[] = "-c:v libvpx-vp9";
+			$command[] = "-b:v 12M";
+
+			if ($this->hlg) :
+				$command[] = "-pix_fmt yuv420p10le";
+				$command[] = "-color_primaries 9";
+				$command[] = "-color_trc 18";
+				$command[] = "-colorspace 9";
+				$command[] = "-color_range 1";
+			else :
+				$command[] = "-pix_fmt yuv420p";
+				$command[] = "-tile-columns 0";
+				$command[] = "-frame-parallel 0";
+				$command[] = "-auto-alt-ref 1";
+				$command[] = "-lag-in-frames 25";
+				$command[] = "-g 9999";
+				$command[] = "-aq-mode 0";
+			endif;
+			$command[] = "-minrate 6M";
+			$command[] = "-maxrate 18M";
+			$command[] = "-bufsize 24M";
+
+			$command[] = "-c:a aac";
+			$command[] = "-b:a 128K";
+			$command[] = "-f mp4";
+			$command[] = "'$destinationPath'";
+			if ($this->multicore) :
+				$command[] = ' </dev/null >/dev/null 2>&1 &';
+				exec(implode(' ', $command));
+			else :
+				if (shell_exec(implode(' ', $command)) === FALSE) :
+					throw new \Exception('Failed to create vp9. ' . implode(' ', $command));
+				endif;
+			endif;
+		endif;
+		if (!$this->multicore && !file_exists($destinationPath)) :
+			throw new \Exception('Failed to create vp9. File not found');
 		endif;
 		return $destinationPath;
 	}

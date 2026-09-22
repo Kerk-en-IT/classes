@@ -5,7 +5,7 @@ namespace KerkEnIT;
 /**
  * Memcache Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.0 or higher (mixed + nullable `?int` type hints)
  *
  * @package    KerkEnIT
  * @subpackage Memcache
@@ -14,6 +14,8 @@ namespace KerkEnIT;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.2.0
+ *
+ * @depends     \Memcache (global)   wraps the global \Memcache class (ext-memcache, or the dummy in class.Memcache.php)
  **/
 
 class Cache

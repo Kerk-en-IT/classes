@@ -5,7 +5,8 @@ namespace KerkEnIT;
 /**
  * Autoloader for the Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.0 or higher (str_contains, spl_autoload_register).
+ * Recommended PHP 8.4+ (class.Video.php requires 8.4 property accessors).
  *
  * @version    1.2.0
  * @package    KerkEnIT
@@ -100,14 +101,27 @@ spl_autoload_register(function ($class) {
 	endif;
 	if ($filename !== FALSE) :
 		if (PHP_MAJOR_MINOR_VERSION >= 84) :
+			// For PHP 8.4 and higher, include the file directly
 			require_once($filename);
-		elseif (PHP_MAJOR_MINOR_VERSION === 83) :
-			if (!str_contains(file_get_contents($filename), 'PHP versions 8.4')) :
+		elseif (PHP_MAJOR_MINOR_VERSION < 80) :
+			// Skip files that require PHP 8.x for versions below 8.0
+			if (str_contains(file_get_contents($filename), 'PHP versions 8.')) :
+				// Skip this file for PHP versions below 8.x
+				throw new \Exception('Skipping file ' . $filename . ' for PHP versions below 8.x');
+			else :
 				require_once($filename);
-			elseif (!str_contains(file_get_contents($filename), 'PHP versions')) :
+			endif;
+		elseif (PHP_MAJOR_MINOR_VERSION <= 83) :
+			// Skip files that require PHP 8.5 or 8.4 for versions <= 8.3
+			if (str_contains(file_get_contents($filename), 'PHP versions 8.5')) :
+				throw new \Exception('Skipping file ' . $filename . ' for PHP version 8.3 or lower. Requires at least PHP 8.5');
+			elseif (str_contains(file_get_contents($filename), 'PHP versions 8.4')) :
+				throw new \Exception('Skipping file ' . $filename . ' for PHP version 8.3 or lower. Requires at least PHP 8.4');
+			else :
 				require_once($filename);
 			endif;
 		else :
+			// For PHP 8.4 and higher, include the file directly (fallback)
 			require_once($filename);
 		endif;
 	endif;

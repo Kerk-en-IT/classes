@@ -7,7 +7,7 @@ use Exception;
 /**
  * Console Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.0 or higher (mixed type hints, float|null typed property)
  *
  * @package    KerkEnIT
  * @subpackage Console
@@ -16,6 +16,8 @@ use Exception;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.1.0
+ *
+ * @requires   PHP extension "intl" (ext-intl)  GetPercentage() — \NumberFormatter (degrades to sprintf() if absent)
  **/
 class Console
 {

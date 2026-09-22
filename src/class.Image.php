@@ -5,7 +5,7 @@ namespace KerkEnIT;
 /**
  * Image Class File for Kerk en IT Framework
  *
- * PHP versions 8.3, 8.4, 8.5
+ * PHP versions 8.1 or higher (backed enum `ImageMimeTypes: string`)
  *
  * @package    KerkEnIT
  * @subpackage Image
@@ -14,6 +14,8 @@ namespace KerkEnIT;
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
  * @since      Class available since Release 1.0.0
+ *
+ * @requires   PHP extension "gd" (ext-gd) Resize()/ToBase64()/getImageRatio() — imagecreatefrom*(), getimagesize()
  **/
 
 /**
