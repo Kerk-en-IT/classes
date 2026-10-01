@@ -1005,6 +1005,26 @@ class DateTime
 	}
 
 	/**
+	 * 20 dec. 2010 t/m 14 jan. 2011
+	 *
+	 * @param	object datetime
+	 * @param	object datetime
+	 * @return	string 20 dec. 2010 t/m 14 jan. 2011
+	 */
+	public static function ShortDateWithoutDayOfWeekFromTill($from, $to = null): string
+	{
+		$from = self::GetDate($from);
+		$to = self::GetDate($to);
+		if ($to !== null && $from->format('Y-m-d') == $to->format('Y-m-d')) :
+			return $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i') . ' ' . self::till() . ' ' . $to->format('G:i');
+		elseif ($to !== null && $from->format('Y-m-d') != $to->format('Y-m-d')) :
+			return str_replace('  ', ' ', $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . '. ' . ($from->format('Y') !== $to->format('Y') ? $from->format('Y') : '') . ' ' . self::till() . ' ' . $to->format('j') . ' ' . self::months_short()[$to->format('m') - 1] . '. ' . $to->format('Y'));
+		else :
+			return $from->format('j') . ' ' . self::months_short()[$from->format('m') - 1] . ' ' . self::from() . ' ' . $from->format('G:i');
+		endif;
+	}
+
+	/**
 	 * ma 20-12 9:42
 	 *
 	 * @param	object datetime
@@ -1588,9 +1608,19 @@ class DateTime
 	public static function isBetween($datetime, $begin, $end, $x = 0)
 	{
 		$currentDate = self::GetDate($datetime);
-		$begin = self::GetDate($begin);
-		$end = self::GetDate($end);
-		if ($currentDate >= $begin && $currentDate <= $end) :
+		if(str_contains($begin, 'week') || str_contains($begin, 'day')) :
+			$startDate = new \DateTime();
+			$startDate->modify($begin);
+		else :
+			$startDate = self::GetDate($begin);
+		endif;
+		if (str_contains($end, 'week') || str_contains($end, 'day')) :
+			$endDate = new \DateTime();
+			$endDate->modify($end);
+		else :
+			$endDate = self::GetDate($end);
+		endif;
+		if ($currentDate >= $startDate && $currentDate <= $endDate) :
 			return TRUE;
 		endif;
 
