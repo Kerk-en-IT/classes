@@ -14,7 +14,7 @@ namespace KerkEnIT;
  * @copyright  2026 © Kerk en IT
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
- * @since 	   Class available since Release 1.2.1
+ * @since 	   Class available since Release 1.3.0
  *
  * @requires   PHP extension "mysqli" (ext-mysqli)
  **/
@@ -138,7 +138,7 @@ class Database
  * MySQL error codes.
  * Contains constants for common MySQL error codes.
  *
- * @since Class available since Release 1.2.1
+ * @since Class available since Release 1.3.0
  */
 class MySqlError
 {
