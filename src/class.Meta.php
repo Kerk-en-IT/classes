@@ -12,7 +12,7 @@ namespace KerkEnIT;
  * @copyright  2026 © Kerk en IT
  * @license    https://www.gnu.org/licenses/gpl-3.0.html  GNU General Public License v3.0
  * @link       https://www.kerkenit.nl
- * @since      Class available since Release 1.2.1
+ * @since      Class available since Release 1.3.0
  *
  * @requires   PHP extension "curl" (ext-curl)      getRedirectUrl(), loadUrl()
  * @requires   PHP extension "dom"  (ext-dom)       loadMetaTags() — DOMDocument/DOMXPath
